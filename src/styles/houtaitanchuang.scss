@@ -1,0 +1,103 @@
+//媒体查询
+@media only screen and (min-width: 1400px) {
+  .succ-pop{
+    top: 49%!important;
+  }
+}
+.popUp {
+  .mask {
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    overflow-y: auto;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 998;
+  }
+  .succ-pop {
+    width: 515px;
+    height: auto;
+    background: #fff;
+    overflow-y: auto;
+    position: absolute;
+    left: 50%;
+    top: 63%;
+    margin-left: -257px;
+    margin-top: -320px;
+    z-index: 999;
+    border-radius: 10px;
+    .title {
+      width: 100%;
+      height: 50px;
+      line-height: 50px;
+      text-align: left;
+      border-bottom: solid 2px #00C5CD;
+      a {
+        color: #3a90b3;
+        font-size: 18px;
+        padding-left: 20px;
+      }
+      div {
+        margin-top: 15px;
+        float: right;
+        width: 24px;
+        height: 24px;
+        color: #363636;
+        margin-right: 6px;
+      }
+
+    }
+    .content{
+      width: 400px;
+      margin: 0 auto;
+      background: #fff;
+      padding-bottom: 90px;
+      span{
+        display: inline-block;
+        width: 120px;
+        height: 40px;
+        line-height: 40px;
+        text-align: right;
+        float: left;
+      }
+      .block{
+        margin-top: 20px;
+        span{
+          margin-right: 10px;
+        }
+        .autoGet{
+          width: 215px;
+          height: 40px;
+          border: 1px solid #d1dbe4;
+          border-radius: 4px;
+          line-height: 40px;
+          text-align: left;
+          padding-left: 10px;
+          background: #eef1f6;
+          color: #7e807f;
+          overflow: hidden;
+          text-overflow:ellipsis;
+          white-space: nowrap;
+        }
+        .discribe{
+          height: 80px;
+          padding: 15px 0;
+          width: 215px;
+          border: 1px solid #d1dbe4;
+          border-radius: 4px;
+          text-align: left;
+          padding-left: 10px;
+          background: #eef1f6;
+          color: #7e807f;
+          line-height: 18px;
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 3;
+          overflow: hidden;
+        }
+      }
+    }
+
+  }
+}
