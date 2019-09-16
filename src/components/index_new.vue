@@ -20,7 +20,7 @@
         name: 'paneldata',
         data() {
             return {
-               radio1:''
+               radio1:'TVOC在线监测'
             }
         },
         activated() {},

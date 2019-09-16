@@ -89,8 +89,8 @@
     .atmoheader{
         width: 100%;
         height:86px;
-        background:rgba(27,33,67,1);
-        box-shadow:0px 1px 16px 2px rgba(27,33,67,0.8);
+        background:url("../assets/img/hdbj.png") no-repeat;
+        background-size: cover;
         .menus-left{
             float: left;
             width: 400px;
