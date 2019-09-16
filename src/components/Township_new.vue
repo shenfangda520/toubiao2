@@ -1,60 +1,29 @@
 <template>
     <div class="township">
         <!--乡镇右侧面板-->
-       <div class="main">
-                    <!--选项查询-->
-                    <div class="first">
-                        <el-tabs v-model="activeNamexz" @tab-click="handleClick">
-                            <el-tab-pane label="固安" name="first3"></el-tab-pane>
-                           <!--  <el-tab-pane label="中部县区" name="second3"></el-tab-pane>
-                            <el-tab-pane label="全市" name="third3"></el-tab-pane> -->
-                            <!--<el-tab-pane label="南部县区" name="fourth3"></el-tab-pane>-->
-                        </el-tabs>
-                    </div>
-                    <!--排名-->
-                    <div class="table_container">
-                        <el-table
-                                :data="tableData"
-                                border
-                                stripe
-                                highlight-current-row
-                                @current-change="RowCurrentChange"
-                                style="width: 400px">
-                            <el-table-column
-                                    property="ranking"
-                                    label="排名"
-                                    width="80">
-                            </el-table-column>
-                            <el-table-column
-                                    v-if="false"
-                                    property="gridname"
-                                    label="网格名称"
-                                    width="80">
-                            </el-table-column>
-                            <el-table-column
-                                    property="name"
-                                    label="名称"
-                                    width="160">
-                            </el-table-column>
-                            <el-table-column
-                                    property="com_index"
-                                    label="综合指数"
-                                    >
-                            </el-table-column>
-                        </el-table>
-                        <div class="Pagination" style="text-align: left;margin-top: 10px;">
-                            <el-pagination
-                                    background
-                                    @current-change="handleCurrentChange"
-                                    :current-page="currentPage"
-                                    :page-size="pagesize"
-                                    layout="total, prev, pager, next"
-                                    :total="totalCount">
-                            </el-pagination>
-                        </div>
-                    </div>
+        <div class="main">
+            <!--选项查询-->
+            <div class="first">
+                <el-tabs v-model="activeNamexz" @tab-click="handleClick">
+                    <el-tab-pane label="全市" name="third3"></el-tab-pane>
+                    <el-tab-pane label="中部县区" name="second3"></el-tab-pane>
+                    <el-tab-pane label="广阳区" name="first3"></el-tab-pane>
+                </el-tabs>
+            </div>
+            <!--排名-->
+            <div class="table_container">
+                <el-table :data="tableData" border stripe :row-class-name="tableRowClassName" @current-change="RowCurrentChange" style="width: 100%">
+                    <el-table-column property="ranking" label="排名" width="80"></el-table-column>
+                    <el-table-column v-if="false" property="gridname" label="网格名称" width="80"></el-table-column>
+                    <el-table-column property="name" label="名称" width="160"></el-table-column>
+                    <el-table-column property="com_index" label="综合指数"></el-table-column>
+                </el-table>
+                <div class="Pagination" style="text-align: left;margin-top: 10px;">
+                    <el-pagination background @current-change="handleCurrentChange" :current-page="currentPage" :page-size="pagesize" layout="total, prev, pager, next" :total="totalCount"></el-pagination>
                 </div>
-       </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -74,7 +43,7 @@
                 //
                 allData: [],
                 //
-                type: '固安',
+                type: '广阳区',
                 //
                 currentRow: null,
                 //
@@ -91,12 +60,13 @@
         },
         mounted() {
             //获取列表数据
-            api.GetTownListDataRe('固安').then(res =>{
-                let Xqlist = res.data.Data;
-                this.InitializationDataMethod(Xqlist);
-            })
-
+            // api.GetTownListDataRe('广阳区').then(res =>{
+            //     let Xqlist = res.data.Data;
+            //     this.InitializationDataMethod(Xqlist);
+            // })
+            this.handleClick({label:'广阳区'}, '');
         },
+
         methods: {
             //排序
             compare(propertyName) {
@@ -105,6 +75,15 @@
                     let value2 = object2[propertyName]
                     return value2 - value1
                 }
+            },
+            //颜色列表
+            tableRowClassName({row, rowIndex}) {
+                if (rowIndex%2 === 0) {
+                    return 'warning-row';
+                } else {
+                    return 'success-row';
+                }
+                return '';
             },
             //初始数据
             InitializationDataMethod(data) {
@@ -141,7 +120,7 @@
                         let Xqlist = res.data.Data;
                         this.InitializationDataMethod(Xqlist);
                         //地图传递
-                        if(this.type == '固安'){
+                        if(this.type == '广阳区'){
                          	bus.$emit('loadCumulative', Xqlist, 'layer_cx', 'pm25', 'name');
                         }
                     })
@@ -151,7 +130,7 @@
             SetDataList(data) {
                 this.data = data.sort(this.compare('com_index'));
                 this.allData = [];
-                //console.log(data);
+                console.log(data);
                 let i = 1;
                 this.data.forEach(item => {
                         const tableData = {};
@@ -172,7 +151,7 @@
                 //
                 this.currentRow = val;
                 //地图联动
-                //bus.$emit('locationClick', 'layer_cx', this.currentRow ,this.type);
+                bus.$emit('locationClick', 'layer_cx', this.currentRow ,this.type);
             },
             //页码变更
             handleCurrentChange(val) {

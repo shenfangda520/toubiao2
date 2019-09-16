@@ -55,7 +55,7 @@
                     <div class="tables" style="position: relative;">
                         <!--选项-->
                         <a style="margin-left: -280px;">应急污染源统计</a>
-                        <strong style="position: absolute;right: 20px;color: #666" @click="showwarp = !showwarp">{{showwarp?'收起∧':'展开∨'}}</strong>
+                        <strong style="position: absolute;right: 20px;color: #12DA88" @click="showwarp = !showwarp">{{showwarp?'收起∧':'展开∨'}}</strong>
 
                         <div class="xian"></div>
                     </div>
@@ -77,7 +77,7 @@
                     <!--统计表title-->
                     <div class="tables qyNumber">
                         <!--选项-->
-                        <a style="color:#2494f2">应急污染企业数量:{{totalCount}}</a>
+                        <a style="color:#12DA88">应急污染企业数量:{{totalCount}}</a>
                         <div class="xian"></div>
                     </div>
                     <!--按钮-->
@@ -108,11 +108,6 @@
                                     label="污染源名称"
                                     width="220">
                             </el-table-column>
-                            <!--<el-table-column-->
-                            <!--property="StartingState"-->
-                            <!--label="启动状态"-->
-                            <!--width="100">-->
-                            <!--</el-table-column>-->
                             <el-table-column
                                     property="Statues"
                                     label="行业"
@@ -141,7 +136,7 @@
                     <!---->
                     <div style="width: 20%;margin-top: 15px;float: right;margin-right: 50px">
                         <!---->
-                        <el-button type="primary" @click="yjxxactive">预警信息统计</el-button>
+                        <!--<el-button type="primary" @click="yjxxactive">预警信息统计</el-button>-->
                     </div>
                 </div>
         <!---->
@@ -229,8 +224,8 @@
                 //console.log(data.ExtraData)
                 let sudata = data;
                 this.SetDataList(sudata)
-                this.totalCount = this.allData.length;
-                //
+                this.totalCount = this.ALLdata.length;
+                this.allData = this.ALLdata;
                 this.setPageTable(10, 1);
                 //地图传送线
                 bus.$emit('loadCumulative', sudata, 'layer_yj','','companyname');
@@ -311,11 +306,22 @@
                     legend: {
                         bottom: 10,
                         left: 'center',
+                        textStyle: {
+                            color:'#fff'
+                        },
                         data:vlegend
                     },
                     series: [{
                         data: vdata,
-
+                        color: [
+                            '#08a1ed',
+                            '#a2c73b',
+                            '#f2cd49',
+                            '#85dbce',
+                            '#ce93e3',
+                            '#6c68e1',
+                            '#e5763f'
+                        ]
                     }]
                 })
             },
@@ -351,16 +357,6 @@
                                         length: 5,
                                     }
                                 }
-                                // normal: {
-                                //     label: {
-                                //         show: true,
-                                //         position: 'inside',
-                                //         formatter: '{d}%'
-                                //     },
-                                //     labelLine: {
-                                //         show: false
-                                //     }
-                                // }
                             }
                         }
                     ]
@@ -372,11 +368,22 @@
                     legend: {
                         bottom: 0,
                         left: 'center',
+                        textStyle: {
+                            color:'#fff'
+                        },
                         data:vlegend
                     },
                     series: [{
                         data: vdata,
-
+                        color: [
+                            '#08a1ed',
+                            '#a2c73b',
+                            '#f2cd49',
+                            '#85dbce',
+                            '#ce93e3',
+                            '#6c68e1',
+                            '#e5763f'
+                        ]
                     }]
                 })
             },
@@ -394,7 +401,7 @@
             //设置分页所需要数据
             SetDataList(data) {
                 this.data = this.filterTimeConversion(this.getPointByType(data));
-                this.allData = [];
+                this.ALLdata = [];
                 let i = 1;
                 this.data.forEach(item => {
                     const tableData = {};
@@ -406,7 +413,7 @@
                     tableData.WanggeName = item.threeGridName ? item.threeGridName : '----';//网格名称item.WanggeName
                     tableData.latitude = item.latitude;//纬度
                     tableData.longitude = item.longitude;//经度
-                    this.allData.push(tableData);
+                    this.ALLdata.push(tableData);
                 })
             },
             //数据
@@ -421,7 +428,7 @@
             //搜索过滤数据
             filterTimeConversion(data) {
                 const t = this;
-                this.allData = [];
+                this.ALLdata = [];
                 let rtValue = [];
                 let dt = data;
                 if (dt) {
@@ -451,9 +458,12 @@
         width: 430px;
         height: auto;
         /**/
-        @media only screen and (min-width: 1400px) {
+        @media only screen and (min-width: 1500px) {
             .emergen2,.emergen{
                 top: 18%!important;
+            }
+            .emergen{
+                right: 530px!important;
             }
         }
         .anniu {
@@ -483,12 +493,11 @@
         }
         .emergen {
             position: fixed;
-            top: 10px;
-            left: 50%;
-            margin-left: -500px;
+            top: 0px;
+            right: 200px;
             width: 1000px;
-            height: 660px;
-            z-index: 5000;
+            height:auto;
+            z-index: 1000;
             padding: 10px;
             border: solid 1px #ccc;
             background: #fff;
@@ -618,8 +627,7 @@
                     position: absolute;
                     width: 610px;
                     height: 44px;
-                    //background: rgba(0,0,0,0.6);
-                    bottom: 56px;
+                    bottom: 87px;
                     left: -610px;
                     .tuli_01 {
                         width: 340px;
@@ -686,14 +694,14 @@
                         margin-left: -240px;
                         display: inline-block;
                         font-size: 16px;
-                        color: #4696FF;
-                        border-bottom: solid 2px #4696FF;
+                        color: #12DA88;
+                        border-bottom: solid 2px #12DA88;
                         padding: 0 20px;
                         margin-bottom: -2px;
                     }
                     .xian {
                         width: 100%;
-                        border: solid 1px #ccc;
+                        border: solid 1px #000;
                     }
                 }
             }

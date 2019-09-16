@@ -2,7 +2,7 @@
     <div class="foghazeforecast">
         <!--雾霾预报-->
         <v-header></v-header>
-       <!---->
+        <!---->
         <img :src="ImgSrc" />
     </div>
 </template>

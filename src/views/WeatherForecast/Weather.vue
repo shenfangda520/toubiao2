@@ -2,15 +2,7 @@
     <div class="YBweather">
         <!--城市天气预报-->
         <v-header></v-header>
-        <iframe
-                frameborder="0"
-                width="100%"
-                height="100%"
-                :src="WeatherForecastUrl"
-        >
-
-        </iframe>
-
+        <iframe frameborder="0" width="100%" height="100%" :src="WeatherForecastUrl"></iframe>
     </div>
 </template>
 
@@ -19,9 +11,8 @@
         name: 'YBweather',
         data() {
             return {
-                WeatherForecastUrl:'http://www.nmc.cn/publish/forecast/AHE/guan.html'
-                //WeatherForecastUrl: 'https://palm.zq12369.com/new2/module/forecast2.php',
-            }
+                WeatherForecastUrl:'http://www.nmc.cn/publish/forecast/AHE/langfang.html'
+               }
         },
         mounted() {
 

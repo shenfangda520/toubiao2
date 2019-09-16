@@ -1,6 +1,6 @@
 <template>
   <div class="batter-map-content">
-    <div id="batter_map" style="width:426px;height:100%"></div>
+    <div id="batter_map" style="width:100%;height:100%"></div>
     <div class="btn-index"></div>
     <battle-handle></battle-handle>
   </div>
@@ -8,7 +8,7 @@
 <script>
   import BMap from 'BMap'
   import LayerSwitch from '@/map/controls/LayerSwitch'
-  import BattleHandle from '@/map/Handle/BattleHandle'
+  import BattleHandle from '@/map/handle/BattleHandle'
   import MapHandle from '@/map/controls/MapHandle'
   import {bus} from '@/js/bus.js'
 
@@ -41,7 +41,7 @@
 </script>
 <style scoped>
   .main-map-content {
-    height: calc(100% - 56px);
+    height: calc(100% - 86px);
     width: 100%;
     margin: 0;
     padding: 0;

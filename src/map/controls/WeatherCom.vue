@@ -13,7 +13,7 @@
     data() {
       return {
         windAngleSrc: 'static/imgs/wind/北-0.png',
-        windDescription: '北风一级'
+        windDescription: '北风'
       }
     },
     created() {
@@ -31,9 +31,9 @@
             let dt = res.Data;
             let wd = dt.wd.replace(/风/g,'');
             let wl = parseInt(dt.wl.replace(/级/g,''));//dt.wl.replace(/级/g,'');
-            t.windDescription = dt.wd + dt.wl + '级';
+            t.windDescription = dt.wd //+ wl + '级';
             //t.windAngleSrc = 'static/imgs/wind/' + wd + '-' + (wl > 6 ? 5 : wl) + '.png';
-            t.windAngleSrc = 'static/imgs/wind/' + wd.replace('-','') + '-'  + (wl > 6 ? 5 : wl) + '.png';
+            t.windAngleSrc = 'static/imgs/wind/' + wd.replace('-','') + '-'  + 0 + '.png';
           }
         }).catch(ex => {
         });

@@ -6,21 +6,21 @@ import Index from '@/views/Index'//实时监测页面
 import HighVideos from '@/views/HighVideo'//高点视频监测
 //气象预报组页面
 import Dynamicwindfield from '@/views/WeatherForecast/DynamicWindField'//动态风场
-// import SuperStation from '@/views/WeatherForecast/SuperStation'//超级站
-// import WeatherStation from '@/views/WeatherForecast/WeatherStation'//气象站
 import Weather from '@/views/WeatherForecast/Weather'//天气预报
 import SandDustForecast from '@/views/WeatherForecast/SandDustForecast'//沙尘预报
 import FogHazeForecast from '@/views/WeatherForecast/FogHazeForecast'//雾霾预报
 //大数据模块组页面
-import pollution from '@/views/PollutionCalendar/pollution'//污染日历
+//import pollution from '@/views/PollutionCalendar/pollution'//污染日历
 //import LargeDataResources from '@/views/DataAnalysis/LargeDataResources'//污染物对比
 //import DistrictsCounties from '@/views/DataAnalysis/DistrictsCounties'//区县打分
 //import FixedSourceStatistics from '@/views/DataAnalysis/FixedSourceStatistics'//固定源统计
-import SensorNetworkRanking from '@/views/DataAnalysis/SensorNetworkRanking'//传感网排名
-//import MeanRatioSensorNetwork from '@/views/DataAnalysis/MeanRatioSensorNetwork'//传感网均值比
+import CaseSupervisionData from '@/views/DataAnalysis/CaseSupervisionData'//案件督查推进
+// import MeanRatioSensorNetwork from '@/views/DataAnalysis/MeanRatioSensorNetwork'//传感网均值比
 import LikeWinter from '@/views/DataAnalysis/LikeWinter'//(今日战报)冬防战报
 //import AirStation from '@/views/DataAnalysis/AirStation'//乡镇空气站统计
 import CityCheck from '@/views/DataAnalysis/CityCheck'//乡镇考核页面
+import ContingencyPlan from '@/views/DataAnalysis/ContingencyPlan'//应急预案
+import Soot from '@/views/DataAnalysis/Soot'//餐饮油烟
 import CountyCheck from '@/views/DataAnalysis/CountyCheck'//乡镇考核页面
 import StateControl from '@/views/DataAnalysis/StateControl'//国省控排名页面
 import DustRange from '@/views/DataAnalysis/DustRange'//工地扬尘排名页面
@@ -28,24 +28,26 @@ import SixParamRange from '@/views/DataAnalysis/SixParamRange'//六参数排名�
 import TvocRange from '@/views/DataAnalysis/TvocRange'//Tvoc排名页面
 import CityRankings from '@/views/DataAnalysis/CityRankings'//城市排名测试页面
 import TodayData from '@/views/DataAnalysis/TodayData'//今日数据页面
-import RankingStatistics from '@/views/DataAnalysis/RankingStatistics'//统计排名页面
-import SimultaneRate from '@/views/DataAnalysis/SimultaneRate'//同期变化率
+import OfficialReport from '@/views/DataAnalysis/OfficialReport'//官方报告
 //解决缓存以及详情页面
 import ScavengingCached from '@/views/ScavengingCached/index'//不需要缓存集合页面
 //后台总集成页面
 import Management from '@/views/Management/Management'//后台业务数据管理
 import BusinessManagement from '@/views/Management/Business/BusinessManagement'//后台业务数据管理
 
+import GridMapView from '@/views/GridMapView'
+import BigDataSource from '@/views/BigDataSource'
+
 Vue.use(Router)
 
 export default new Router({
     routes: [
         //登录页面
-        // {
-        //     path: '/Login',
-        //     name: 'Login',
-        //     component: Login
-        // },
+        {
+            path: '/Login',
+            name: 'Login',
+            component: Login
+        },
         //实时监控页面（主页面）
         {
             path: '/',
@@ -66,6 +68,18 @@ export default new Router({
                     meta: { keepAlive: true },
                     component:resolve => require(['@/components/Township_new'], resolve)
                 },
+                //大气污染源
+                {
+                    path:'Staticdust',
+                    meta: { keepAlive: true },
+                    component:resolve => require(['@/components/Staticdust_new'], resolve)
+                },
+                //应急清单
+                {
+                    path:'Emergencylist',
+                    meta: { keepAlive: true },
+                    component:resolve => require(['@/components/Emergencylist_new'], resolve)
+                },
                 //TVOC页面有车右侧
                 {
                     path:'tvocPanel',
@@ -84,17 +98,11 @@ export default new Router({
                     meta: { keepAlive: true },
                     component:resolve => require(['@/components/OnlineList_new'], resolve)
                 },
-                //应急清单右侧
+                //餐饮油烟监测右侧
                 {
-                    path:'EmergencylistPanel',
+                    path:'CookingFumeMonitoring',
                     meta: { keepAlive: true },
-                    component:resolve => require(['@/components/Emergencylist_new'], resolve)
-                },
-                //静态原清单右侧
-                {
-                    path:'StaticdustPanel',
-                    meta: { keepAlive: true },
-                    component:resolve => require(['@/components/Staticdust_new'], resolve)
+                    component:resolve => require(['@/components/CookingFumeMonitoring'], resolve)
                 },
                 //企业部分右侧
                 {
@@ -102,32 +110,110 @@ export default new Router({
                     meta: { keepAlive: true },
                     component:resolve => require(['@/components/Enterprise_new'], resolve)
                 },
-                //散乱污视频右侧
+                //散乱污视频监控右侧
                 {
-                    path:'ScatteredDirtData',
+                    path:'ScatteredDirtVideo_jk',
                     meta: { keepAlive: true },
-                    component:resolve => require(['@/components/ScatteredDirtVideo_new'], resolve)
+                    component:resolve => require(['@/components/ScatteredDirtVideo_jk'], resolve)
                 },
-                //VOCs视频右侧
+                //VOCs视频监控右侧
                 {
-                    path:'VocsVideoData',
+                    path:'VocsVideo_jk',
                     meta: { keepAlive: true },
-                    component:resolve => require(['@/components/VocsVideo_new'], resolve)
+                    component:resolve => require(['@/components/VocsVideo_jk'], resolve)
                 },
-                //全民举报
+                //餐饮油烟监控右侧
                 {
-                    path:'ReportWholePeople',
+                    path:'FoodFumeVideo_jk',
                     meta: { keepAlive: true },
-                    component:resolve => require(['@/components/ReportWholePeople_new'], resolve)
+                    component:resolve => require(['@/components/FoodFumeVideo_jk'], resolve)
                 },
-                //指挥 案件
+                //工地扬尘监控右侧
                 {
-                    path:'ZH_Case',
+                    path:'SiteDustVideo_jk',
                     meta: { keepAlive: true },
-                    component:resolve => require(['@/components/ZH_Case'], resolve)
+                    component:resolve => require(['@/components/SiteDustVideo_jk'], resolve)
+                },
+                //秸秆焚烧监控右侧
+                {
+                    path:'StrawBurningVideo_jk',
+                    meta: { keepAlive: true },
+                    component:resolve => require(['@/components/StrawBurningVideo_jk'], resolve)
+                },
+                //河道监控右侧
+                {
+                    path:'RiverMonitoringVideo_jk',
+                    meta: { keepAlive: true },
+                    component:resolve => require(['@/components/RiverMonitoringVideo_jk'], resolve)
+                },
+                //案件督查
+                {
+                    path:'CaseSupervision',
+                    meta: { keepAlive: true },
+                    component:resolve => require(['@/components/CaseSupervision'], resolve)
+                },
+                // 尾气遥感检测
+                {
+                    path:'TailGasMonitoring',
+                    meta: { keepAlive: true },
+                    component:resolve => require(['@/components/TailGasMonitoring'], resolve)
+                },
+                // 油气回收在线监测
+                 {
+                    path:'OilGasRecoveryMonitoring',
+                    meta: { keepAlive: true },
+                    component:resolve => require(['@/components/OilGasRecoveryMonitoring'], resolve)
                 },
             ]
-        },
+        },{
+          path:'/GridMap',
+          name:'gmap',
+          meta:{keepAlive:true},
+          component:GridMapView
+      },
+      {
+        path:'/BigDataSource',
+        name:'BigDataSource',
+        component:BigDataSource,
+        children:[
+          /*均值比*/
+          {
+            path:'/BigDataSource/MeanRatioSensorNetwork',
+            meta: { keepAlive: false },
+            component:resolve => require(['@/views/DataAnalysis/MeanRatioSensorNetwork'], resolve)
+          },
+          /*区县排名*/
+          {
+            path:'/BigDataSource/CityRankings',
+            meta: { keepAlive: false },
+            component:resolve => require(['@/views/DataAnalysis/CityRankings'], resolve)
+          },
+          /*同期变化率*/
+          {
+            path:'/BigDataSource/SimultaneousRate',
+            meta: { keepAlive: false },
+            component:resolve => require(['@/views/DataAnalysis/SimultaneousRate'], resolve)
+          },
+            /*实时数据变化*/
+            {
+                path:'/BigDataSource/ContaminantCurve',
+                meta: { keepAlive: false },
+                component:resolve => require(['@/views/DataAnalysis/ContaminantCurve'], resolve)
+            },
+            /*控制值*/
+            {
+                path:'/BigDataSource/Warn',
+                meta: { keepAlive: false },
+                component:resolve => require(['@/views/DataAnalysis/Warn'], resolve)
+            },
+            /*污染日历*/
+            {
+                path:'/BigDataSource/pollution',
+                meta: { keepAlive: false },
+                component:resolve => require(['@/views/PollutionCalendar/pollution'], resolve)
+            },
+        ]
+      },
         //乡镇统计
         // {
         //     path: '/AirStation',
@@ -150,12 +236,12 @@ export default new Router({
             component: DustRange,
         },
         //污染日历
-        {
-            path:'/pollution',
-            name: 'pollution',
-            meta: { keepAlive: false },
-            component: pollution,
-        },
+        // {
+        //     path:'/pollution',
+        //     name: 'pollution',
+        //     meta: { keepAlive: false },
+        //     component: pollution,
+        // },
          //六参数排名页面
         {
             path: '/SixParamRange',
@@ -184,6 +270,20 @@ export default new Router({
             meta: { keepAlive: false },
             component: CityCheck,
         },
+        //应急预案
+        {
+          path: '/ContingencyPlan',
+          name: 'ContingencyPlan',
+          meta: { keepAlive: false },
+          component: ContingencyPlan,
+        },
+      //餐饮油烟
+      {
+        path: '/Soot',
+        name: 'Soot',
+        meta: { keepAlive: false },
+        component: Soot,
+      },
         //国省控排名
         {
             path: '/StateControl',
@@ -205,15 +305,9 @@ export default new Router({
             meta: { keepAlive: false },
             component: TodayData,
         },
-      {
-        path: '/RankingStatistics',
-        name: 'RankingStatistics',
-        meta: { keepAlive: false },
-        component: RankingStatistics,
-      },
         //传感网均值比
         // {
-        //     path: '/MeanRatioSensorNetwork',
+        //     path: '/BigDataSource/MeanRatioSensorNetwork',
         //     name: 'Meanratiosensornetwork',
         //     meta: { keepAlive: false },
         //     component: MeanRatioSensorNetwork
@@ -232,11 +326,11 @@ export default new Router({
             component: HighVideos,
             meta: { keepAlive: false }
         },
-        //同期变化率
+        //官方报告
         {
-            path: '/SimultaneRate',
-            name: 'Simultane-rate',
-            component: SimultaneRate,
+            path: '/OfficialReport',
+            name: 'OfficialReport',
+            component: OfficialReport,
             meta: { keepAlive: false },
 
         },
@@ -262,12 +356,12 @@ export default new Router({
         //     meta: { keepAlive: false },
         //     component: FixedSourceStatistics
         // },
-        //传感网排名
+        //督查案件
         {
-            path: '/SensorNetworkRanking',
-            name: 'Sensornetworkranking',
+            path: '/CaseSupervisionData',
+            name: 'case-supervision',
             meta: { keepAlive: false },
-            component: SensorNetworkRanking
+            component: CaseSupervisionData
         },
         //动态风场页面
         {
@@ -411,16 +505,16 @@ export default new Router({
                             path:'/Management/BusinessManagement/Business-Electricity',
                             component:resolve => require(['@/views/Management/Business/BusinessElectricity'], resolve)
                         },
-                        //案件
+                        //网格员案件处理
+                        {
+                            path:'/Management/BusinessManagement/Handling-Cases',
+                            component:resolve => require(['@/views/Management/Business/HandlingCases'], resolve)
+                        },
                         //案件处理
                 		{
 	                    	path:'/Management/BusinessManagement/Case-Review',
 	                    	component:resolve => require(['@/views/Management/Business/CaseReview'], resolve)
                 		},
-                  {
-                    path:'/Management/BusinessManagement/Case-Input',
-                    component:resolve => require(['@/views/Management/Business/CaseInput'], resolve)
-                  },
                 		//案件类型占比
                 		{
 	                    	path:'/Management/BusinessManagement/Case-Type',
@@ -454,12 +548,17 @@ export default new Router({
                 		{
 	                    	path:'/Management/BusinessManagement/Report-Search',
 	                    	component:resolve => require(['@/views/Management/Business/ReportSearch'], resolve)
-                        },
-                        //版本管理
-                        {
-	                    	path:'/Management/BusinessManagement/Business-Version',
-	                    	component:resolve => require(['@/views/Management/Business/VersionManage'], resolve)
                 		},
+                        //应急预案
+                        {
+                            path:'/Management/BusinessManagement/Business-Contingencyplan',
+                            component:resolve => require(['@/views/Management/Business/Contingencyplan'], resolve)
+                        },
+                        //治理设备
+                        {
+                            path:'/Management/BusinessManagement/Business-Equipmentstatus',
+                            component:resolve => require(['@/views/Management/Business/Equipmentstatus'], resolve)
+                        },
 		            ]
 		        },
                 

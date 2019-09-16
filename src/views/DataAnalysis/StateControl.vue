@@ -1,6 +1,6 @@
 <template>
     <div class="StateControl">
-        <!--省控排名-->
+        <!--工地扬尘排名-->
         <v-header></v-header>
         <!---->
         <div class="warp3">
@@ -8,7 +8,7 @@
                 <div class="wbiaoti borderNO">
                     <div class="float001">
                         <el-radio-group v-model="SelectVal" @change='GetMonitoringRank'>
-                            <el-radio-button label="固安"></el-radio-button>
+                            <el-radio-button label="广阳"></el-radio-button>
                             <el-radio-button label="全市"></el-radio-button>
                         </el-radio-group>
                 	</div>
@@ -57,7 +57,6 @@
                 </div>
                 <div class="float003">
                     <el-button type="primary" @click='GetMonitoringRank'>查询</el-button>
-                    <el-button type="primary" @click='MonitoringExcelOutPut'>导出</el-button>
                 </div>
             </div>
             <!---->
@@ -66,7 +65,6 @@
                     <a>筛选区域</a>
                 </div>
             </div>
-          <p class="updateTime">数据更新时间：{{updateTime}}</p>
             <!--表格-->
             <div class="xuanxiantable">
                 <el-table
@@ -205,8 +203,7 @@
 		        tableStateData:[],
 		        timevalue2:'',
 		        //固安 全市切换
-		        SelectVal:'固安',
-              updateTime:''
+		        SelectVal:'固安'
             }
         },
         created() {
@@ -262,7 +259,6 @@
         			let stateData=[];
         			let proData=[];
         			let allData = res.data.Data;
-              t.updateTime = allData[0].updatetime;
         			if(allData){
         				if(t.SelectVal=='固安'){
         					allData.forEach(item=>{
@@ -305,33 +301,6 @@
         			}
         		})
         	},
-          //导出
-          MonitoringExcelOutPut(){
-            var ranktype='';
-            var starttime='';
-            var endtime='';
-            if(this.StatisticalRankingsName=='日报'){
-              ranktype = '0';
-              starttime = $('.day01 input').val()?$('.day01 input').val():this.GetYesterday();
-              endtime = '';
-            }
-            if(this.StatisticalRankingsName=='月报'){
-              ranktype = '1';
-              endtime = $('.day01 input').val()?$('.day01 input').val():this.GetYesterday();
-              starttime = '';
-            }
-            if(this.StatisticalRankingsName=='年报'){
-              ranktype = '2';
-              endtime = $('.day01 input').val()?$('.day01 input').val():this.GetYesterday();
-              starttime = '';
-            }
-            if(this.StatisticalRankingsName=='自定义'){
-              ranktype = '3';
-              starttime = $('.day02 input').val();
-              endtime = $('.day03 input').val();
-            }
-            api.MonitoringExcelOutPut(ranktype,starttime,endtime);
-          },
         	//省控点数据获取
         	GetMonitoringRankPro(){
         		var ranktype='';
@@ -799,9 +768,6 @@
                 width: 100%;
                 height: auto;
             }
-          .updateTime{
-            text-align: right;
-          }
             .genduo {
                 width: 100%;
                 height: 34px;

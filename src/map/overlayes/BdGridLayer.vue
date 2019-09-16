@@ -102,25 +102,25 @@
           'url': 'http://60.10.135.153:3000/querys/adj.json',
           'var': type
         };
-
+        type=type.substring(0,type.length-4)
         RequestHandle.request({
-          url: url + '?paramStr=' + JSON.stringify(pms),
+          url: url +type,//+ '?paramStr=' + JSON.stringify(pms),
           type: 'GET',
           pms: {}
         }, function (result) {
           if (result.status) {
             let data = result.obj;
-            switch(type){
-              case 'CO_120':
-                  data = data.CO_120;
-                  break;
-              case 'SO2_120':
-                  data = data.SO2_120;
-                  break;
-              case 'NOX_120':
-                  data = data.NOX_120;
-                  break;
-            }
+            // switch(type){
+            //   case 'CO_120':
+            //       data = data.CO_120;
+            //       break;
+            //   case 'SO2_120':
+            //       data = data.SO2_120;
+            //       break;
+            //   case 'NOX_120':
+            //       data = data.NOX_120;
+            //       break;
+            // }
             for (let i = 0; i < 70; i++) {
               for (let j = 0; j < 120; j++) {
                 if (data[i][j] > 0.05) {
@@ -143,23 +143,25 @@
         let xmin = p.getBounds().getSouthWest().lng;
         let ymin = p.getBounds().getSouthWest().lat;
         let url = RequestHandle.getRequestUrl('GRIDCHAR');//'http://lftdkplat.zhiscity.com/api/GridForecast/GetGridForecast';
-        let pms = {
-          method: 'POST',
-          url: 'http://www.zc12369.com/percenter/findCompanyByLocation.jhtm',
-          xmin: xmin,
-          xmax: (xmin + 0.1),
-          ymin: ymin,
-          ymax: (ymin + 0.1)
-        };
+        // let pms = {
+        //   method: 'POST',
+        //   url: 'http://www.zc12369.com/percenter/findCompanyByLocation.jhtm',
+        //   xmin: xmin,
+        //   xmax: (xmin + 0.1),
+        //   ymin: ymin,
+        //   ymax: (ymin + 0.1)
+        // };
 
         RequestHandle.request({
-          url: url + '?paramStr=' + JSON.stringify(pms),
+          url: url + 'CO',//+ '?paramStr=' + JSON.stringify(pms),
           type: 'GET', pms: {}
         }, function (result) {
           if (result.status) {
+            debugger;
             bus.$emit('getGridData', result.obj);
           }
         }, function (ex) {
+          debugger;
         });
       },
       locationPoint(lng, lat, code){
@@ -170,14 +172,14 @@
 
         //let url = 'http://lftdkplat.zhiscity.com/api/GridForecast/GetGridForecast';
         let url = RequestHandle.getRequestUrl('GRIDCHAR');
-        let pms = {
-          method: 'POST',
-          url: 'http://www.zc12369.com/percenter/findCompany.jhtm',
-          id: code,
-        };
+        // let pms = {
+        //   method: 'POST',
+        //   url: 'http://www.zc12369.com/percenter/findCompany.jhtm',
+        //   id: code,
+        // };
 
         RequestHandle.request({
-          url: url + '?paramStr=' + JSON.stringify(pms),
+          url: url+ 'CO' ,//+ '?paramStr=' + JSON.stringify(pms),
           type: 'GET', pms: {}
         }, function (result) {
           if (result.status) {

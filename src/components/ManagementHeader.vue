@@ -3,28 +3,18 @@
         <div class="navbox">
             <!--环境监测-->
             <div class="logo">
-                <img src="../assets/img/logo1.png" alt="logo">
-                <a style="color: #fff;font-size:21px;font-weight: 500;line-height: 56px;font-family: 'Microsoft YaHei' ">固安县环境保护网格化管理平台</a>
+                <img src="../assets/img/logo1.png" alt="logo"> <a style="color: #fff;font-size:21px;font-weight: 500;line-height: 56px;font-family: 'Microsoft YaHei' ">廊坊市广阳区网格化环境管理平台-后台</a>
             </div>
-            <!--<div style="color: #fff;float: left;height: 56px;line-height: 66px;margin-left: 4px">2018版</div>-->
             <ul class="bnav">
-            	<div>
-                    <!--<img src="../assets/img/sy-z.png" alt="">-->
-                    <a href="#/">实时监测</a>
+                <div> <a href="#/likewinter">首页</a>
                 </div>
-                <div>
-                    <!--系统后台-退出系统-->
-                    <!--<li style="margin-right: 0;">-->
-                        <span class="position-p"></span>
-                        <img style="padding: 0 20px" src="../assets/img/btn_intercalate.png" class="activehov">
-                        <!--<div class="Sixitem submenu" v-if="isShow">
-                            <a href="#/Management/BusinessManagement/Case-Review" class="houtai"><img src="../assets/img/btn_Backstage1.png" alt="">进入后台</a><br/>
-                            <a class="tuichu" v-on:click="exit"><img src="../assets/img/btn_quit1.png" alt="">退出系统</a>
-                        </div>-->
-                        <div class="Sixitem submenu">
-                            <a class="tuichu" v-on:click="exit"><img src="../assets/img/btn_quit1.png" alt="">退出系统</a>
-                        </div>
-                    <!--</li>-->
+                <div> <span class="position-p"></span>
+
+                    <img style="padding: 0 20px" src="../assets/img/btn_intercalate.png" class="activehov">
+                    <div class="Sixitem submenu">
+                        <a class="tuichu" v-on:click="exit">
+                            <img src="../assets/img/btn_quit1.png" alt="">退出系统</a>
+                    </div>
                 </div>
             </ul>
         </div>
@@ -44,31 +34,17 @@
             }
         },
         mounted(){
-
             const t = this;
             //
-            $(".houtai").hover(function () {
-                $(".houtai img").attr('src', t.houtaiSrc);
-                // event.stopPropagation();
-            }, function () {
-                $(".houtai img").attr('src', t.houtaiChesSrc);
-            });
+            $(".houtai").hover(function () {$(".houtai img").attr('src', t.houtaiSrc);}, function () {$(".houtai img").attr('src', t.houtaiChesSrc);});
             //
-            $(".tuichu").hover(function () {
-                $(".tuichu img").attr('src', t.tuichuSrc);
-                // event.stopPropagation();
-            }, function () {
-                $(".tuichu img").attr('src', t.tuichuChesSrc);
-            });
+            $(".tuichu").hover(function () {$(".tuichu img").attr('src', t.tuichuSrc);}, function () {$(".tuichu img").attr('src', t.tuichuChesSrc);});
         },
         methods: {
 			exit(){
-                this.$cookies.remove('auth')
-                setTimeout(() => {
-                    //
-                    this.$router.push('/login')
-                })
-            },
+                this.$cookies.remove('auth');
+                this.$router.push('/login');
+            }
         }
     }
 </script>
@@ -82,7 +58,7 @@
         .navbox{
             width: 100%;
             height: 56px;
-            background: #1b9d33;
+            background: #2494F2;
             position: absolute;
             top: 0;
             left: 0;

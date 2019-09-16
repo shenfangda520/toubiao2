@@ -1,18 +1,12 @@
 <template>
     <div class="pollution">
         <!--首页部分-->
-        <v-header></v-header>
+        <!--<v-header></v-header>-->
         <!--日历-->
         <div class="warp-content">
             <div class="con-cont">
-                <div class="warp-coter" style="margin-top: 20px">
-                    <el-radio-group v-model="valueOne" size="medium">
-                        <el-radio-button label="环比" ></el-radio-button>
-                        <el-radio-button label="同比"></el-radio-button>
-                    </el-radio-group>
-                </div>
                 <div class="warp-float">
-                    <el-radio-group v-model="valueTwo" size="small">
+                    <el-radio-group v-model="valueTwo" @change="typechange" size="small">
                         <el-radio-button label="AQI"></el-radio-button>
                         <el-radio-button label="PM2.5"></el-radio-button>
                         <el-radio-button label="PM10"></el-radio-button>
@@ -23,184 +17,383 @@
                     </el-radio-group>
                 </div>
             </div>
-            <!--环比界面-->
-            <div class="warp-calendar" v-show="valueOne ==='环比'">
+                <!---->
+            <div class="warp-calendar">
                 <!--日历-->
                 <div id="calendar"></div>
-                <!--地下-->
-                <div class="posi-1ceng">
+                <!--地下大屏幕-->
+                <div class="posi-1ceng" v-if="doclientWidth > 1500">
+                    <!--1月-->
                     <div class="let-01">
-                        <div v-if="January">
-                            <div class="l-001">
-                                <div class="ll1"><a class="text">优:</a> <span :style="ChangeBackground(January.y_count)">{{January.y_count}}</span></div>
-                                <div class="ll1"><a class="text">良:</a> <span :style="ChangeBackground(January.l_count)">{{January.l_count}}</span></div>
-                                <div class="ll1"><a class="text">轻度:</a> <span :style="ChangeBackground(January.qd_count)">{{January.qd_count}}</span></div>
-                            </div>
-                            <div class="l-001">
-                                <div class="ll1"><a class="text">中度:</a> <span :style="ChangeBackground(January.zd_count)">{{January.zd_count}}</span></div>
-                                <div class="ll1"><a class="text">重度:</a> <span :style="ChangeBackground(January.yz_count)">{{January.yz_count}}</span></div>
-                                <div class="ll1"><a class="text">严重:</a> <span :style="ChangeBackground(January.zhd_count)">{{January.zhd_count}}</span></div>
-                            </div>
-                        </div>
+                      <dl class="posi-float">
+                          <dt><span class="p-text">优:</span> <span class="p-backgrd" style="background:#13e613;color: #333">{{January.y_count}}</span></dt>
+                          <dd><span class="p-text">良:</span> <span class="p-backgrd" style="background:rgb(239, 220, 49);color: #333">{{January.l_count}}</span></dd>
+                      </dl>
+                      <dl class="posi-float">
+                          <dt><span class="p-text">中度:</span> <span class="p-backgrd" style="background:rgb(255, 0, 0);color: #fff">{{January.zd_count}}</span></dt>
+                          <dd><span class="p-text">重度:</span> <span class="p-backgrd" style="background:#de2159;color: #fff">{{January.yz_count}}</span></dd>
+                      </dl>
+                      <dl class="posi-float">
+                          <dt><span class="p-text">轻度:</span> <span class="p-backgrd" style="background:rgb(255, 126, 0);color: #333">{{January.qd_count}}</span></dt>
+                          <dd><span class="p-text">严重:</span> <span class="p-backgrd" style="background:#9e0835;color: #fff">{{January.zhd_count}}</span></dd>
+                      </dl>
+                  </div>
+                    <!--2月-->
+                    <div class="let-01">
+                        <dl class="posi-float">
+                            <dt><span class="p-text">优:</span> <span class="p-backgrd" style="background:#13e613;color: #333">{{February.y_count}}</span></dt>
+                            <dd><span class="p-text">良:</span> <span class="p-backgrd" style="background:rgb(239, 220, 49);color: #333">{{February.l_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">中度:</span> <span class="p-backgrd" style="background:rgb(255, 0, 0);color: #fff">{{February.zd_count}}</span></dt>
+                            <dd><span class="p-text">重度:</span> <span class="p-backgrd" style="background:#de2159;color: #fff">{{February.yz_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">轻度:</span> <span class="p-backgrd" style="background:rgb(255, 126, 0);color: #333">{{February.qd_count}}</span></dt>
+                            <dd><span class="p-text">严重:</span> <span class="p-backgrd" style="background:#9e0835;color: #fff">{{February.zhd_count}}</span></dd>
+                        </dl>
                     </div>
+                    <!--3月-->
                     <div class="let-01">
-                        <div v-if="February">
-                            <div class="l-001">
-                                <div class="ll1"><a class="text">优:</a> <span :style="ChangeBackground(February.y_count)">{{February.y_count}}</span></div>
-                                <div class="ll1"><a class="text">良:</a> <span :style="ChangeBackground(February.l_count)">{{February.l_count}}</span></div>
-                                <div class="ll1"><a class="text">轻度:</a> <span :style="ChangeBackground(February.qd_count)">{{February.qd_count}}</span></div>
-                            </div>
-                            <div class="l-001">
-                                <div class="ll1"><a class="text">中度:</a> <span :style="ChangeBackground(February.zd_count)">{{February.zd_count}}</span></div>
-                                <div class="ll1"><a class="text">重度:</a> <span :style="ChangeBackground(February.yz_count)">{{February.yz_count}}</span></div>
-                                <div class="ll1"><a class="text">严重:</a> <span :style="ChangeBackground(February.zhd_count)">{{February.zhd_count}}</span></div>
-                            </div>
-                        </div>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">优:</span> <span class="p-backgrd" style="background:#13e613;color: #333">{{March.y_count}}</span></dt>
+                            <dd><span class="p-text">良:</span> <span class="p-backgrd" style="background:rgb(239, 220, 49);color: #333">{{March.l_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">中度:</span> <span class="p-backgrd" style="background:rgb(255, 0, 0);color: #fff">{{March.zd_count}}</span></dt>
+                            <dd><span class="p-text">重度:</span> <span class="p-backgrd" style="background:#de2159;color: #fff">{{March.yz_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">轻度:</span> <span class="p-backgrd" style="background:rgb(255, 126, 0);color: #333">{{March.qd_count}}</span></dt>
+                            <dd><span class="p-text">严重:</span> <span class="p-backgrd" style="background:#9e0835;color: #fff">{{March.zhd_count}}</span></dd>
+                        </dl>
                     </div>
+                    <!--4月-->
                     <div class="let-01">
-                        <div v-if="March">
-                            <div class="l-001">
-                                <div class="ll1"><a class="text">优:</a> <span :style="ChangeBackground(March.y_count)">{{March.y_count}}</span></div>
-                                <div class="ll1"><a class="text">良:</a> <span :style="ChangeBackground(March.l_count)">{{March.l_count}}</span></div>
-                                <div class="ll1"><a class="text">轻度:</a> <span :style="ChangeBackground(March.qd_count)">{{March.qd_count}}</span></div>
-                            </div>
-                            <div class="l-001">
-                                <div class="ll1"><a class="text">中度:</a> <span :style="ChangeBackground(March.zd_count)">{{March.zd_count}}</span></div>
-                                <div class="ll1"><a class="text">重度:</a> <span :style="ChangeBackground(March.yz_count)">{{March.yz_count}}</span></div>
-                                <div class="ll1"><a class="text">严重:</a> <span :style="ChangeBackground(March.zhd_count)">{{March.zhd_count}}</span></div>
-                            </div>
-                        </div>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">优:</span> <span class="p-backgrd" style="background:#13e613;color: #333">{{April.y_count}}</span></dt>
+                            <dd><span class="p-text">良:</span> <span class="p-backgrd" style="background:rgb(239, 220, 49);color: #333">{{April.l_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">中度:</span> <span class="p-backgrd" style="background:rgb(255, 0, 0);color: #fff">{{April.zd_count}}</span></dt>
+                            <dd><span class="p-text">重度:</span> <span class="p-backgrd" style="background:#de2159;color: #fff">{{April.yz_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">轻度:</span> <span class="p-backgrd" style="background:rgb(255, 126, 0);color: #333">{{April.qd_count}}</span></dt>
+                            <dd><span class="p-text">严重:</span> <span class="p-backgrd" style="background:#9e0835;color: #fff">{{April.zhd_count}}</span></dd>
+                        </dl>
                     </div>
+                    <!--5月-->
                     <div class="let-01">
-                        <div v-if="April">
-                            <div class="l-001">
-                                <div class="ll1"><a class="text">优:</a> <span :style="ChangeBackground(April.y_count)">{{April.y_count}}</span></div>
-                                <div class="ll1"><a class="text">良:</a> <span :style="ChangeBackground(April.l_count)">{{April.l_count}}</span></div>
-                                <div class="ll1"><a class="text">轻度:</a> <span :style="ChangeBackground(April.qd_count)">{{April.qd_count}}</span></div>
-                            </div>
-                            <div class="l-001">
-                                <div class="ll1"><a class="text">中度:</a> <span :style="ChangeBackground(April.zd_count)">{{April.zd_count}}</span></div>
-                                <div class="ll1"><a class="text">重度:</a> <span :style="ChangeBackground(April.yz_count)">{{April.yz_count}}</span></div>
-                                <div class="ll1"><a class="text">严重:</a> <span :style="ChangeBackground(April.zhd_count)">{{April.zhd_count}}</span></div>
-                            </div>
-                        </div>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">优:</span> <span class="p-backgrd" style="background:#13e613;color: #333">{{May.y_count}}</span></dt>
+                            <dd><span class="p-text">良:</span> <span class="p-backgrd" style="background:rgb(239, 220, 49);color: #333">{{May.l_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">中度:</span> <span class="p-backgrd" style="background:rgb(255, 0, 0);color: #fff">{{May.zd_count}}</span></dt>
+                            <dd><span class="p-text">重度:</span> <span class="p-backgrd" style="background:#de2159;color: #fff">{{May.yz_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">轻度:</span> <span class="p-backgrd" style="background:rgb(255, 126, 0);color: #333">{{May.qd_count}}</span></dt>
+                            <dd><span class="p-text">严重:</span> <span class="p-backgrd" style="background:#9e0835;color: #fff">{{May.zhd_count}}</span></dd>
+                        </dl>
                     </div>
+                    <!--6月-->
                     <div class="let-01">
-                        <div v-if="May">
-                            <div class="l-001">
-                                <div class="ll1"><a class="text">优:</a> <span :style="ChangeBackground(May.y_count)">{{May.y_count}}</span></div>
-                                <div class="ll1"><a class="text">良:</a> <span :style="ChangeBackground(May.l_count)">{{May.l_count}}</span></div>
-                                <div class="ll1"><a class="text">轻度:</a> <span :style="ChangeBackground(May.qd_count)">{{May.qd_count}}</span></div>
-                            </div>
-                            <div class="l-001">
-                                <div class="ll1"><a class="text">中度:</a> <span :style="ChangeBackground(May.zd_count)">{{May.zd_count}}</span></div>
-                                <div class="ll1"><a class="text">重度:</a> <span :style="ChangeBackground(May.yz_count)">{{May.yz_count}}</span></div>
-                                <div class="ll1"><a class="text">严重:</a> <span :style="ChangeBackground(May.zhd_count)">{{May.zhd_count}}</span></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="let-01">
-                        <div v-if="June">
-                            <div class="l-001">
-                                <div class="ll1"><a class="text">优:</a> <span :style="ChangeBackground(June.y_count)">{{June.y_count}}</span></div>
-                                <div class="ll1"><a class="text">良:</a> <span :style="ChangeBackground(June.l_count)">{{June.l_count}}</span></div>
-                                <div class="ll1"><a class="text">轻度:</a> <span :style="ChangeBackground(June.qd_count)">{{June.qd_count}}</span></div>
-                            </div>
-                            <div class="l-001">
-                                <div class="ll1"><a class="text">中度:</a> <span :style="ChangeBackground(June.zd_count)">{{June.zd_count}}</span></div>
-                                <div class="ll1"><a class="text">重度:</a> <span :style="ChangeBackground(June.yz_count)">{{June.yz_count}}</span></div>
-                                <div class="ll1"><a class="text">严重:</a> <span :style="ChangeBackground(June.zhd_count)">{{June.zhd_count}}</span></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="posi-2ceng">
-                    <div class="let-01">
-                        <div v-if="July">
-                            <div class="l-001">
-                                <div class="ll1"><a class="text">优:</a> <span :style="ChangeBackground(July.y_count)">{{July.y_count}}</span></div>
-                                <div class="ll1"><a class="text">良:</a> <span :style="ChangeBackground(July.l_count)">{{July.l_count}}</span></div>
-                                <div class="ll1"><a class="text">轻度:</a> <span :style="ChangeBackground(July.qd_count)">{{July.qd_count}}</span></div>
-                            </div>
-                            <div class="l-001">
-                                <div class="ll1"><a class="text">中度:</a> <span :style="ChangeBackground(July.zd_count)">{{July.zd_count}}</span></div>
-                                <div class="ll1"><a class="text">重度:</a> <span :style="ChangeBackground(July.yz_count)">{{July.yz_count}}</span></div>
-                                <div class="ll1"><a class="text">严重:</a> <span :style="ChangeBackground(July.zhd_count)">{{July.zhd_count}}</span></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="let-01">
-                        <div v-if="August">
-                            <div class="l-001">
-                                <div class="ll1"><a class="text">优:</a> <span :style="ChangeBackground(August.y_count)">{{August.y_count}}</span></div>
-                                <div class="ll1"><a class="text">良:</a> <span :style="ChangeBackground(August.l_count)">{{August.l_count}}</span></div>
-                                <div class="ll1"><a class="text">轻度:</a> <span :style="ChangeBackground(August.qd_count)">{{August.qd_count}}</span></div>
-                            </div>
-                            <div class="l-001">
-                                <div class="ll1"><a class="text">中度:</a> <span :style="ChangeBackground(August.zd_count)">{{August.zd_count}}</span></div>
-                                <div class="ll1"><a class="text">重度:</a> <span :style="ChangeBackground(August.yz_count)">{{August.yz_count}}</span></div>
-                                <div class="ll1"><a class="text">严重:</a> <span :style="ChangeBackground(August.zhd_count)">{{August.zhd_count}}</span></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="let-01">
-                        <div v-if="September">
-                            <div class="l-001">
-                                <div class="ll1"><a class="text">优:</a> <span :style="ChangeBackground(September.y_count)">{{September.y_count}}</span></div>
-                                <div class="ll1"><a class="text">良:</a> <span :style="ChangeBackground(September.l_count)">{{September.l_count}}</span></div>
-                                <div class="ll1"><a class="text">轻度:</a> <span :style="ChangeBackground(September.qd_count)">{{September.qd_count}}</span></div>
-                            </div>
-                            <div class="l-001">
-                                <div class="ll1"><a class="text">中度:</a> <span :style="ChangeBackground(September.zd_count)">{{September.zd_count}}</span></div>
-                                <div class="ll1"><a class="text">重度:</a> <span :style="ChangeBackground(September.yz_count)">{{September.yz_count}}</span></div>
-                                <div class="ll1"><a class="text">严重:</a> <span :style="ChangeBackground(September.zhd_count)">{{September.zhd_count}}</span></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="let-01">
-                        <div v-if="October">
-                            <div class="l-001">
-                                <div class="ll1"><a class="text">优:</a> <span :style="ChangeBackground(October.y_count)">{{October.y_count}}</span></div>
-                                <div class="ll1"><a class="text">良:</a> <span :style="ChangeBackground(October.l_count)">{{October.l_count}}</span></div>
-                                <div class="ll1"><a class="text">轻度:</a> <span :style="ChangeBackground(October.qd_count)">{{October.qd_count}}</span></div>
-                            </div>
-                            <div class="l-001">
-                                <div class="ll1"><a class="text">中度:</a> <span :style="ChangeBackground(October.zd_count)">{{October.zd_count}}</span></div>
-                                <div class="ll1"><a class="text">重度:</a> <span :style="ChangeBackground(October.yz_count)">{{October.yz_count}}</span></div>
-                                <div class="ll1"><a class="text">严重:</a> <span :style="ChangeBackground(October.zhd_count)">{{October.zhd_count}}</span></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="let-01">
-                        <div v-if="November">
-                            <div class="l-001">
-                                <div class="ll1"><a class="text">优:</a> <span :style="ChangeBackground(November.y_count)">{{November.y_count}}</span></div>
-                                <div class="ll1"><a class="text">良:</a> <span :style="ChangeBackground(November.l_count)">{{November.l_count}}</span></div>
-                                <div class="ll1"><a class="text">轻度:</a> <span :style="ChangeBackground(November.qd_count)">{{November.qd_count}}</span></div>
-                            </div>
-                            <div class="l-001">
-                                <div class="ll1"><a class="text">中度:</a> <span :style="ChangeBackground(November.zd_count)">{{November.zd_count}}</span></div>
-                                <div class="ll1"><a class="text">重度:</a> <span :style="ChangeBackground(November.yz_count)">{{November.yz_count}}</span></div>
-                                <div class="ll1"><a class="text">严重:</a> <span :style="ChangeBackground(November.zhd_count)">{{November.zhd_count}}</span></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="let-01">
-                        <div v-if="December">
-                            <div class="l-001">
-                                <div class="ll1"><a class="text">优:</a> <span :style="ChangeBackground(December.y_count)">{{December.y_count}}</span></div>
-                                <div class="ll1"><a class="text">良:</a> <span :style="ChangeBackground(December.l_count)">{{December.l_count}}</span></div>
-                                <div class="ll1"><a class="text">轻度:</a> <span :style="ChangeBackground(December.qd_count)">{{December.qd_count}}</span></div>
-                            </div>
-                            <div class="l-001">
-                                <div class="ll1"><a class="text">中度:</a> <span :style="ChangeBackground(December.zd_count)">{{December.zd_count}}</span></div>
-                                <div class="ll1"><a class="text">重度:</a> <span :style="ChangeBackground(December.yz_count)">{{December.yz_count}}</span></div>
-                                <div class="ll1"><a class="text">严重:</a> <span :style="ChangeBackground(December.zhd_count)">{{December.zhd_count}}</span></div>
-                            </div>
-                        </div>
-
+                        <dl class="posi-float">
+                            <dt><span class="p-text">优:</span> <span class="p-backgrd" style="background:#13e613;color: #333">{{June.y_count}}</span></dt>
+                            <dd><span class="p-text">良:</span> <span class="p-backgrd" style="background:rgb(239, 220, 49);color: #333">{{June.l_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">中度:</span> <span class="p-backgrd" style="background:rgb(255, 0, 0);color: #fff">{{June.zd_count}}</span></dt>
+                            <dd><span class="p-text">重度:</span> <span class="p-backgrd" style="background:#de2159;color: #fff">{{June.yz_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">轻度:</span> <span class="p-backgrd" style="background:rgb(255, 126, 0);color: #333">{{June.qd_count}}</span></dt>
+                            <dd><span class="p-text">严重:</span> <span class="p-backgrd" style="background:#9e0835;color: #fff">{{June.zhd_count}}</span></dd>
+                        </dl>
                     </div>
                 </div>
+                <div class="posi-2ceng" v-if="doclientWidth > 1500">
+                    <!--7月-->
+                    <div class="let-01">
+                        <dl class="posi-float">
+                            <dt><span class="p-text">优:</span> <span class="p-backgrd" style="background:#13e613;color: #333">{{July.y_count}}</span></dt>
+                            <dd><span class="p-text">良:</span> <span class="p-backgrd" style="background:rgb(239, 220, 49);color: #333">{{July.l_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">中度:</span> <span class="p-backgrd" style="background:rgb(255, 0, 0);color: #fff">{{July.zd_count}}</span></dt>
+                            <dd><span class="p-text">重度:</span> <span class="p-backgrd" style="background:#de2159;color: #fff">{{July.yz_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">轻度:</span> <span class="p-backgrd" style="background:rgb(255, 126, 0);color: #333">{{July.qd_count}}</span></dt>
+                            <dd><span class="p-text">严重:</span> <span class="p-backgrd" style="background:#9e0835;color: #fff">{{July.zhd_count}}</span></dd>
+                        </dl>
+                    </div>
+                    <!--8月-->
+                    <div class="let-01">
+                        <dl class="posi-float">
+                            <dt><span class="p-text">优:</span> <span class="p-backgrd" style="background:#13e613;color: #333">{{August.y_count}}</span></dt>
+                            <dd><span class="p-text">良:</span> <span class="p-backgrd" style="background:rgb(239, 220, 49);color: #333">{{August.l_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">中度:</span> <span class="p-backgrd" style="background:rgb(255, 0, 0);color: #fff">{{August.zd_count}}</span></dt>
+                            <dd><span class="p-text">重度:</span> <span class="p-backgrd" style="background:#de2159;color: #fff">{{August.yz_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">轻度:</span> <span class="p-backgrd" style="background:rgb(255, 126, 0);color: #333">{{August.qd_count}}</span></dt>
+                            <dd><span class="p-text">严重:</span> <span class="p-backgrd" style="background:#9e0835;color: #fff">{{August.zhd_count}}</span></dd>
+                        </dl>
+                    </div>
+                    <!--9月-->
+                    <div class="let-01">
+                        <dl class="posi-float">
+                            <dt><span class="p-text">优:</span> <span class="p-backgrd" style="background:#13e613;color: #333">{{September.y_count}}</span></dt>
+                            <dd><span class="p-text">良:</span> <span class="p-backgrd" style="background:rgb(239, 220, 49);color: #333">{{September.l_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">中度:</span> <span class="p-backgrd" style="background:rgb(255, 0, 0);color: #fff">{{September.zd_count}}</span></dt>
+                            <dd><span class="p-text">重度:</span> <span class="p-backgrd" style="background:#de2159;color: #fff">{{September.yz_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">轻度:</span> <span class="p-backgrd" style="background:rgb(255, 126, 0);color: #333">{{September.qd_count}}</span></dt>
+                            <dd><span class="p-text">严重:</span> <span class="p-backgrd" style="background:#9e0835;color: #fff">{{September.zhd_count}}</span></dd>
+                        </dl>
+                    </div>
+                    <!--10月-->
+                    <div class="let-01">
+                        <dl class="posi-float">
+                            <dt><span class="p-text">优:</span> <span class="p-backgrd" style="background:#13e613;color: #333">{{October.y_count}}</span></dt>
+                            <dd><span class="p-text">良:</span> <span class="p-backgrd" style="background:rgb(239, 220, 49);color: #333">{{October.l_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">中度:</span> <span class="p-backgrd" style="background:rgb(255, 0, 0);color: #fff">{{October.zd_count}}</span></dt>
+                            <dd><span class="p-text">重度:</span> <span class="p-backgrd" style="background:#de2159;color: #fff">{{October.yz_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">轻度:</span> <span class="p-backgrd" style="background:rgb(255, 126, 0);color: #333">{{October.qd_count}}</span></dt>
+                            <dd><span class="p-text">严重:</span> <span class="p-backgrd" style="background:#9e0835;color: #fff">{{October.zhd_count}}</span></dd>
+                        </dl>
+                    </div>
+                    <!--11月-->
+                    <div class="let-01">
+                        <dl class="posi-float">
+                            <dt><span class="p-text">优:</span> <span class="p-backgrd" style="background:#13e613;color: #333">{{November.y_count}}</span></dt>
+                            <dd><span class="p-text">良:</span> <span class="p-backgrd" style="background:rgb(239, 220, 49);color: #333">{{November.l_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">中度:</span> <span class="p-backgrd" style="background:rgb(255, 0, 0);color: #fff">{{November.zd_count}}</span></dt>
+                            <dd><span class="p-text">重度:</span> <span class="p-backgrd" style="background:#de2159;color: #fff">{{November.yz_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">轻度:</span> <span class="p-backgrd" style="background:rgb(255, 126, 0);color: #333">{{November.qd_count}}</span></dt>
+                            <dd><span class="p-text">严重:</span> <span class="p-backgrd" style="background:#9e0835;color: #fff">{{November.zhd_count}}</span></dd>
+                        </dl>
+                    </div>
+                    <!--12月-->
+                    <div class="let-01">
+                        <dl class="posi-float">
+                            <dt><span class="p-text">优:</span> <span class="p-backgrd" style="background:#13e613;color: #333">{{December.y_count}}</span></dt>
+                            <dd><span class="p-text">良:</span> <span class="p-backgrd" style="background:rgb(239, 220, 49);color: #333">{{December.l_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">中度:</span> <span class="p-backgrd" style="background:rgb(255, 0, 0);color: #fff">{{December.zd_count}}</span></dt>
+                            <dd><span class="p-text">重度:</span> <span class="p-backgrd" style="background:#de2159;color: #fff">{{December.yz_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">轻度:</span> <span class="p-backgrd" style="background:rgb(255, 126, 0);color: #333">{{December.qd_count}}</span></dt>
+                            <dd><span class="p-text">严重:</span> <span class="p-backgrd" style="background:#9e0835;color: #fff">{{December.zhd_count}}</span></dd>
+                        </dl>
+                    </div>
+                </div>
+                <!--小屏幕日历下挂-->
+                <div class="posi-smallceng1" v-if="doclientWidth < 1500">
+                    <!--1月-->
+                    <div class="let-01">
+                        <dl class="posi-float">
+                            <dt><span class="p-text">优:</span> <span class="p-backgrd" style="background:#13e613;color: #333">{{January.y_count}}</span></dt>
+                            <dd><span class="p-text">良:</span> <span class="p-backgrd" style="background:rgb(239, 220, 49);color: #333">{{January.l_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">中度:</span> <span class="p-backgrd" style="background:rgb(255, 0, 0);color: #fff">{{January.zd_count}}</span></dt>
+                            <dd><span class="p-text">重度:</span> <span class="p-backgrd" style="background:#de2159;color: #fff">{{January.yz_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">轻度:</span> <span class="p-backgrd" style="background:rgb(255, 126, 0);color: #333">{{January.qd_count}}</span></dt>
+                            <dd><span class="p-text">严重:</span> <span class="p-backgrd" style="background:#9e0835;color: #fff">{{January.zhd_count}}</span></dd>
+                        </dl>
+                    </div>
+                    <!--2月-->
+                    <div class="let-01">
+                        <dl class="posi-float">
+                            <dt><span class="p-text">优:</span> <span class="p-backgrd" style="background:#13e613;color: #333">{{February.y_count}}</span></dt>
+                            <dd><span class="p-text">良:</span> <span class="p-backgrd" style="background:rgb(239, 220, 49);color: #333">{{February.l_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">中度:</span> <span class="p-backgrd" style="background:rgb(255, 0, 0);color: #fff">{{February.zd_count}}</span></dt>
+                            <dd><span class="p-text">重度:</span> <span class="p-backgrd" style="background:#de2159;color: #fff">{{February.yz_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">轻度:</span> <span class="p-backgrd" style="background:rgb(255, 126, 0);color: #333">{{February.qd_count}}</span></dt>
+                            <dd><span class="p-text">严重:</span> <span class="p-backgrd" style="background:#9e0835;color: #fff">{{February.zhd_count}}</span></dd>
+                        </dl>
+                    </div>
+                    <!--3月-->
+                    <div class="let-01">
+                        <dl class="posi-float">
+                            <dt><span class="p-text">优:</span> <span class="p-backgrd" style="background:#13e613;color: #333">{{March.y_count}}</span></dt>
+                            <dd><span class="p-text">良:</span> <span class="p-backgrd" style="background:rgb(239, 220, 49);color: #333">{{March.l_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">中度:</span> <span class="p-backgrd" style="background:rgb(255, 0, 0);color: #fff">{{March.zd_count}}</span></dt>
+                            <dd><span class="p-text">重度:</span> <span class="p-backgrd" style="background:#de2159;color: #fff">{{March.yz_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">轻度:</span> <span class="p-backgrd" style="background:rgb(255, 126, 0);color: #333">{{March.qd_count}}</span></dt>
+                            <dd><span class="p-text">严重:</span> <span class="p-backgrd" style="background:#9e0835;color: #fff">{{March.zhd_count}}</span></dd>
+                        </dl>
+                    </div>
+                    <!--4月-->
+                    <div class="let-01">
+                        <dl class="posi-float">
+                            <dt><span class="p-text">优:</span> <span class="p-backgrd" style="background:#13e613;color: #333">{{April.y_count}}</span></dt>
+                            <dd><span class="p-text">良:</span> <span class="p-backgrd" style="background:rgb(239, 220, 49);color: #333">{{April.l_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">中度:</span> <span class="p-backgrd" style="background:rgb(255, 0, 0);color: #fff">{{April.zd_count}}</span></dt>
+                            <dd><span class="p-text">重度:</span> <span class="p-backgrd" style="background:#de2159;color: #fff">{{April.yz_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">轻度:</span> <span class="p-backgrd" style="background:rgb(255, 126, 0);color: #333">{{April.qd_count}}</span></dt>
+                            <dd><span class="p-text">严重:</span> <span class="p-backgrd" style="background:#9e0835;color: #fff">{{April.zhd_count}}</span></dd>
+                        </dl>
+                    </div>
+                </div>
+                <div class="posi-smallceng2" v-if="doclientWidth < 1500">
+                    <!--5月-->
+                    <div class="let-01">
+                        <dl class="posi-float">
+                            <dt><span class="p-text">优:</span> <span class="p-backgrd" style="background:#13e613;color: #333">{{May.y_count}}</span></dt>
+                            <dd><span class="p-text">良:</span> <span class="p-backgrd" style="background:rgb(239, 220, 49);color: #333">{{May.l_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">中度:</span> <span class="p-backgrd" style="background:rgb(255, 0, 0);color: #fff">{{May.zd_count}}</span></dt>
+                            <dd><span class="p-text">重度:</span> <span class="p-backgrd" style="background:#de2159;color: #fff">{{May.yz_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">轻度:</span> <span class="p-backgrd" style="background:rgb(255, 126, 0);color: #333">{{May.qd_count}}</span></dt>
+                            <dd><span class="p-text">严重:</span> <span class="p-backgrd" style="background:#9e0835;color: #fff">{{May.zhd_count}}</span></dd>
+                        </dl>
+                    </div>
+                    <!--6月-->
+                    <div class="let-01">
+                        <dl class="posi-float">
+                            <dt><span class="p-text">优:</span> <span class="p-backgrd" style="background:#13e613;color: #333">{{June.y_count}}</span></dt>
+                            <dd><span class="p-text">良:</span> <span class="p-backgrd" style="background:rgb(239, 220, 49);color: #333">{{June.l_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">中度:</span> <span class="p-backgrd" style="background:rgb(255, 0, 0);color: #fff">{{June.zd_count}}</span></dt>
+                            <dd><span class="p-text">重度:</span> <span class="p-backgrd" style="background:#de2159;color: #fff">{{June.yz_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">轻度:</span> <span class="p-backgrd" style="background:rgb(255, 126, 0);color: #333">{{June.qd_count}}</span></dt>
+                            <dd><span class="p-text">严重:</span> <span class="p-backgrd" style="background:#9e0835;color: #fff">{{June.zhd_count}}</span></dd>
+                        </dl>
+                    </div>
+                    <!--7月-->
+                    <div class="let-01">
+                        <dl class="posi-float">
+                            <dt><span class="p-text">优:</span> <span class="p-backgrd" style="background:#13e613;color: #333">{{July.y_count}}</span></dt>
+                            <dd><span class="p-text">良:</span> <span class="p-backgrd" style="background:rgb(239, 220, 49);color: #333">{{July.l_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">中度:</span> <span class="p-backgrd" style="background:rgb(255, 0, 0);color: #fff">{{July.zd_count}}</span></dt>
+                            <dd><span class="p-text">重度:</span> <span class="p-backgrd" style="background:#de2159;color: #fff">{{July.yz_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">轻度:</span> <span class="p-backgrd" style="background:rgb(255, 126, 0);color: #333">{{July.qd_count}}</span></dt>
+                            <dd><span class="p-text">严重:</span> <span class="p-backgrd" style="background:#9e0835;color: #fff">{{July.zhd_count}}</span></dd>
+                        </dl>
+                    </div>
+                    <!--8月-->
+                    <div class="let-01">
+                        <dl class="posi-float">
+                            <dt><span class="p-text">优:</span> <span class="p-backgrd" style="background:#13e613;color: #333">{{August.y_count}}</span></dt>
+                            <dd><span class="p-text">良:</span> <span class="p-backgrd" style="background:rgb(239, 220, 49);color: #333">{{August.l_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">中度:</span> <span class="p-backgrd" style="background:rgb(255, 0, 0);color: #fff">{{August.zd_count}}</span></dt>
+                            <dd><span class="p-text">重度:</span> <span class="p-backgrd" style="background:#de2159;color: #fff">{{August.yz_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">轻度:</span> <span class="p-backgrd" style="background:rgb(255, 126, 0);color: #333">{{August.qd_count}}</span></dt>
+                            <dd><span class="p-text">严重:</span> <span class="p-backgrd" style="background:#9e0835;color: #fff">{{August.zhd_count}}</span></dd>
+                        </dl>
+                    </div>
+                </div>
+                <div class="posi-smallceng3" v-if="doclientWidth < 1500">
+                    <!--9月-->
+                    <div class="let-01">
+                        <dl class="posi-float">
+                            <dt><span class="p-text">优:</span> <span class="p-backgrd" style="background:#13e613;color: #333">{{September.y_count}}</span></dt>
+                            <dd><span class="p-text">良:</span> <span class="p-backgrd" style="background:rgb(239, 220, 49);color: #333">{{September.l_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">中度:</span> <span class="p-backgrd" style="background:rgb(255, 0, 0);color: #fff">{{September.zd_count}}</span></dt>
+                            <dd><span class="p-text">重度:</span> <span class="p-backgrd" style="background:#de2159;color: #fff">{{September.yz_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">轻度:</span> <span class="p-backgrd" style="background:rgb(255, 126, 0);color: #333">{{September.qd_count}}</span></dt>
+                            <dd><span class="p-text">严重:</span> <span class="p-backgrd" style="background:#9e0835;color: #fff">{{September.zhd_count}}</span></dd>
+                        </dl>
+                    </div>
+                    <!--10月-->
+                    <div class="let-01">
+                        <dl class="posi-float">
+                            <dt><span class="p-text">优:</span> <span class="p-backgrd" style="background:#13e613;color: #333">{{October.y_count}}</span></dt>
+                            <dd><span class="p-text">良:</span> <span class="p-backgrd" style="background:rgb(239, 220, 49);color: #333">{{October.l_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">中度:</span> <span class="p-backgrd" style="background:rgb(255, 0, 0);color: #fff">{{October.zd_count}}</span></dt>
+                            <dd><span class="p-text">重度:</span> <span class="p-backgrd" style="background:#de2159;color: #fff">{{October.yz_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">轻度:</span> <span class="p-backgrd" style="background:rgb(255, 126, 0);color: #333">{{October.qd_count}}</span></dt>
+                            <dd><span class="p-text">严重:</span> <span class="p-backgrd" style="background:#9e0835;color: #fff">{{October.zhd_count}}</span></dd>
+                        </dl>
+                    </div>
+                    <!--11月-->
+                    <div class="let-01">
+                        <dl class="posi-float">
+                            <dt><span class="p-text">优:</span> <span class="p-backgrd" style="background:#13e613;color: #333">{{November.y_count}}</span></dt>
+                            <dd><span class="p-text">良:</span> <span class="p-backgrd" style="background:rgb(239, 220, 49);color: #333">{{November.l_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">中度:</span> <span class="p-backgrd" style="background:rgb(255, 0, 0);color: #fff">{{November.zd_count}}</span></dt>
+                            <dd><span class="p-text">重度:</span> <span class="p-backgrd" style="background:#de2159;color: #fff">{{November.yz_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">轻度:</span> <span class="p-backgrd" style="background:rgb(255, 126, 0);color: #333">{{November.qd_count}}</span></dt>
+                            <dd><span class="p-text">严重:</span> <span class="p-backgrd" style="background:#9e0835;color: #fff">{{November.zhd_count}}</span></dd>
+                        </dl>
+                    </div>
+                    <!--12月-->
+                    <div class="let-01">
+                        <dl class="posi-float">
+                            <dt><span class="p-text">优:</span> <span class="p-backgrd" style="background:#13e613;color: #333">{{December.y_count}}</span></dt>
+                            <dd><span class="p-text">良:</span> <span class="p-backgrd" style="background:rgb(239, 220, 49);color: #333">{{December.l_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">中度:</span> <span class="p-backgrd" style="background:rgb(255, 0, 0);color: #fff">{{December.zd_count}}</span></dt>
+                            <dd><span class="p-text">重度:</span> <span class="p-backgrd" style="background:#de2159;color: #fff">{{December.yz_count}}</span></dd>
+                        </dl>
+                        <dl class="posi-float">
+                            <dt><span class="p-text">轻度:</span> <span class="p-backgrd" style="background:rgb(255, 126, 0);color: #333">{{December.qd_count}}</span></dt>
+                            <dd><span class="p-text">严重:</span> <span class="p-backgrd" style="background:#9e0835;color: #fff">{{December.zhd_count}}</span></dd>
+                        </dl>
+                    </div>
+                </div>
+                <!---->
                 <div class="posi-3ceng">
                     <p>
                         <span>全年空气质量统计：</span>
@@ -214,16 +407,12 @@
                     </p>
                 </div>
             </div>
-            <!--同比界面-->
-            <yaeryaerhandle v-show="valueOne ==='同比'"></yaeryaerhandle>
-
         </div>
     </div>
 </template>
 
 <script>
     import api from '../../api/index';
-    import yaeryaerhandle from './yearyaerhandle'
     export default {
         name: "pollution",
         data(){
@@ -233,6 +422,7 @@
                 yeardata:'',
                 January:{},
                 February:{},
+                doclientWidth:document.body.clientWidth,
                 March:{},
                 April:{},
                 May:{},
@@ -245,9 +435,9 @@
                 December:{},
                 afData:{},
                 mothData:{},
+                ceType:'pm25'
             }
         },
-        created(){},
         methods:{
             //环比处理数据
             LinkDataHandle(){
@@ -280,12 +470,71 @@
                         so2c:item.so2c,
                         temp:item.temp,
                         weather:item.weather,
+                        color:item[_this.colorChange()],
                         winddirect:item.winddirect,
                         windlevel:item.windlevel,
                         startDate:new Date(item.day.replace(/\\/g, ',')),
                         endDate:new Date(item.day.replace(/\\/g, ','))
                     }
                 }));
+            },
+             //切换指标
+            typechange(val){
+                console.log(val);
+                 const _this = this;
+                switch (val){
+                    case 'AQI':
+                        _this.ceType = 'aqi';
+                        break;
+                    case 'PM2.5':
+                        _this.ceType = 'pm25';
+                        break;
+                    case 'PM10':
+                        _this.ceType = 'pm10';
+                        break;
+                    case 'SO2':
+                        _this.ceType = 'so2';
+                        break;
+                    case 'NO2':
+                        _this.ceType = 'no2';
+                        break;
+                    case 'CO':
+                        _this.ceType = 'co';
+                        break;
+                    case 'O3':
+                        _this.ceType = 'o3';
+                        break;
+                }
+                _this.ChainRequest();
+            },
+            //颜色修改
+            colorChange(){
+                let types = this.valueTwo;
+                let color ='';
+                switch (types){
+                    case 'AQI':
+                        color = 'aqic';
+                        break;
+                    case 'PM2.5':
+                        color = 'pm25c';
+                        break;
+                    case 'PM10':
+                        color = 'pm10c';
+                        break;
+                    case 'SO2':
+                        color = 'so2c';
+                        break;
+                    case 'NO2':
+                        color = 'no2c';
+                        break;
+                    case 'CO':
+                        color = 'coc';
+                        break;
+                    case 'O3':
+                        color = 'o3c';
+                        break;
+                }
+                return color
             },
             //环比查询底部统计
             ChainRatioStatistics(monts){
@@ -301,8 +550,10 @@
                 })
             },
             //环比比数据请求
-            ChainRequest(year){
-                api.GetPolluteCalendarhb(year).then(res =>{
+            ChainRequest(){
+                let type =  this.ceType;
+                let year = new Date().getFullYear();
+                api.GetPolluteCalendarhb(year,type).then(res =>{
                     this.afData = res.data;
                     console.log(this.afData);
                 });
@@ -441,7 +692,6 @@
                     dataSource: colordata
                 });
             },
-
         },
         mounted (){
             const _this = this;
@@ -452,113 +702,42 @@
                     if($(item).hasClass('hidden-xs') === false){
                         if($(item).find('year-title').context.innerText){
                             let years = $(item).find('year-title').context.innerText;
-                            _this.ChainRequest(years);
+                            _this.ChainRequest();
                         }
                     }
                 })
             });
-        },
-        components:{
-            yaeryaerhandle
         }
     }
 </script>
 
 <style lang="scss" scoped>
     .pollution{
-        width: 100%;
-        height: 100%;
+        width: calc(100% - 116px);
+        height:calc(100% - 86px);
+        overflow-y: auto;
+        box-sizing: border-box;
+        padding: 30px;
+        background: #fff;
         .warp-content{
-            width: 100%;
-            height: calc(100% - 64px);
+            width: 98%;
+            height: auto;
             margin: 0 auto;
-            overflow-x: hidden;
-            overflow-y: auto;
+            overflow: hidden;
             .con-cont{
                 width: 95%;
-                height: 100px;
-                .warp-coter{}
+                height: 58px;
+                .warp-coter{
+
+                }
                 .warp-float{
-                    float: right;
-                    margin-right: 10px;
+                    float: left;
+                    margin-left: 10px;
                 }
             }
             .warp-calendar{
                 position: relative;
                 width: 95%;
-                margin-left: 2.5%;
-                .posi-1ceng{
-                    position: absolute;
-                    top: 290px;
-                    width: 100%;
-                    height: 80px;
-                    .let-01{
-                        width: calc(16.6666666% - 3px);
-                        margin-left: 3px;
-                        height: 80px;
-                        float: left;
-                        .l-001{
-                            width: 100%;
-                            height: 40px;
-                            line-height: 40px;
-                            .ll1{
-                                float: left;
-                                width: 30%;
-                                text-align: right;
-                                height: auto;
-                                .text{
-                                    display: inline-block;
-                                    text-align: right;
-                                    color: #000;
-                                }
-                                span{
-                                    display: inline-block;
-                                    width: 20px;
-                                    height: 20px;
-                                    border-radius: 50%;
-                                    line-height: 20px;
-                                    text-align: center;
-                                }
-                            }
-                        }
-                    }
-                }
-                .posi-2ceng{
-                    position: absolute;
-                    top: 600px;
-                    width: 100%;
-                    height: 80px;
-                    .let-01{
-                        width: calc(16.6666666% - 3px);
-                        margin-left: 3px;
-                        height: 80px;
-                        float: left;
-                        .l-001{
-                            width: 100%;
-                            height: 40px;
-                            line-height: 40px;
-                            .ll1{
-                                float: left;
-                                width: 30%;
-                                height: auto;
-                                text-align: right;
-                                .text{
-                                    display: inline-block;
-                                    text-align: right;
-                                    color: #000;
-                                }
-                                span{
-                                    display: inline-block;
-                                    width: 20px;
-                                    height: 20px;
-                                    border-radius: 50%;
-                                    line-height: 20px;
-                                    text-align: center;
-                                }
-                            }
-                        }
-                    }
-                }
                 .posi-3ceng{
                     width: 98%;
                     height: 40px;
@@ -593,15 +772,111 @@
                         font-weight: bold;
                     }
                 }
-            }
-            .calendar_mom_text{
-                width: 100%;
-                height: auto;
-                .mon_text{
-                    width: 100%;height: 80px;border: solid 1px #e3e3e3;border-radius: 4px;
+                .posi-1ceng,.posi-2ceng{
+                    position: absolute;
+                    top: 290px;
+                    width: 100%;
+                    height: 80px;
+                    .let-01{
+                        width: calc(16.6666666% - 3px);
+                        margin-left: 3px;
+                        height: 80px;
+                        float: left;
+                        .posi-float{
+                            width: 33%;
+                            height: 100%;
+                            float: left;
+                            padding-left: 5px;
+                            dt,dd{
+                                width: 100%;
+                                height: 40%;
+                                line-height: 40px;
+                                text-align: left;
+                                .p-text{
+                                    text-align: right;
+                                    padding-left: 1px;
+                                    padding-right: 8px;
+                                    display: inline-block;
+                                    width: 44px;
+                                }
+                                .p-backgrd{
+                                    font-weight: 400;
+                                    display: inline-block;
+                                    margin-left: -10px;
+                                    width: 22px;
+                                    height: 22px;
+                                    text-align: center;
+                                    background: #3a1028;
+                                    color: #fff;
+                                    border-radius: 50%;
+                                    line-height: 22px;
+                                }
+                            }
+                        }
+                    }
+                }
+                .posi-2ceng{
+                    position: absolute;
+                    top: 600px;
+                    width: 100%;
+                    height: 80px;
+                }
+                .posi-smallceng1,.posi-smallceng2,.posi-smallceng3{
+                    position: absolute;
+                    top: 290px;
+                    width: 100%;
+                    height: 80px;
+                    .let-01{
+                        width: calc(25% - 3px);
+                        margin-left: 3px;
+                        height: 80px;
+                        float: left;
+                        .posi-float{
+                            width: 33%;
+                            height: 100%;
+                            float: left;
+                            padding-left: 5px;
+                            dt,dd{
+                                width: 100%;
+                                height: 40%;
+                                line-height: 40px;
+                                text-align: left;
+                                .p-text{
+                                    text-align: right;
+                                    padding-left:1px;
+                                    padding-right: 8px;
+                                    display: inline-block;
+                                    width: 44px;
+                                }
+                                .p-backgrd{
+                                    font-weight: 400;
+                                    display: inline-block;
+                                    margin-left: -10px;
+                                    width: 22px;
+                                    height: 22px;
+                                    text-align: center;
+                                    background: #3a1028;
+                                    color: #fff;
+                                    border-radius: 50%;
+                                    line-height: 22px;
+                                }
+                            }
+                        }
+                    }
+                }
+                .posi-smallceng2{
+                    position: absolute;
+                    top: 600px;
+                    width: 100%;
+                    height: 80px;
+                }
+                .posi-smallceng3{
+                    position: absolute;
+                    top: 910px;
+                    width: 100%;
+                    height: 80px;
                 }
             }
-
         }
 
     }

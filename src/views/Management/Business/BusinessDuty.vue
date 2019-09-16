@@ -36,16 +36,27 @@
 			      label="责任部门名称"
 			      >
 			    </el-table-column>
-			    <el-table-column
-			      prop="leader"
-			      label="主管领导"
-			     >
-			    </el-table-column>
+				<!--<el-table-column-->
+					<!--prop="createTime"-->
+					<!--label="创建时间"-->
+				<!--&gt;-->
+				<!--</el-table-column>-->
+				<el-table-column
+					prop="contact"
+					label="主管领导"
+				>
+				</el-table-column>
 			     <el-table-column
-			      prop="contacts"
+			      prop="phoneNum"
 			      label="联系方式"
 			      >
 			    </el-table-column>
+				<el-table-column
+					prop="isForbidenString"
+					label="是否禁用"
+					width="100"
+				>
+				</el-table-column>
 			    <el-table-column
 			      label="操作"
 			      width="120">
@@ -53,7 +64,8 @@
 			        <el-button @click="handleClick(scope.row)" type="text" size="small" class='eidt'>编辑</el-button>
 			        <span style="color: #eee;">|</span>
 			        <span class="OverBox">
-			        	<el-button @click="DeleteOperatorInfo(scope.row)" type="text" size="small" class='eidt'>删除</el-button>
+			        	<el-button v-if="scope.row.isForbidenString==='未禁用'" @click="DeleteOperatorInfo(scope.row)" type="text" size="small" class='eidt'>禁用</el-button>
+						<el-button v-if="scope.row.isForbidenString==='已禁用'" @click="ForResponsibility(scope.row)" type="text" size="small" class='eidt'>解禁</el-button>
 			        </span>
 			      </template>
 			    </el-table-column>
@@ -80,10 +92,10 @@
 	                </div>
 	                <div class="content">
 						<!---->
-						<div class="block">
-						    <span>部门编号</span>
-						    <el-input v-model="equipmentPerson1" placeholder="请输入内容"></el-input>
-						</div>
+						<!--<div class="block">-->
+						    <!--<span>部门编号</span>-->
+						    <!--<el-input v-model="equipmentPerson1" placeholder="请输入内容"></el-input>-->
+						<!--</div>-->
 						<div class="block">
 							<span>部门名称</span>
 							<el-input v-model="equipmentPerson2" placeholder="请输入内容"></el-input>
@@ -96,6 +108,21 @@
 							<span>联系方式</span>
 							<el-input v-model="equipmentPerson4" placeholder="请输入内容"></el-input>
 						</div>
+						<div class="block">
+							<span>联系地址</span>
+							<el-input v-model="address" placeholder="请输入内容"></el-input>
+						</div>
+						<!--<div class="block">-->
+							<!--<span>是否禁用</span>-->
+							<!--<el-select v-model="isForbidenVale" filterable  @change="AddSelectName" placeholder="请选择">-->
+								<!--<el-option-->
+										<!--v-for="item in isForbidenOptions"-->
+										<!--:key="item.value"-->
+										<!--:label="item.name"-->
+										<!--:value="item.value">-->
+								<!--</el-option>-->
+							<!--</el-select>-->
+						<!--</div>-->
 						<el-row style='position: absolute;bottom: 20px;right: 30px;'>
 							<el-button type="primary" @click='publish'>确定</el-button>
 							<el-button plain @click='isNew=false'>取消</el-button>
@@ -113,10 +140,10 @@
 	                </div>
 	                <div class="content">
 						<!---->
-						<div class="block">
-							<span>部门编号</span>
-							<el-input v-model="equipmentPerson1b" placeholder="请输入内容"></el-input>
-						</div>
+						<!--<div class="block">-->
+							<!--<span>部门编号</span>-->
+							<!--<el-input v-model="equipmentPerson1b" placeholder="请输入内容"></el-input>-->
+						<!--</div>-->
 						<div class="block">
 							<span>部门名称</span>
 							<el-input v-model="equipmentPerson2b" placeholder="请输入内容"></el-input>
@@ -129,6 +156,21 @@
 							<span>联系方式</span>
 							<el-input v-model="equipmentPerson4b" placeholder="请输入内容"></el-input>
 						</div>
+						<div class="block">
+							<span>联系地址</span>
+							<el-input v-model="address" placeholder="请输入内容"></el-input>
+						</div>
+						<!--<div class="block">-->
+							<!--<span>是否禁用</span>-->
+							<!--<el-select v-model="isForbidenVale" filterable  @change="AddSelectName" placeholder="请选择">-->
+								<!--<el-option-->
+										<!--v-for="item in isForbidenOptions"-->
+										<!--:key="item.value"-->
+										<!--:label="item.name"-->
+										<!--:value="item.value">-->
+								<!--</el-option>-->
+							<!--</el-select>-->
+						<!--</div>-->
 						<el-row style='position: absolute;bottom: 20px;right: 30px;'>
 							<el-button type="primary" @click='EditUpdate'>确定</el-button>
 							<el-button plain @click='isEdit=false'>取消</el-button>
@@ -164,12 +206,17 @@
 			    isNew: false,
 			    //
 			    title:'添加',
+				//
+                isForbidenVale:'',
+                isForbidenOptions:[{name:'禁用', value:'1'}, {name:'不禁用', value:'0'}],
+                isForbidenObj:{name:'禁用', value:'1'},
                 //添加
                 equipmentPerson1:'',
                 equipmentPerson2:'',
                 equipmentPerson3:'',
                 equipmentPerson4:'',
                 equipmentPersonid:'',
+                address:'',
 				//编辑
                 equipmentPerson1b:'',
                 equipmentPerson2b:'',
@@ -193,26 +240,62 @@
             
         },
         methods: {
-            //
+            //添加下拉选择
+            AddSelectName(val){
+                console.log(val)
+                this.isForbidenObj = {};
+                this.isForbidenObj = this.isForbidenOptions.find((item)=>{
+                    if (val === item.value) {
+                        return item;
+                    }
+                });
+            },
+            //查询列表
             QueryNeedsData(){
                 let condata = this.departmentVal;
                 this.getNotice(condata);
             },
-        	//列表删除
+			//责任主体解禁
+			ForResponsibility(row){
+                const _this = this;
+                console.log(row)
+                let id = row.id;
+                this.$confirm('确认要解禁吗？')
+                    .then(_ => {
+                        // done();
+                        console.log('解禁成功')
+                        api.POSTForResponsibility(id).then(res=>{
+                            console.log(res)
+                            if(res.data.status > 0){
+                                _this.$message({showClose: true, message: '解禁成功', type: 'success'});
+                            }else {
+                                _this.$message({showClose: true, message: '解禁失败', type: 'error'});
+                            }
+                        })
+                        //
+                        setTimeout(()=>{
+                            _this.getNotice();
+                        },200)
+                    })
+                    .catch(_ => {
+                        console.log('解禁失败')
+                    });
+			},
+        	//责任主体禁用
         	DeleteOperatorInfo(row) {
                 const _this = this;
                 console.log(row)
                 let id = row.id;
-                this.$confirm('确认要删除本条数据吗？')
+                this.$confirm('确认要禁用吗？')
                     .then(_ => {
                         // done();
-						console.log('删除成功')
+						console.log('禁用成功')
                         api.POSTcodeDepartmentlistdelt(id).then(res=>{
                         	console.log(res)
-							if(res.data.message === 'true'){
-                                _this.$message({showClose: true, message: '删除成功', type: 'success'});
+							if(res.data.status > 0){
+                                _this.$message({showClose: true, message: '禁用成功', type: 'success'});
 							}else {
-                                _this.$message({showClose: true, message: '删除失败', type: 'error'});
+                                _this.$message({showClose: true, message: '禁用失败', type: 'error'});
 							}
                         })
 						//
@@ -221,7 +304,7 @@
 						},200)
                     })
                     .catch(_ => {
-                        console.log('删除失败')
+                        console.log('禁用失败')
                     });
 		    },
 			//添加数据
@@ -236,29 +319,31 @@
 	        	console.log(row)
 	        	if(this.isEdit){
 	      			this.equipmentPerson1bid = row.id;
-	      			this.equipmentPerson1b = row.code;
+	      			//this.equipmentPerson1b = row.id;
 	      			this.equipmentPerson2b = row.name;
-	      			this.equipmentPerson3b = row.leader;
-	      			this.equipmentPerson4b = row.contacts;
+	      			this.equipmentPerson3b = row.contact;
+	      			this.equipmentPerson4b = row.phoneNum;
 	        	}
 	        	this.isNew = false;
       		},
       		//编辑发布
       		EditUpdate(){
+
       			const _this = this;
       			let id = this.equipmentPerson1bid;
-      			let code = _this.equipmentPerson1b;
-      			let name = _this.equipmentPerson2b;
-      			let leader = _this.equipmentPerson3b;
-      			let contacts = _this.equipmentPerson4b;
-      			api.POSTcodeDepartmentlistupt(id,code,name,leader,contacts).then(result=>{
+                let name = _this.equipmentPerson2b;
+                let contact = _this.equipmentPerson3b;
+                let phoneNum = _this.equipmentPerson4b;
+                let address = _this.address;
+                //let isForbiden = _this.isForbidenObj.value;
+      			api.POSTcodeDepartmentlistupt(id, name, address, contact, phoneNum).then(result=>{
       			    console.log(result);
       			    //let info = result.data.message;
-      			    let error = result.data.errorDesc;
-                    if(result.data.status > -1){
+      			    //let error = result.data.errorDesc;
+                    if(result.data.status > 0){
                         _this.$message({showClose: true, message: '修改成功！', type: 'success'});
                     }else {
-                        _this.$message({showClose: true, message:'修改失败！' +error, type: 'error'});
+                        _this.$message({showClose: true, message:'修改失败！', type: 'error'});
                     }
                     _this.getNotice();
 				});
@@ -272,8 +357,8 @@
       		handleCurrentChange(val) {
         		//this.setPageTable(10, val);
                 let cona = this.departmentVal;
-                let pag = val;
-                this.getNotice(cona,pag);
+                //let pag = val;
+                this.getNotice(cona);
       		},
 			//
       		openWin(){
@@ -287,40 +372,42 @@
       		//添加数据
       		Insert(){
                 const _this = this;
-                let id = _this.equipmentPersonid ||'';
-                let code = _this.equipmentPerson1;
+                let id = _this.equipmentPerson1;
                 let name = _this.equipmentPerson2;
-                let leader = _this.equipmentPerson3;
-                let contacts = _this.equipmentPerson4;
-				api.POSTcodeDepartmentlistaddt(id,code,name,leader,contacts).then(result=>{
+                let contact = _this.equipmentPerson3;
+                let phoneNum = _this.equipmentPerson4;
+                let address = _this.address;
+                //let isForbiden = _this.isForbidenObj.value;
+				api.POSTcodeDepartmentlistaddt(id, name, address, contact, phoneNum).then(result=>{
                     console.log(result);
                     //let info = result.data.message;
-                    let error = result.data.errorDesc;
-                    if(result.data.status > -1){
+                    //let error = result.data.errorDesc;
+                    if(result.data.status > 0){
                         _this.$message({showClose: true, message: '修改成功！', type: 'success'});
                     }else {
-                        _this.$message({showClose: true, message:'添加失败！'+error, type: 'error'});
+                        _this.$message({showClose: true, message:'添加失败！', type: 'error'});
                     }
                     _this.getNotice();
 				});
       		},
       		//获取列表数据
-      		getNotice(name = '',pag =1){
-                let nm = name;
-                let pageNo = pag;
+      		getNotice(name = ''){
+                let tbname = name;
       			const _this = this;
       			this.tableData = [];
-      			api.GetcodeDepartmentlistdt(nm,pageNo).then(result=>{
+      			api.GetcodeDepartmentlistdt(tbname).then(result=>{
       			    console.log(result);
-                    let InfoData = result.data.data.rows;
-                    _this.totalCount = result.data.data.total;
+                    let InfoData = result.data.data;
+                    _this.totalCount = result.data.data.length;
 					InfoData.forEach(item=>{
-						let tableData = {};
+						const tableData = {};
                         tableData.id = item.id;//id
-                        tableData.code = item.code;//部门编码
+                        tableData.code = item.id;//部门编码
                         tableData.name = item.name;//部门名称
-                        tableData.leader = item.leader;//主管领导
-                        tableData.contacts = item.contacts;//联系方式
+						tableData.phoneNum = item.phoneNum;//联系方式
+                        tableData.isForbidenString = item.isForbidenString;//禁用状态
+                        tableData.contact = item.contact;//主管领导
+						tableData.createTime = item.createTime;
                         _this.tableData.push(tableData);
 					})
                     //_this.setPageTable(10, 1);

@@ -2,58 +2,28 @@
     <div class="tvoc">
         <!--TVOC右侧面板-->
         <div class="main">
-                    <!--选项查询-->
-                    <div class="first">
-                        <el-tabs v-model="activeNametoc" @tab-click="handleClick">
-                            <el-tab-pane label="全市" name="first2"></el-tab-pane>
-                            <el-tab-pane label="开发区" name="second2"></el-tab-pane>
-                            <el-tab-pane label="安次区" name="third2"></el-tab-pane>
-                        </el-tabs>
-                    </div>
-                    <!--排名-->
-                    <div class="table_container">
-                        <el-table
-                                :data="tableData"
-                                border
-                                stripe
-                                highlight-current-row
-                                @current-change="RowCurrentChange"
-                                style="width: 400px">
-                            <el-table-column
-                                    property="ranking"
-                                    label="排名"
-                                    width="80">
-                            </el-table-column>
-                            <el-table-column
-                                    property="gridName"
-                                    label="网格名称"
-                                    width="80">
-                            </el-table-column>
-                            <el-table-column
-                                    property="pointName"
-                                    label="名称"
-                                    width="160">
-                            </el-table-column>
-                            <el-table-column
-                                    property="tVOC_V"
-                                    label="TVOC"
-                                   >
-                            </el-table-column>
-                        </el-table>
-                        <div class="Pagination" style="text-align: left;margin-top: 10px;">
-                            <el-pagination
-                                    background
-                                    @current-change="handleCurrentChange"
-                                    :current-page="currentPage"
-                                    :page-size="pagesize"
-                                    layout="total, prev, pager, next"
-                                    :total="totalCount">
-                            </el-pagination>
-                        </div>
-                    </div>
+            <!--选项查询-->
+            <div class="first">
+                <el-tabs v-model="activeNametoc" @tab-click="handleClick">
+                    <el-tab-pane label="全市" name="first2"></el-tab-pane>
+                    <!-- <el-tab-pane label="开发区" name="second2"></el-tab-pane>
+                    <el-tab-pane label="安次区" name="third2"></el-tab-pane> -->
+                </el-tabs>
+            </div>
+            <!--排名-->
+            <div class="table_container">
+                <el-table :data="tableData" border stripe :row-class-name="tableRowClassName" @current-change="RowCurrentChange" style="width: 400px">
+                    <el-table-column property="ranking" label="排名" width="80"></el-table-column>
+                    <el-table-column property="gridName" label="网格名称" width="80"></el-table-column>
+                    <el-table-column property="pointName" label="名称" width="160"></el-table-column>
+                    <el-table-column property="tVOC_V" label="TVOC"></el-table-column>
+                </el-table>
+                <div class="Pagination" style="text-align: left;margin-top: 10px;">
+                    <el-pagination background @current-change="handleCurrentChange" :current-page="currentPage" :page-size="pagesize" layout="total, prev, pager, next" :total="totalCount"></el-pagination>
                 </div>
+            </div>
+        </div>
     </div>
-
 </template>
 
 <script>
@@ -102,6 +72,15 @@
                     let value2 = object2[propertyName]
                     return value2 - value1
                 }
+            },
+            //颜色列表
+            tableRowClassName({row, rowIndex}) {
+                if (rowIndex%2 === 0) {
+                    return 'warning-row';
+                } else {
+                    return 'success-row';
+                }
+                return '';
             },
             //切换事件
             handleClick(tab, event) {

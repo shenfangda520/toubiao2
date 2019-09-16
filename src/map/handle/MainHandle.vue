@@ -6,8 +6,7 @@
   import {bus} from '@/js/bus'
   import {PostSchduleListResource} from '@/api/resource.js'
   import {GetXCYHistoryTrackResource} from '@/api/resource.js'
-  import {GetXCYSingleInfoResource} from '@/api/resource.js'
-
+  import BdPolygon from '@/map/overlayes/BdPolygon'
 
   export default {
     name: 'MainHandle',
@@ -24,7 +23,7 @@
         mouseLabel: undefined,
         mkm: undefined,
         markUrl: '/static/imgs/duststatic/',
-        defaultType: 'LAYER_GS',
+        defaultType: 'LAYER_CGQ_VOC',
         maxZoom: 13,
         trafficLayer: undefined,
         searchInfoWindow: undefined,
@@ -83,19 +82,22 @@
           boxShadow: '1px 3px 4px rgba(0,0,0,0.18)',
           padding: 0
         }), this.mouseLabel.hide(), this.map.addOverlay(this.mouseLabel));
-        // if (this.map) {
-        //this.targetClick(this.defaultType, true);
-        // }
+        if (this.map) {
+          this.targetClick(this.defaultType, true);
+        }
       },
 
       //切换响应事件
       targetClick(type, hasVisible, from) {
+        console.log(from);
         switch (type.toUpperCase()) {
           case 'LAYER_SP':
           case 'LAYER_SP_SLW':
           case 'LAYER_SP_VOC':
           case 'LAYER_SP_GD':
           case 'LAYER_SP_GKW':
+          case 'LAYER_SP_CY':
+          case 'LAYER_SP_HD':
           case 'LAYER_VOC':
           case 'LAYER_CG':
           case 'LAYER_CGQ_LCS':
@@ -109,8 +111,15 @@
           case 'LAYER_YJ':
           case 'LAYER_QM':
           case 'LAYER_XCY':
+          case 'LAYER_CY':
+          case 'LAYER_YQ':
+          case 'LAYER_WQ':
             //请求接口触发
             hasVisible ? this.requestData(type, from) : (this.removeMarkerByList(this.getMarkerByType(type), type), this.removeLabelValue(this.getLabelValueByType(type), type), this.removeLabelRed(this.getLabelRedByType(type), type), this.delDataSourceByCode(type));
+            break;
+          case 'LAYER_SP_FS':
+            hasVisible ? this.requestData(type, from) : (this.removeMarkerByList(this.getMarkerByType(type), type), this.removeLabelValue(this.getLabelValueByType(type), type), this.removeLabelRed(this.getLabelRedByType(type), type), this.delDataSourceByCode(type));
+            this.setFSLayer(hasVisible);
             break;
           case 'LAYER_LK':
             this.targetTrafficLayer(hasVisible);
@@ -119,18 +128,25 @@
       },
 
       //指标切换事件
-      pollutionTargetClick(type, fieldName, displayName) {
+      pollutionTargetClick(type, fieldName, displayName, fieldValue = undefined) {
         const t = this;
-        let dt = this.getDataSourceByCode(type, fieldName);
+        let dt = this.getDataSourceByCode(type, fieldName, fieldValue);
         if (dt) {
           this.lsMarkers.length && this.removeMarkerByList(this.getMarkerByType(type), type);
           this.lsLabels.length && this.removeMarkerLabel(this.getMarkerLabelByType(type), type);
           this.lsRedLabels.length && this.removeLabelRed(this.getLabelRedByType(type), type);
           this.lsValueLabels.length && this.removeLabelValue(this.getLabelValueByType(type), type);
+          //过滤数据
+          let filterdata = dt.data;
+          if (type.toUpperCase() === 'LAYER_QM' && parseInt(fieldValue)) {
+            filterdata = dt.data.filter(v => parseInt(v['type']) === parseInt(fieldValue))
+          }
+
           //源清单切换图层缓存问题
           type.toUpperCase() === 'LAYER_YQD' ? setTimeout(() => {
             t.loadMarker(dt.data, type, fieldName, displayName);
-          }, 200) : this.loadMarker(dt.data, type, fieldName, displayName);
+          }, 200) : this.loadMarker((type.toUpperCase() === 'LAYER_SP_VOC' && parseInt(fieldValue)) ? dt.data.filter(v => parseInt(v['warningColor']) === parseInt(fieldValue)) : filterdata, type, fieldName, displayName);
+
           switch (type.toUpperCase()) {
             case 'LAYER_GS':
               bus.$emit('switchRender', fieldName);
@@ -149,18 +165,16 @@
           }
         }
       },
-
-      //点击播放关联视频
-      AssociatedVideo(id) {
-        //获取需要视频idcode
-        let idcode = id;
-        //跳转页面传递idcode
-        this.$router.push({
-          path: '/HighVideos',
-          query: {
-            id: idcode
-          }
-        })
+      /*
+      * 视频播放
+      * @type 视频类别  1秸秆焚烧  0 其他
+      * @name 视频名称
+      * @code 视频code（播放必须）
+      * */
+      VideoPlayback(type, name, code) {
+        //type区分视频类别
+        let vname = encodeURI(name);//加密文字
+        this.$router.push({path: '/HighVideos', query: {type, name: vname, code}})
       },
 
       //右侧面板点击事件
@@ -170,16 +184,18 @@
         }
         let lng = data.lng || data.longitude;
         let lat = data.lat || data.latitude;
+        if(!lng||!lat)
+          return;
         let pt = new BMap.Point(lng, lat);
         if (!hasSearch) {
           if (data && type) {
             data['ptType'] = type;
             type.toUpperCase() === 'LAYER_GS' && (data['isLf'] = true, data['dataLevel'] = 1);
-            type.toUpperCase() !== 'LAYER_GS' && (pt = this.wgsPointToBd(pt));
+            type.toUpperCase() !== 'LAYER_GS'&&  type.toUpperCase() !== 'LAYER_CX'&& (pt = this.wgsPointToBd(pt));
             this.markerClick(data, pt, fieldName);
           }
         } else {
-          let code = data.layer.toUpperCase();
+          let code =type.toUpperCase();// data.layer.toUpperCase();
           let ckItem = this.dataSource.find(v => v.code === code) || {};
           let dtItem = undefined;
           let fieldName = undefined;
@@ -231,9 +247,17 @@
               fieldName = 'smokeStatus';
               break;
             case 'LAYER_SP_VOC':
-            case 'LAYER_SP_SLW':
             case 'LAYER_SP_GKW':
-              this.AssociatedVideo(data.id);
+             // this.VideoPlayback();
+              break;
+            case 'LAYER_SP_SLW':
+              dtItem=ckItem.data.find(v => v.id === data.id) || {};
+              break;
+            case 'LAYER_SP_HD':
+              dtItem=ckItem.data.find(v => v.id === data.id) || {};
+              break;
+            case 'LAYER_CY':
+              dtItem=ckItem.data.find(v => v.name === data.name) || {};
               break;
             // dtItem = {
             //   CamName: data.voc_name,
@@ -374,89 +398,136 @@
         let requestType = 'GET';
         let uppercaseType = type.toUpperCase();
         switch (uppercaseType) {
-          case 'LAYER_SP':
-          case 'LAYER_SP_SLW':
-          case 'LAYER_SP_VOC':
-          case 'LAYER_SP_GD':
-          case 'LAYER_SP_GKW':
-            //pmsKey = uppercaseType === 'LAYER_SP' ? undefined : (uppercaseType === 'LAYER_SP_SLW' ? '' : (uppercaseType === 'LAYER_SP_VOC' ? '' : (uppercaseType === 'LAYER_SP_GKW' ? '' : undefined)));
-            let urlSP = RequestHandle.getRequestUrl('VIDEOTAEGET');
-            displayName = 'CamName';
-            //pmsKey && (pms = {key: pmsKey});
-            lsUrl.push(urlSP);
+          case 'LAYER_SP_GD'://工地
+            fieldName = 'pm25';
+            displayName = 'name';
+            let urlSGD = RequestHandle.getRequestUrl(uppercaseType);
+            lsUrl.push(urlSGD);
             break;
-          case 'LAYER_CG':
-          case 'LAYER_CGQ_LCS':
-          case 'LAYER_CGQ_GSX':
+          case 'LAYER_SP_VOC'://VOC
+            fieldName = '';
+            displayName = 'name';
+            let urlSVOC = RequestHandle.getRequestUrl(uppercaseType);
+            lsUrl.push(urlSVOC);
+            break;
+          case 'LAYER_SP_CY'://餐饮
+            fieldName = '';
+            displayName = 'name';
+            let urlSCY = RequestHandle.getRequestUrl(uppercaseType);
+            lsUrl.push(urlSCY);
+            break;
+          case 'LAYER_SP_GKW'://高空五公里
+            fieldName='';
+            displayName='name';
+            let urlGKW=RequestHandle.getRequestUrl(uppercaseType);
+            lsUrl.push(urlGKW);
+            requestType = 'GET';
+            break;
+          case 'LAYER_SP_FS'://秸秆焚烧
+          case 'LAYER_SP_HD'://河道
+          case 'LAYER_SP_SLW'://散乱污
+            // let urlSP = RequestHandle.getRequestUrl('VIDEOTAEGET');
+            // displayName = 'CamName';
+            // lsUrl.push(urlSP);
+            fieldName = 'sunnum';
+            displayName = 'name';
+            let urlFS = RequestHandle.getRequestUrl(uppercaseType);
+            lsUrl.push(urlFS);
+            requestType = 'POST';
+            break;
+          case 'LAYER_CGQ_LCS'://六参数
             //pmsKey = uppercaseType === 'LAYER_CG' ? undefined : (uppercaseType === 'LAYER_CGQ_LCS' ? '' : (uppercaseType === 'LAYER_CGQ_GSX' ? '' : (uppercaseType === 'LAYER_CGQ_VOC' ? '' : undefined)));
-            let urlLCS = RequestHandle.getRequestUrl('MAINSIXPOLLUTION');
+            let urlLCS = RequestHandle.getRequestUrl(uppercaseType);
             //pmsKey && (pms = {key: pmsKey});
             fieldName = 'aqi';
             displayName = 'stationname';
             lsUrl.push(urlLCS);
             break;
           case 'LAYER_VOC':
-          case 'LAYER_CGQ_VOC':
-            let urlVOC = RequestHandle.getRequestUrl('VOCPOLLUTION');
+          case 'LAYER_CGQ_VOC'://
+            let urlVOC = RequestHandle.getRequestUrl(uppercaseType);
             fieldName = 'tVOC_V';
             displayName = 'pointName';
             lsUrl.push(urlVOC);
             break;
-          case 'LAYER_CGQ_SLW':
-            let urlSLW = RequestHandle.getRequestUrl('VOCPOLLUTION');
+          case 'LAYER_CGQ_SLW'://散乱污
+            let urlSLW = RequestHandle.getRequestUrl(uppercaseType);
             fieldName = 'aqi';
             lsUrl.push(urlSLW);
             break;
-          case 'LAYER_GS':
-            let urlGS = RequestHandle.getRequestUrl('GSCITYPOLLUTION');
+          case 'LAYER_GS'://国省控
+            let urlGS = RequestHandle.getRequestUrl(uppercaseType);
             fieldName = 'aqi';
             displayName = 'pointname';
             lsUrl.push(urlGS);
             break;
-          case 'LAYER_GD':
-            let urlGD = RequestHandle.getRequestUrl('DUSTPOLLUTION');
-//            let urlXHGD = RequestHandle.getRequestUrl('XHDUST');
+          case 'LAYER_GD'://工地
+            let urlGD = RequestHandle.getRequestUrl(uppercaseType);
             fieldName = 'pm25';
             displayName = 'name';
             lsUrl.push(urlGD);
             break;
-          case 'LAYER_QY':
-            let urlQY = RequestHandle.getRequestUrl('ENTERPRISE');
+          case 'LAYER_QY'://企业
+            let urlQY = RequestHandle.getRequestUrl(uppercaseType);
             lsUrl.push(urlQY);
             fieldName = 'smokeStatus';
             displayName = 'psname';
             break;
-          case 'LAYER_CX':
-            let urlCX = RequestHandle.getRequestUrl('TOWNPOLLUTION');
+          case 'LAYER_CX'://城乡
+            let urlCX = RequestHandle.getRequestUrl(uppercaseType);
             lsUrl.push(urlCX);
             fieldName = 'pm25';
             displayName = 'name';
+            pms = {
+              region: '广阳区'
+            };
             break;
-          case 'LAYER_YQD':
-            let urlYQ = RequestHandle.getRequestUrl('STATICTARGET');
-            lsUrl.push(urlYQ);
+          case 'LAYER_YQD'://原清单
+            let urlYQD = RequestHandle.getRequestUrl(uppercaseType);
+            lsUrl.push(urlYQD);
             requestType = 'GET';
             fieldName = 'so2';
             displayName = 'name';
             pms = params || {ids: '0001'};
             break;
-          case 'LAYER_YJ':
-            let urlYJ = RequestHandle.getRequestUrl('EMERGENCY');
+          case 'LAYER_YJ'://应急企业
+            let urlYJ = RequestHandle.getRequestUrl(uppercaseType);
             lsUrl.push(urlYJ);
             fieldName = '';
             displayName = 'companyname';
             break;
-          case 'LAYER_QM':
-            let urlQM = RequestHandle.getRequestUrl('ALLREPORT');
+          case 'LAYER_CY'://餐饮
+            let urlCY = RequestHandle.getRequestUrl(uppercaseType);
+            lsUrl.push(urlCY);
+            fieldName = 'concentrationOut';
+            displayName = 'name'
+            pms = {
+              pageSize: 10000,
+              pageNo: 1
+            };
+            break;
+          case 'LAYER_YQ'://油气
+            let urlYQ = RequestHandle.getRequestUrl(uppercaseType);
+            lsUrl.push(urlYQ);
+            fieldName = '';
+            displayName = 'name'
+            pms = {
+              pageSize: 10000,
+              pageNo: 1
+            };
+            break;
+          case 'LAYER_QM'://案件督察
+            let urlQM = RequestHandle.getRequestUrl(uppercaseType);
             lsUrl.push(urlQM);
-            fieldName = 'casecode';
+            requestType = 'POST';
+            fieldName = 'type';
             displayName = '';
             pms = {
               pageSize: 10000,
               pageNo: 1
             };
             break;
-          case 'LAYER_XCY':
+          case 'LAYER_XCY'://
             lsUrl.push(PostSchduleListResource);
             requestType = 'POST';
             // fieldName = 'mobile';
@@ -465,6 +536,13 @@
               PageSize: 10000,
               PageIndex: 1
             };
+            break;
+          case 'LAYER_WQ':
+            let urlWQ=RequestHandle.getRequestUrl(uppercaseType);
+            lsUrl.push(urlWQ);
+            fieldName = 'standard_rate';
+            displayName = 'name';
+
             break;
         }
         let reqPms = undefined;
@@ -481,12 +559,14 @@
           let url = lsUrl[i];
           let params = {url: url + (reqPms ? ('?' + reqPms) : ''), type: requestType, pms: postPms};
           RequestHandle.request(params, function (result) {
-            debugger;
             if (result.status) {
               let rtValue = [];
               let dt = undefined;
               switch (uppercaseType) {
                 case 'LAYER_QM':
+                  dt = result.obj;
+                  break;
+                case 'LAYER_YQ':
                   dt = result.obj.rows;
                   break;
                 default:
@@ -496,12 +576,18 @@
               if (dt) {
                 for (let k = 0, length = dt.length; k < length; k++) {
                   let item = dt[k];
-                  if (item.Type == from) {
-                    rtValue.push(dt[k]);
-                  }
+                  // if (item.Type == from) {
+                  rtValue.push(dt[k]);
+                  // }
+
                 }
               }
-              rtValue.length && (t.loadMarker(rtValue, type, fieldName, displayName), t.setDataSource(type, rtValue, fieldName, displayName));
+              let filterData = rtValue;
+              if (type.toUpperCase() === 'LAYER_QM') {
+                filterData = rtValue.filter(v => (v.type === from));
+              }
+
+              rtValue.length && (t.loadMarker(filterData, type, fieldName, displayName), t.setDataSource(type, rtValue, fieldName, displayName));
             }
           }, function (e) {
             console.error(e);
@@ -590,12 +676,13 @@
       },
 
       //获取dataSource根据图层标识
-      getDataSourceByCode(code, fieldName) {
-        return this.dataSource.find(function (v) {
+      getDataSourceByCode(code, fieldName, fieldValue = undefined) {
+        let source = this.dataSource.find(function (v) {
           let rtValue = v.code.toUpperCase() === code.toUpperCase();
           rtValue && (v.fieldName = fieldName);
           return rtValue;
         });
+        return source;
       },
 
       //删除dataSource根据图层标识
@@ -634,6 +721,29 @@
         if (polyline)
           this.map.removeOverlay(polyline);
 
+      },
+
+      setFSLayer(hasChecked){
+        let urlFSRatio = RequestHandle.getRequestUrl("CASE_FS_GRID_RATIO");
+        let requestType = 'POST';
+        let params = {url: urlFSRatio, type: requestType};
+        var rtValue = [];
+        RequestHandle.request(params, function (result) {
+
+          if (result.status) {
+            let dt = undefined;
+            dt = result.obj;
+
+            if (dt) {
+              for (let k = 0, length = dt.length; k < length; k++) {
+                rtValue.push(dt[k]);
+              }
+            }
+          }
+          bus.$emit('setMenuLayer', 1, hasChecked, rtValue);
+        }, function (e) {
+          console.error("异常", e);
+        });
       },
 
       setZoom(points) {
@@ -680,7 +790,6 @@
         //判断不是火狐谷歌全部使用gif
         if ('FF' !== mb && 'Chrome' !== mb)
           this.browser = 0;
-
         for (let i = 0, length = data.length; i < length; i++) {
           let value = data[i];
           value['ptType'] = type;
@@ -868,7 +977,7 @@
         let displayFieldName = tg.displayField;
         let valueField = tg.valueField;
         let lt = tg.layerType;
-        if (lt.toUpperCase() === 'LAYER_YQD' || lt.toUpperCase() === 'LAYER_YJ' || lt.toUpperCase() === 'LAYER_QY' || lt.toUpperCase() === 'LAYER_SP_SLW' || lt.toUpperCase() === 'LAYER_SP_VOC' || lt.toUpperCase() === 'LAYER_SP_GKW') {
+        if (['LAYER_YQD', 'LAYER_YJ', 'LAYER_QY', 'LAYER_SP_SLW', 'LAYER_SP_CY', 'LAYER_SP_HD', 'LAYER_SP_VOC', 'LAYER_SP_GD', 'LAYER_SP_GKW','LAYER_YQ','LAYER_WQ'].indexOf(lt.toUpperCase()) > -1) {
           let ptName = attr[displayFieldName] || attr['psname'];
           ptName && (t.mouseLabel.setContent('<span style="padding:0 5px;">' + ptName + '</span>' + '<div class="arrow" style="width: 0;  height: 0; border-left: 8px solid transparent; border-bottom: 8px solid; border-right: 8px solid transparent; color:#fff; position: absolute;  margin-top:-26px;margin-left:' + (ptName.length * 14) / 2 + 'px  " ></div>'),
             t.mouseLabel.setPosition(tg.getPosition()),
@@ -910,7 +1019,7 @@
             if (waringType) {
               let elContext = '<div class="pulse"></div><div class="pulse1"></div>';
               let opts = {
-                position: (ptType.toUpperCase() === 'LAYER_SP' || ptType.toUpperCase() === 'LAYER_SP_VOC' || ptType.toUpperCase() === 'LAYER_CGQ_VOC' || ptType.toUpperCase() === 'LAYER_GD') ? conPoint : pt,//ptType.toUpperCase() === 'LAYER_CGQ_LCS' ||
+                position: ['LAYER_SP_GD','LAYER_SP_SLW','LAYER_SP_VOC','LAYER_SP_CY','LAYER_SP_FS','LAYER_SP_HD'].includes(ptType.toUpperCase()) ? conPoint : pt,//ptType.toUpperCase() === 'LAYER_CGQ_LCS' ||
                 offset: (ptType.toUpperCase() === 'LAYER_SP' || ptType.toUpperCase() === 'LAYER_CGQ_LCS' || ptType.toUpperCase() === 'LAYER_SP_VOC' || ptType.toUpperCase() === 'LAYER_CGQ_VOC' || ptType.toUpperCase() === 'LAYER_GD') ? new BMap.Size(-35, -35) : new BMap.Size(-35, -35)
               };
               labelRed = new BMap.Label(elContext, opts);
@@ -950,14 +1059,69 @@
           case 'LAYER_YQD':
             level = 2;
             break;
+          case 'LAYER_YQ':
+            level = 0;
+            break;
           case 'LAYER_YJ':
             level = -1;
             break;
+          case 'LAYER_CY':
+            level=1;
+            const nd = parseInt(data[fieldName]);
+            if (!nd || nd < 0) {
+              level = 1;
+            }
+            else if (nd >= 0 && nd < 2) {
+              level = 2;
+            }
+            else if (nd >= 2 && nd < 200) {
+              level = 3;
+            }
+            else {
+              level = 4;
+            }
+            break;
           case 'LAYER_SP_SLW':
+            level = -1;
+            const casenum = parseInt(data['sunnum']);
+            if (casenum < 1) {
+              level = 2;
+            }
+            else if (casenum >= 1 && casenum < 3) {
+              level = 3;
+            }
+            else if (casenum >= 3) {
+              level = 4;
+            }
+            break;
           case 'LAYER_SP_VOC':
+          case 'LAYER_SP_CY':
+            level = parseInt(data['status']) ? 1 : 4;
+            break;
           case 'LAYER_SP_GKW':
-          case 'LAYER_QM':
+          case 'LAYER_SP_GD':
             level = 1;
+            break;
+          case 'LAYER_SP_FS':
+            level = -1;
+            break;
+          case 'LAYER_SP_HD':
+            level = -1;
+            if (data['szType'])
+              level = parseInt(data['szType']) + 1;
+            break;
+          case 'LAYER_QM':
+            level = -1;
+            const qmnum = parseInt(data['sunnum']);
+            if (qmnum >= 0 && qmnum < 1) {
+              level = 2;
+            }
+            else if (qmnum >= 1 && qmnum < 3) {
+              level = 3;
+            }
+            else {
+              level = 4;
+            }
             break;
           case 'LAYER_XCY':
             level = data.status == true ? 1 : 0;
@@ -1047,20 +1211,32 @@
           case 'LAYER_QY':
             iconName = 'qy-';
             break;
+          case 'LAYER_CY':
+            iconName = 'cyyy-';
+            break;
           case 'LAYER_SP':
             iconName = 'sp-';
             break;
-          case 'LAYER_SP_SLW':
+          case 'LAYER_SP_SLW'://散乱污企业
             iconName = 'sp-slw-';
             break;
-          case 'LAYER_SP_VOC':
+          case 'LAYER_SP_VOC'://VOCs
             iconName = 'sp-voc-';
             break;
-          case 'LAYER_SP_GD':
+          case 'LAYER_SP_GD'://工地
             iconName = 'sp-gd-';
             break;
-          case 'LAYER_SP_GKW':
+          case 'LAYER_SP_GKW'://高空五公里
             iconName = 'sp-gkwgl-';
+            break;
+          case 'LAYER_SP_CY'://餐饮
+            iconName = 'sp-cy-';
+            break;
+          case 'LAYER_SP_FS'://秸秆焚烧
+            iconName = 'sp-fs-';
+            break;
+          case 'LAYER_SP_HD'://河道
+            iconName = 'sp-hd-';
             break;
           case 'LAYER_LK':
             iconName = 'lk-';
@@ -1085,6 +1261,12 @@
             break;
           case 'LAYER_XCY':
             iconName = 'xcy-';
+            break;
+          case 'LAYER_YQ':
+            iconName = 'yq-';
+            break;
+          case 'LAYER_WQ':
+            iconName = 'wq-';
             break;
         }
         switch (level) {
@@ -1115,16 +1297,15 @@
 
       //图标点击事件
       markerClick(attributes, point, fieldName) {
-        // console.log(attributes)
-        // console.log(point)
-        // console.log(fieldName)
+        console.log(attributes);
         const t = this;
         let m = new BMap.Marker(point, {
           offset: (attributes.hasOwnProperty('ptType')) && (attributes.ptType.toUpperCase() === 'LAYER_GS' ? (new BMap.Size(-39, 18)) : (new BMap.Size(-39, 38))) || (new BMap.Size(0, 0))
         });
-        if (attributes.hasOwnProperty('ptType') && (attributes.ptType.toUpperCase() === 'LAYER_SP' || attributes.ptType.toUpperCase() === 'LAYER_SP_VOC' || attributes.ptType.toUpperCase() === 'LAYER_SP_SLW' || attributes.ptType.toUpperCase() === 'LAYER_SP_GKW')) {
+        if (attributes.hasOwnProperty('ptType') && (attributes.ptType.toUpperCase() === 'LAYER_SP' || attributes.ptType.toUpperCase() === 'LAYER_SP_GKW')) {
 
-          t.AssociatedVideo(attributes.CamIndexCode);//attributes.DevIndexCode
+          // t.VideoPlayback(attributes.CamIndexCode);//attributes.DevIndexCode
+          t.VideoPlayback('0', attributes.name, attributes.cameraCode);
 
           // let res = t.setCameraWindow(attributes);
           // (this.searchInfoWindow = new BMapLib.SearchInfoWindow(t.map, res, {
@@ -1170,34 +1351,55 @@
             searchTypes: []
           });
           this.searchInfoWindow.open(m);
+        }  else if (attributes.hasOwnProperty('ptType') && (attributes.ptType.toUpperCase() === 'LAYER_WQ')) {
+          let res = t.setWQInfoWindow(attributes);
+          let displayFieldName = 'name';
+          this.searchInfoWindow = new BMapLib.SearchInfoWindow(t.map, res || '无数据', {
+            title: '<sapn style="font-size:16px" ><b title="' + (attributes[displayFieldName] || '') + '">' + (attributes[displayFieldName] || '') + '</b>' + '</span>',             //标题
+            width: '350',
+            height: 'auto',
+            enableAutoPan: true,
+            enableSendToPhone: false,
+            searchTypes: []
+          });
+          this.searchInfoWindow.open(m);
+        }else if(attributes.hasOwnProperty('ptType') && (attributes.ptType.toUpperCase() === 'LAYER_YQ')){
+          let res = t.setYouQInfoWindow(attributes);
+          let displayFieldName = 'name';
+          this.searchInfoWindow = new BMapLib.SearchInfoWindow(t.map, res || '无数据', {
+            title: '<sapn style="font-size:16px" ><b title="' + (attributes[displayFieldName] || '') + '">' + (attributes[displayFieldName] || '') + '</b>' + '</span>',             //标题
+            width: '450',
+            height: 'auto',
+            enableAutoPan: true,
+            enableSendToPhone: false,
+            searchTypes: []
+          });
+          this.searchInfoWindow.open(m);
         }else {
           let res = undefined;
-          let charUrl = undefined;
           let pms = undefined;
+          let requestType = 'GET';
           let displayName = undefined;
           let infoWidth = '410px';
-          let ptType = attributes.ptType;
+          let ptType = attributes.ptType.toUpperCase();
+          let charUrl = RequestHandle.getRequestUrl(ptType + '_INFO');
           let ckItem = this.dataSource.find(v => v.code === ptType.toUpperCase());
-          let infowindowTitle=undefined;
-          switch (ptType.toUpperCase()) {
-            case 'LAYER_CG':
+
+          switch (ptType) {
             case 'LAYER_CGQ_LCS':
-              //res = t.setCGInfoWindow(attributes);
-              //let dtCGType = (attributes.hasOwnProperty('dataType') && attributes.dataType) || undefined;
-              //charUrl = !dtCGType ? RequestHandle.getRequestUrl('SENSECHART') : RequestHandle.getRequestUrl('XHPOLLUTIONCHAR');
-              charUrl = RequestHandle.getRequestUrl('MAINSIXCHART');
+              // charUrl = RequestHandle.getRequestUrl(ptType+'_INFO');
               pms = {stationid: attributes.stationid, pollute: fieldName, dataType: attributes.dataType || ''};
               displayName = 'stationname';
               break;
             case 'LAYER_CGQ_VOC':
               //res = t.setVOCInfoWindow(attributes);
-              charUrl = RequestHandle.getRequestUrl('VOCCHART');
+              // charUrl = RequestHandle.getRequestUrl('VOCCHART');
               pms = {stationid: attributes.stationId || attributes.id};
               displayName = 'pointName';
               break;
             case 'LAYER_GS':
               //res = t.setGSInfoWindow(attributes);
-              charUrl = RequestHandle.getRequestUrl('GSCITYPOLLUTIONCHART');
+              // charUrl = RequestHandle.getRequestUrl('GSCITYPOLLUTIONCHART');
               pms = {
                 id: attributes.citygid,
                 type: (fieldName === 'pm25' ? 'pm2.5' : fieldName),
@@ -1209,7 +1411,7 @@
             case 'LAYER_GD':
               //res = t.setGDInfoWindow(attributes);
               let dtGDType = (attributes.hasOwnProperty('dataType') && attributes.dataType) || undefined;
-              charUrl = !dtGDType ? RequestHandle.getRequestUrl('DUSTCHART') : RequestHandle.getRequestUrl('XHDUSTCHAR');
+              // charUrl = !dtGDType ? RequestHandle.getRequestUrl('DUSTCHART') : RequestHandle.getRequestUrl('XHDUSTCHAR');
               pms = {
                 deviceid: attributes.deviceid || attributes.cityid,
                 ptype: ckItem.fieldName,
@@ -1219,39 +1421,55 @@
               break;
             case 'LAYER_QY':
               displayName = 'psname';
-              charUrl = RequestHandle.getRequestUrl('ENTERPRISECHAR');
+              // charUrl = RequestHandle.getRequestUrl('ENTERPRISECHAR');
               pms = {pscode: attributes.pscode, type: fieldName.replace('Status', '') || ckItem.fieldName};
               infoWidth = 588;
               break;
             case 'LAYER_CX':
               displayName = 'name';
-              charUrl = RequestHandle.getRequestUrl('TOWNCHART');
+              // charUrl = RequestHandle.getRequestUrl('TOWNCHART');
               fieldName = ckItem.fieldName;
-              //
               pms = {name: encodeURI(attributes.name), Type: fieldName};
-              //pms = {StationId: attributes.deviceid || attributes.id, type: fieldName};
               break;
             case 'LAYER_QM':
-              charUrl = RequestHandle.getRequestUrl('ALLREPORTCHAR');
-              pms = {casecode: attributes.casecode};
+              // charUrl = RequestHandle.getRequestUrl('ALLREPORTCHAR');
+              pms = {companyId: attributes.id, pageSize: 10000, pageNo: 1};
+              requestType = 'POST';
+              displayName='name';
               break;
-            case 'LAYER_XCY':
+            case 'LAYER_CY':
+              pms = {id: attributes.Id};
+              infoWidth = 474;
               displayName = 'name';
-              infowindowTitle='<div style="font-size:14px;background-color: #259ae0;color:#fff;margin:0 -5px 0 -20px; padding:0 5px;" title="' + (attributes[displayName] || '') + '">' + (attributes[displayName] || '') + '</div>';
-              charUrl= GetXCYSingleInfoResource;
-              pms={Id:attributes.Id};
-              infoWidth=224;
+              break;
+            case 'LAYER_SP_SLW':
+            case 'LAYER_SP_FS':
+              pms = {companyId: attributes.id};
+              displayName = 'name';
+              infoWidth = 425;//250
+              break;
+            case 'LAYER_SP_HD':
+              pms = {companyId: attributes.id};
+              displayName = 'name';
+              infoWidth = 450;//220;
+              break;
+            case 'LAYER_SP_GD':
+            case 'LAYER_SP_VOC':
+            case 'LAYER_SP_CY':
+              displayName = 'name';
+              pms = {id: attributes.id};
               break;
           }
 
-          (this.searchInfoWindow = new BMapLib.SearchInfoWindow(t.map, res || '无数据', {
-            title:infowindowTitle?infowindowTitle: '<sapn style="font-size:16px" ><b title="' + (attributes[displayName] || '') + '">' + (attributes[displayName] || '') + '</b>' + '</span><span id="vocvideo" class="class-vidoes"  style="display:' + ((ptType.toUpperCase() === 'LAYER_CGQ_VOC') ? 'block' : 'none') + '">视频点击播放</span>',             //标题
-            width: infoWidth,
-            height: "auto",
-            enableAutoPan: true,
-            enableSendToPhone: false,
-            searchTypes: []
-          }));
+            (this.searchInfoWindow = new BMapLib.SearchInfoWindow(t.map, res || '无数据', {
+              title: '<sapn style="font-size:16px" ><b title="' + (attributes[displayName] || '') + '">' + (attributes[displayName] || '') + '</b>' + '</span><span id="vocvideo" class="class-vidoes"  style="display:' + (['LAYER_CGQ_VOC', 'LAYER_SP_GD', 'LAYER_SP_CY', 'LAYER_SP_VOC', 'LAYER_SP_SLW', 'LAYER_SP_FS', 'LAYER_SP_HD'].indexOf(ptType.toUpperCase()) > -1 ? 'block' : 'none') + '">视频点击播放</span>',             //标题
+              width: infoWidth,
+              height: "auto",
+              enableAutoPan: true,
+              enableSendToPhone: false,
+              searchTypes: []
+            }));
+
           //其他关闭窗口
 
           this.searchInfoWindow.open(m);
@@ -1283,7 +1501,7 @@
           //   t.searchInfoWindow.setContent(qmContent);
           // }
 
-          RequestHandle.request({url: url, type: 'GET', pms: {}}, function (result) {
+          RequestHandle.request({url: url, type: requestType, pms: {}}, function (result) {
             let data = result.obj;
             if (data) {
               switch (ptType.toUpperCase()) {
@@ -1301,18 +1519,15 @@
                 case 'LAYER_GD':
                   let gdContent = t.setGDInfoWindow(data[data.length - 1] || data);
                   t.searchInfoWindow.setContent(gdContent);
-                  t.setGDChart(attributes.deviceid || attributes.cityid, data.valuelist || data[0].valuelist || [], fieldName);
+                  t.setGDChart(attributes.deviceid || attributes.cityid, data.valuelist || data[0].valuelist || [], fieldName);//deviceid
                   break;
                 case 'LAYER_CGQ_VOC':
-
                   let vocContent = t.setVOCInfoWindow(data);
                   t.searchInfoWindow.setContent(vocContent);
                   t.setVOCChart(attributes.stationId, data.hourdatas);
-                  //
                   $('#vocvideo').click(function () {
-                    //
                     if (data.videoCamIndexCode) {
-                      t.AssociatedVideo((data.videoCamIndexCode));
+                      t.VideoPlayback(('0', data.name, data.videoCamIndexCode));
                     }
                   });
                   break;
@@ -1335,42 +1550,65 @@
                   t.setCXChart(attributes.name || attributes.id, data.list, fieldName);
                   break;
                 case 'LAYER_QM':
-                  let qmContent = t.setQMInfoWindow(data);
+                  let qmContent = parseInt(attributes['type']) === 4 ? t.setFSQMInfoWindow(attributes, data) : t.setCommonQMInfoWindow(attributes, data);
                   t.searchInfoWindow.setContent(qmContent);
                   break;
-                case 'LAYER_XCY':
-                  let xcyContent=t.setXCYInfoWindow(data);
-                  t.searchInfoWindow.setContent(xcyContent);
-                  $('#queryxcytrack').click(()=>{
-                    t.clearTrackLine();
-                    console.log(attributes.Id);
-                    const id = attributes.Id;
-                    let datestr = $('#_date').val();
-                    let starttimestr = $('#_startTime').val();
-                    let enttimestr = $('#_endTime').val();
-                    console.log(datestr);
-                    let url = GetXCYHistoryTrackResource+  `UserId=${id}&StartTime=${datestr} ${starttimestr}&EndTime=${datestr} ${enttimestr}`;
-
-                    let params = {
-                      url: url ,
-                      type: 'GET',
-                      pms: null
-                    };
-                    RequestHandle.request(params, (result) => {
-                      let data = result.obj;
-                    if (data) {
-                      if (data.length < 1) {
-                        alert("无轨迹");
-                      }
-                      else {
-                        console.log(data);
-                        t.loadXCYTrack(data);
-                      }
+                case 'LAYER_CY':
+                  let cyContent = t.setCyInfoWindow(data);
+                  t.searchInfoWindow.setContent(cyContent);
+                  break;
+                case 'LAYER_SP_SLW':
+                  let spSLWContent = t.setSLWVideoInfoWindow(attributes, data);//t.setCommonVideoInfoWindow(attributes, data);
+                  t.searchInfoWindow.setContent(spSLWContent);
+                  $('#vocvideo').click(function () {
+                    if (data && data.length > 0) {
+                      t.VideoPlayback('0', data[0].name, data[0].cameraCode);
                     }
-                  }, function (ex) {
-                      alert("查询出错");
-                      console.error(ex);
-                    });
+                  });
+                  break;
+                case 'LAYER_SP_FS':
+                  let spFSContent = t.setCommonVideoInfoWindow(attributes, data);
+                  t.searchInfoWindow.setContent(spFSContent);
+                  $('#vocvideo').click(function () {
+                    if (data && data.length > 0) {
+                      t.VideoPlayback('1', data[0].name, data[0].cameraCode);
+                    }
+                  });
+                  break;
+                case 'LAYER_SP_HD':
+                  let spHDContent = t.setHDVideoInfoWindow(attributes,data);
+                  t.searchInfoWindow.setContent(spHDContent);
+                  $('#vocvideo').click(function () {
+                    if (data && data.length > 0) {
+                      t.VideoPlayback('0', data[0].name, data[0].cameraCode);
+                    }
+                  });
+                  break;
+                case 'LAYER_SP_GD':
+                  let spGdContent = t.setSpGdInfoWindow(data);
+                  t.searchInfoWindow.setContent(spGdContent);
+                  $('#vocvideo').click(function () {
+                    if (data.device.length) {
+                      t.VideoPlayback('0',data.name,data.device[0].cameraCode);
+                    }
+                  });
+                  break;
+                case 'LAYER_SP_VOC':
+                  let spVocContent = t.setSpVocInfoWindow(data);
+                  t.searchInfoWindow.setContent(spVocContent);
+                  $('#vocvideo').click(function () {
+                    if (data.device.length) {
+                      t.VideoPlayback('0',data.name,data.device[0].cameraCode);
+                    }
+                  });
+                  break;
+                case 'LAYER_SP_CY':
+                  let spCyContent = t.setSpCyInfoWindow(data);
+                  t.searchInfoWindow.setContent(spCyContent);
+                  $('#vocvideo').click(function () {
+                    if (data.devicecode) {
+                      t.VideoPlayback('0',data.name,data.devicecode);
+                    }
                   });
                   break;
               }
@@ -1380,59 +1618,105 @@
           });
         }
       },
-      setXCYInfoWindow(data){
-        Date.prototype.format = function (format) {
-          var o = {
-            "M+": this.getMonth() + 1, //month
-            "d+": this.getDate(),    //day
-            "h+": this.getHours(),   //hour
-            "m+": this.getMinutes(), //minute
-            "s+": this.getSeconds(), //second
-            "q+": Math.floor((this.getMonth() + 3) / 3),  //quarter
-            "S": this.getMilliseconds() //millisecond
-          }
-          if (/(y+)/.test(format)) format = format.replace(RegExp.$1,
-            (this.getFullYear() + "").substr(4 - RegExp.$1.length));
-          for (var k in o) if (new RegExp("(" + k + ")").test(format))
-            format = format.replace(RegExp.$1,
-              RegExp.$1.length == 1 ? o[k] :
-                ("00" + o[k]).substr(("" + o[k]).length));
-          return format;
-        }
-        const today = new Date();
 
-        return  `
-<style>
-.infowindow-table{
-margin: 15px auto;width:90%;
-}
-.infowindow-table td{
-padding:2px 0;
-}
-.infowindow-table tr:last-child td>button{
-height: 30px;
-width:80px;
-margin: 5px 0 0;
-background-color: #0899ff;
-color: white;
-line-height: 12px;
-font-size: 12px;
-vertical-align: middle;
-}
-.infowindow-table input{
-width:100%;
-}
-</style>
-<table class="infowindow-table">
-<tr><td>编&nbsp;&nbsp;号：</td><td>${data.Id || '暂无'}</td></tr>
-<tr><td>联系方式：</td><td>${data.mobile || '暂无'}</td></tr>
-<tr><td>定位时间：</td><td>${data.locationtime?data.locationtime.toLocaleString():'暂无'}</td></tr>
-<tr><td>查询日期：</td><td><input id="_date" type="date" value="${today.format('yyyy-MM-dd')}"/></td></tr>
-<tr><td>开始时间：</td><td><input id="_startTime"  type="time" value="00:00"/></td></tr>
-<tr><td>结束时间：</td><td><input id="_endTime" type="time" value="23:59"/></td></tr>
-<tr><td colspan="2" style="text-align: center;margin-top:3px;"><button id="queryxcytrack" onclick="QueryTrack()">查询轨迹</button></td></tr>
-</table>`;
+      //设置工地扬尘视频弹出框
+      setYouQInfoWindow(data) {
+        return `<div class="sp-info">
+                <div class="sp-info-row"><span>加油站名称</span><div class="sp-info-value">${data.name || '--'}</div></div>
+                <div class="sp-info-row"><span>地址</span><div class="sp-info-value">${data.address || '--'}</div></div>
+                <div class="sp-info-row">
+                  <div class="sp-info-cell"><span>联系人</span><div class="sp-info-value">${data.contacts || '--'}</div></div>
+                  <div class="sp-info-cell"><span>联系电话</span><div class="sp-info-value">${data.phone || '--'}</div></div>
+                  <div class="sp-info-cell"><span>加油机数量</span><div class="sp-info-value">${data.machine || '--'}</div></div>
+                  <div class="sp-info-cell"><span>加油枪数量</span><div class="sp-info-value">${data.gun || '--'}</div></div>
+                  <div class="sp-info-cell"><span>密闭性</span><div class="sp-info-value">${data.tightness || '--'}</div></div>
+                  <div class="sp-info-cell"><span>液阻</span><div class="sp-info-value">${data.resistance || '--'}</div></div>
+                  <div class="sp-info-cell"><span>气液比</span><div class="sp-info-value">${data.vlr || '--'}</div></div>
+                  <div class="sp-info-cell"><span>是否合格</span><div class="sp-info-value">${(data.standard ? '是' :'否') || '--'}</div></div>
+                </div>
+            </div>`;
       },
+
+      //设置工地扬尘视频弹出框
+      setSpGdInfoWindow(data) {
+        //渲染颜色
+        if (!data.device.length) {
+          // console.log(data.videoCamIndexCode)
+          // console.log('这里走过来了')
+          $('#vocvideo').css('background', '#ccc');
+        }
+        return `<div class="sp-info">
+                <div class="sp-info-row"><span>名称</span><div class="sp-info-value">${data.name || '--'}</div></div>
+                <div class="sp-info-row"><span>地址</span><div class="sp-info-value">${data.address || '--'}</div></div>
+                <div class="sp-info-row"><span>行业类别</span><div class="sp-info-value">${data.industry || '--'}</div></div>
+                <div class="sp-info-row"><span>建筑面积</span><div class="sp-info-value">${data.coverarea || '--'}</div></div>
+                <div class="sp-info-row"><span>治理措施</span><div class="sp-info-value">${data.measures || '--'}</div></div>
+                <div class="sp-info-row"><span>治理投资</span><div class="sp-info-value">${data.investment || '--'}</div></div>
+                <div class="sp-info-row"><span>所属网格</span><div class="sp-info-value">${data.grid || '--'}</div></div>
+                <div class="sp-info-row">
+                  <div class="sp-info-cell"><span>经度</span><div class="sp-info-value">${data.longitude || '--'}</div></div>
+                  <div class="sp-info-cell"><span>纬度</span><div class="sp-info-value">${data.latitude || '--'}</div></div>
+                  <div class="sp-info-cell"><span>联系人</span><div class="sp-info-value">${data.uname || '--'}</div></div>
+                  <div class="sp-info-cell"><span>联系电话</span><div class="sp-info-value">${data.phone || '--'}</div></div>
+                </div>
+            </div>`;
+      },
+
+      //设置VOC视频弹出框
+      setSpVocInfoWindow(data) {
+        //渲染颜色
+        if (!data.device.length) {
+          // console.log(data.videoCamIndexCode)
+          // console.log('这里走过来了')
+          $('#vocvideo').css('background', '#ccc');
+        }
+        return `<div class="sp-info">
+                <div class="sp-info-row"><span>名称</span><div class="sp-info-value">${data.name || '--'}</div></div>
+                <div class="sp-info-row"><span>地址</span><div class="sp-info-value">${data.address || '--'}</div></div>
+                <div class="sp-info-row"><span>行业类别</span><div class="sp-info-value">${data.industry || '--'}</div></div>
+                <div class="sp-info-row"><span>占地面积</span><div class="sp-info-value">${data.coverarea || '--'}</div></div>
+                <div class="sp-info-row"><span>治理工序</span><div class="sp-info-value">${data.process || '--'}</div></div>
+                <div class="sp-info-row"><span>治理措施</span><div class="sp-info-value">${data.measures || '--'}</div></div>
+                <div class="sp-info-row"><span>治理投资</span><div class="sp-info-value">${data.investment || '--'}</div></div>
+                <div class="sp-info-row"><span>所属网格</span><div class="sp-info-value">${data.grid || '--'}</div></div>
+                <div class="sp-info-row">
+                  <div class="sp-info-cell"><span>经度</span><div class="sp-info-value">${data.longitude || '--'}</div></div>
+                  <div class="sp-info-cell"><span>纬度</span><div class="sp-info-value">${data.latitude || '--'}</div></div>
+                  <div class="sp-info-cell"><span>联系人</span><div class="sp-info-value">${data.uname || '--'}</div></div>
+                  <div class="sp-info-cell"><span>联系电话</span><div class="sp-info-value">${data.phone || '--'}</div></div>
+                </div>
+            </div>`;
+      },
+
+      //设置餐饮视频弹出框
+      setSpCyInfoWindow(data) {
+        //渲染颜色
+        if (!data.devicecode) {
+          // console.log(data.videoCamIndexCode)
+          // console.log('这里走过来了')
+          $('#vocvideo').css('background', '#ccc');
+        }
+        return `<div class="sp-info">
+                <div class="sp-info-row"><span>名称</span><div class="sp-info-value">${data.name || '--'}</div></div>
+                <div class="sp-info-row"><span>地址</span><div class="sp-info-value">${data.address || '--'}</div></div>
+                <div class="sp-info-row"><span>所属网格</span><div class="sp-info-value">${data.gridName || '--'}</div></div>
+                <div class="sp-info-row"><span>规模</span><div class="sp-info-value">${data.scale || '--'}</div></div>
+                <div class="sp-info-row">
+                  <div class="sp-info-cell"><span>联系人</span><div class="sp-info-value">${data.contact || '--'}</div></div>
+                  <div class="sp-info-cell"><span>联系电话</span><div class="sp-info-value">${data.phone || '--'}</div></div>
+                </div>
+            </div>`;
+      },
+
+      // //设置VOCs视频弹出框
+      // setSpVocInfoWindow(data) {
+      //   //渲染颜色
+      //   if (!data.videoCamIndexCode) {
+      //     // console.log(data.videoCamIndexCode)
+      //     // console.log('这里走过来了')
+      //     $('#vocvideo').css('background', '#ccc');
+      //   }
+      // },
 
       //国省控点
       setGSInfoWindow(data) {
@@ -1475,7 +1759,7 @@ width:100%;
           '        </div>' +
           '<div class="item third">' +
           '<div class="key" style=\'color:' + (getComplexIndex(data.complexindex) > 3 ? '#fff' : '#000') + ';background-color:' + getColorByIndex(getComplexIndex(data.complexindex)) + '\'>综指</div>' +
-          '<div class="value">' + (this.hasNullOrUndefined(data.complexindex) ? parseFloat(data.complexindex).toFixed(3) : '--') + '</div></div><br>\n' +
+          '<div class="value">' + (this.hasNullOrUndefined(data.complexindex) ? parseFloat(data.complexindex).toFixed(2) : '--') + '</div></div><br>\n' +
           '        <div class="item secondLine secondLine1">\n' +
           '            <div class="key" style=\'color:' + (getPM25LevelIndex(data.pm25) > 3 ? '#fff' : '#000') + ';background-color:' + getColorByIndex(getPM25LevelIndex(data.pm25)) + '\'>PM2.5</div>\n' +
           '            <div class="value"> ' + (this.hasNullOrUndefined(data.pm25) ? parseInt(data.pm25) : '--') + '</div>\n' +
@@ -1504,7 +1788,7 @@ width:100%;
           '<div class="item">温度：' + (this.hasNullOrUndefined(data.temp) ? (parseInt(data.temp) + '℃') : '--') + '</div>' +
           '<div class="item">湿度：' + (this.hasNullOrUndefined(data.humi) ? (parseInt(data.humi) + '%') : '--') + '</div>' +
           '<div class="item">风向：' + (data.winddirection || '--') + '</div>' +
-          '<div class="item">风级：' + (parseInt(data.windspeed) || 0) + '级' + '</div></div>' +
+          '<div class="item">风级：' + (parseFloat(data.windspeed) || 0) + '级' + '</div></div>' +
 
           '<div class="chart"><div id=\'citychart_' + data.citygid + '\' style=\'width:100%;height:110px\'></div></div>' +
           '<div class="Introduce"><div class="Net">所属网格：' + gridName + '</div><div class="Person">网格员代表：' + memberName + '</div><div>联系方式：' + tel + '</div></div>'
@@ -1552,10 +1836,97 @@ width:100%;
           '        <div class="key" style=\'color:' + (data.tVOC_V > 300 ? '#fff' : '#000') + ';background-color:' + getVOCLeveColor(data.tVOC_V) + '\'>TVOC</div>\n' +
           '        <div class="value">' + (this.hasNullOrUndefined(data.tVOC_V) ? data.tVOC_V : '--') + '</div>\n' +
           '    </div>\n' +
-          '</div><div class="chart"><div id=\'citychart_' + data.stationId + '\' style=\'width:100%;height:110px\'></div></div>' +
+          '</div><div class="chart"><div id=\'citychart_' + data.stationId + '\' style=\'width:100%;height:110px;display:none;\'></div></div>' +
           '<div class="Introduce"><div class="Net">所属网格：' + gridName + '</div><div class="Person">网格员代表：' + memberName + '</div><div>联系方式：' + tel + '</div></div>'
       },
 
+      //餐饮监测弹框
+      setCyInfoWindow(data) {
+        var jhxn='离线';
+        var jcnd=parseInt(data.concentrationOut);
+        if(!jcnd||jcnd<0){
+          jhxn='离线';
+        }
+        else if (jcnd >= 0 && jcnd < 2) {
+          jhxn = '优';
+        }
+        else if (jcnd >= 2 && jcnd < 200) {
+          jhxn = '良';
+        }
+        else {
+          jhxn = '差'
+        }
+        //净化效能 data.realTimeEfficiency
+        return `  <div class="form">
+            <label class="allrow"><span>名称</span><div>${data.name || '暂无'}</div></label>
+            <label class="allrow"><span>地址</span><div>${data.address || '暂无'}</div></label>
+            <label><span>联系人</span><div>${data.person || '暂无'}</div></label>
+            <label><span>联系电话</span><div>${data.phone || '暂无'}</div></label>
+            <label><span>净化器类型</span><div>${data.jhqlx || '暂无'}</div></label>
+            <label><span>灶头个数</span><div>${data.ztgs || '暂无'}</div></label>
+            <label><span>所属网格</span><div>${data.thirdGridName || '暂无'}</div></label>
+            <label><span>风机名称</span><div>${data.fanName || '暂无'}</div></label>
+            <label><span>风机状态</span><div>${data.fanRealTimeStatus || '暂无'}</div></label>
+            <label><span>净化器名称</span><div>${data.purifierName || '暂无'}</div></label>
+            <label><span>净化器状态</span><div>${data.purRealTimeStatus || '暂无'}</div></label>
+            <label><span>净化效能</span> <div>${jhxn || '暂无'}</div></label>
+            <label class="allrow"><span>监测浓度</span><div>${data.concentrationOut || '暂无'}</div></label>
+        </div>`;
+      },
+      //散乱污监控
+      setSLWVideoInfoWindow(attributes, data) {
+        if ((!data || data.length === 0))
+          $('#vocvideo').css('background', '#ccc');
+        return ` <div class="form">
+            <label class="allrow"><span>名称</span><div>${attributes.name || '暂无'}</div></label>
+            <label class="allrow"><span>地址</span><div>${attributes.address || '暂无'}</div></label>
+            <label class="allrow"><span>所属网格</span><div>${attributes.gridName || '暂无'}</div></label>
+            <label class="allrow"><span>占地面积</span><div>${attributes.coverarea || '暂无'}</div></label>
+            <label class="allrow"><span>行业类别</span><div>${attributes.industry || '暂无'}</div></label>
+            <label class="allrow"><span>整改措施</span><div>${attributes.measures || '暂无'}</div></label>
+            <label class="allrow"><span>联系人</span><div>${attributes.contact || '暂无'}</div></label>
+            <label class="allrow"><span>联系电话</span><div>${attributes.phoneNum || '暂无'}</div></label>
+            <label class="allrow"><span>经度</span><div>${attributes.longitude || '暂无'}</div></label>
+            <label class="allrow"><span>纬度</span><div>${attributes.latitude || '暂无'}</div></label>
+        </div>`;
+      },
+
+      //秸秆焚烧监控
+      setCommonVideoInfoWindow(attributes, data) {
+        if ((!data || data.length === 0))
+          $('#vocvideo').css('background', '#ccc');
+        return ` <div class="form">
+            <label class="allrow"><span>名称</span><div>${attributes.name || '暂无'}</div></label>
+            <label class="allrow"><span>地址</span><div>${attributes.address || '暂无'}</div></label>
+            <label class="allrow"><span>所属网格</span><div>${attributes.gridName || '暂无'}</div></label>
+            <label class="allrow"><span>联系人</span><div>${attributes.contact || '暂无'}</div></label>
+            <label class="allrow"><span>联系电话</span><div>${attributes.phoneNum || '暂无'}</div></label>
+        </div>`;
+      },
+
+      //河道监控
+      setHDVideoInfoWindow(attributes, data) {
+        if ((!data || data.length === 0))
+          $('#vocvideo').css('background', '#ccc');
+        return ` <div class="form">
+            <label class="allrow"><span>名称</span><div>${attributes.name || '暂无'}</div></label>
+            <label class="allrow"><span>地址</span><div>${attributes.address || '暂无'}</div></label>
+            <label class="allrow"><span>所属网格</span><div>${attributes.gridName || '暂无'}</div></label>
+            <label class="allrow"><span>联系人</span><div>${attributes.contact || '暂无'}</div></label>
+            <label class="allrow"><span>联系电话</span><div>${attributes.phoneNum || '暂无'}</div></label>
+            <label><span>河道水质</span><div>${attributes.szTypeString || '暂无'}</div></label>
+            <label><span>监测点水位</span><div>${'暂无'}</div></label>
+        </div>`;
+      },
+      //尾气遥感监测详情
+      setWQInfoWindow(attributes){
+        return ` <div class="form">
+            <label class="allrow"><span>区域名称</span><div>${attributes.name || '暂无'}</div></label>
+            <label class="allrow"><span>监测总数</span><div>${attributes.total || '暂无'}</div></label>
+            <label class="allrow"><span>达标率</span><div>${Number(attributes.standard_rate*100)+'%' || '暂无'}</div></label>
+            <label class="allrow"><span>更新时间</span><div>${this.formatTime(attributes.time, 'Y年M月D日 h:m:s') || '暂无'}</div></label>
+        </div>`;
+      },
       //六参数
       setCGInfoWindow(data) {
         let gridName = (data.firstGridName || '') + '-' + (data.secodGridName || '') + '-' + (data.threeGridName || '');
@@ -1668,7 +2039,12 @@ width:100%;
           '<div class="key" style=\'color:' + (data.pm10 > 250 ? '#fff' : '#000') + ';background-color:' + getColorByIndex(getPM10LevelIndex(data.pm10)) + '\'>PM10</div>' +
           '<div class="value">' + (this.hasNullOrUndefined(data.pm10) ? parseInt(data.pm10) : '--') + '</div>' +
           '</div>\n' +
-          '</div><div class="chart"><div id=\'citychart_' + data.deviceid + '\' style=\'width:100%;color:#666666;font-weight:bold;height:110px\'></div></div>' +
+          '    </div><div class="index">' +
+          '<div class="item">温度：' + (this.hasNullOrUndefined(data.temp) ? (parseInt(data.temp) + '℃') : '--') + '</div>' +
+          '<div class="item">湿度：' + (this.hasNullOrUndefined(data.humi) ? (parseInt(data.humi) + '%') : '--') + '</div>' +
+          '<div class="item">风向：' + (data.winddirection || '--') + '</div>' +
+          '<div class="item">风级：' + (parseInt(data.windspeed) || 0) + '级' + '</div></div>' +
+          '<div class="chart"><div id=\'citychart_' + data.deviceid + '\' style=\'width:100%;color:#666666;font-weight:bold;height:110px\'></div></div>' +
           '<div class="Introduce"><div class="Net">所属网格：' + gridName + '</div><div class="Person">网格员代表：' + memberName + '</div><div>联系方式：' + tel + '</div></div>'
 
       },
@@ -1733,7 +2109,7 @@ width:100%;
       },
       getQyData(pscode, callback) {
         let t = this;
-        let url = RequestHandle.getRequestUrl('COMPONYINFO') + pscode;
+        let url = RequestHandle.getRequestUrl('LAYER_QY_MSG') + pscode;
 //      let url = 'http://gkpt.zq12369.com:8016/api/Company/GetCompanyInfo?pscode=' + pscode;
         RequestHandle.request({url: url, type: 'GET', pms: {}}, function (result) {
           callback(result.obj);
@@ -1819,26 +2195,44 @@ width:100%;
         let title = '最近24小时' + targetFieldName + '变化趋势';
         this.loadChar(code, targetFieldName, rtValue.reverse(), title);
       },
+      //设置案件督查弹出框
+      setCommonQMInfoWindow(attribute, data) {
+        let wgxx = '';
+        if (data.rows.length > 0) {
+          wgxx += `<label class="allrow"><span>违规信息</span></label><div class="mess" style="">`;
+          data.rows.forEach(v => (wgxx += ` <label class="allrow"><span class="wgxx">${v.feedbackTime}  ${v.caseTypeString}</span></label>`))
+          wgxx+=`</div>`;
+        }
+        ;
+        return `  <div class="form">
+            <label class="allrow"><span>企业名称</span><div>${attribute.name || '暂无'}</div></label>
+            <label class="allrow"><span>污染类型</span><div>${attribute.typeString || '暂无'}</div></label>
+            <label class="allrow"><span>二级网格</span><div>${attribute.gridName || '暂无'}</div></label>
+            <label class="allrow"><span>位置</span><div>${attribute.address || '暂无'}</div></label>
+            <label class="allrow"><span>违规次数</span><div>${attribute.sunnum || '暂无'}</div></label>
+            ${wgxx}
+        </div>`
+
+      },
+      setFSQMInfoWindow(attribute, data) {
+        let wgxx = '';
+        if (data.rows.length > 0) {
+          wgxx += `<label class="allrow"><span>违规信息</span></label>`;
+          data.rows.forEach(v => (wgxx += ` <label class="allrow"><span class="wgxx">${v.feedbackTime}  ${v.caseTypeString}</span></label>`))
+        }
+        ;
+        return `  <div class="form">
+            <label class="allrow"><span>村街名称</span><div>${attribute.name || '暂无'}</div></label>
+            <label class="allrow"><span>污染类型</span><div>${attribute.typeString || '暂无'}</div></label>
+            <label class="allrow"><span>二级网格</span><div>${attribute.gridName || '暂无'}</div></label>
+            <label class="allrow"><span>位置</span><div>${attribute.address || '暂无'}</div></label>
+            <label class="allrow"><span>火情次数</span><div>${attribute.sunnum || '暂无'}</div></label>
+            ${wgxx}
+        </div>`
+      },
 
       //设置全民举报弹出框
       setQMInfoWindow(data) {
-        switch (data.status) {
-          case 1:
-            data.status = '未处理';
-            break;
-          case 2:
-            data.status = '已指派';
-            break;
-          case 3:
-            data.status = '已处理';
-            break;
-          case 4:
-            data.status = '已结案';
-            break;
-          default:
-            data.status = undefined;
-            break;
-        }
         const fls = [{
           fieldName: 'pollutiontype',
           aliasName: '污染类型'
@@ -1864,7 +2258,7 @@ width:100%;
         let atrElement = '';
         let imgElement = '';
         let ims = data.tupian || [];
-        fls.forEach(v => (atrElement += `<div class="item"><div class="key">${v.aliasName}</div><div class="value">${v.fieldName !== 'username' ? (data[v.fieldName] || '--') : (data.sysUser[v.fieldName])}</div></div>`));
+        fls.forEach(v => (atrElement += `<div class="item"><div class="key">${v.aliasName}</div><div class="value">${data[v.fieldName]}</div></div>`));
         ims.forEach(v => (imgElement += `<div class="item" style='background-image:url(${v.attachment})' />`));
         return `<div class="qm-panel"><div></div><div>${atrElement}</div><div></div><div class="img-panel">${imgElement}</div></div>`;
       },
@@ -2184,7 +2578,7 @@ width:100%;
 
       //判断国省控点是否显示
       hasMarkerVisible(v) {
-        let hasVisible = false;
+        let hasVisible = true;
         if (v && v.hasOwnProperty('dataLevel')) {
           let zom = this.map.getZoom();
           let level = parseInt(v['dataLevel']);
@@ -2218,7 +2612,7 @@ width:100%;
           let conPoint = this.wgsPointToBd(pt);
           let imgUrl = this.getMarkerIcon(type);
           let icon = new BMap.Icon(imgUrl, new BMap.Size(25, 25));//|| lyType.toUpperCase() === 'LAYER_CGQ_LCS'
-          marker = new BMap.Marker((lyType.toUpperCase() === 'LAYER_SP' || lyType.toUpperCase() === 'LAYER_SP_VOC' || lyType.toUpperCase() === 'LAYER_CGQ_VOC' || lyType.toUpperCase() === 'LAYER_GD') ? conPoint : pt, {
+          marker = new BMap.Marker(['LAYER_SP_GD','LAYER_SP_SLW','LAYER_SP_VOC','LAYER_SP_CY','LAYER_SP_FS','LAYER_SP_HD'].includes(lyType.toUpperCase()) ? conPoint : pt, {
             //marker = new BMap.Marker((lyType.toUpperCase() === 'LAYER_GS') ? pt:conPoint, {
             icon: icon,
             offset: new BMap.Size(0, 0)
@@ -2277,7 +2671,7 @@ width:100%;
           let bgcolor = getColorByIndex(index) || '#999';
           let conPoint = this.wgsPointToBd(pt);//|| ptType.toUpperCase() === 'LAYER_CGQ_LCS'
           let opts = {
-            position: (ptType.toUpperCase() === 'LAYER_SP' || ptType.toUpperCase() === 'LAYER_SP_VOC' || ptType.toUpperCase() === 'LAYER_CGQ_VOC' || ptType.toUpperCase() === 'LAYER_GD') ? conPoint : pt,
+            position: ['LAYER_SP_GD','LAYER_SP_SLW','LAYER_SP_VOC','LAYER_SP_CY','LAYER_SP_FS','LAYER_SP_HD'].includes(ptType.toUpperCase()) ? conPoint : pt,
             offset: new BMap.Size(-9, 24)
           };
           label = new BMap.Label(((vl === null || vl === undefined || vl === '') ? '--' : vl) + '<div class="arrow" style="width: 0;  height: 0; border-left: 8px solid transparent; border-bottom: 8px solid; border-right: 8px solid transparent; color:' + bgcolor + '; position: absolute;  margin-top:-30px;margin-left:8px  " ></div>', opts)  // 创建文本标注对象
@@ -2311,7 +2705,7 @@ width:100%;
           boxShadow: '1px 3px 4px rgba(0,0,0,0.18)',
           padding: 0
         });
-        label.setPosition((lyType.toUpperCase() === 'LAYER_SP' || lyType.toUpperCase() === 'LAYER_SP_VOC' || lyType.toUpperCase() === 'LAYER_CGQ_VOC' || lyType.toUpperCase() === 'LAYER_GD') ? conPoint : point);//|| lyType.toUpperCase() === 'LAYER_CGQ_LCS'
+        label.setPosition(['LAYER_SP_GD','LAYER_SP_SLW','LAYER_SP_VOC','LAYER_SP_CY','LAYER_SP_FS','LAYER_SP_HD'].includes(lyType.toUpperCase()) ? conPoint : point);//|| lyType.toUpperCase() === 'LAYER_CGQ_LCS'
         displayValue && label.setOffset(new BMap.Size(-((displayValue.length * 14 + 32) / 2), 22));
         this.map.getZoom() >= this.maxZoom ? label.show() : label.hide();
         lyType.toUpperCase() === 'LAYER_GS' && (label.show());
@@ -2344,11 +2738,11 @@ width:100%;
 
       //WGS坐标转百度坐标
       wgsPointToBd: function (pt) {
-        //let transPoint = this.transformFun([pt.lng, pt.lat]);
-        //let bdPoint = new BMap.Point(transPoint[0], transPoint[1]);
+        let transPoint = this.transformFun([pt.lng, pt.lat]);
+        let bdPoint = new BMap.Point(transPoint[0], transPoint[1]);
 
-        // return bdPoint;
-        return pt;
+        return bdPoint;
+        // return pt;
       },
 
       //WGS坐标转百度坐标
@@ -2808,6 +3202,15 @@ width:100%;
           case 'LAYER_QM':
             rtValue = {pk: 'casecode', index: 15};
             break;
+          case 'LAYER_CY':
+            rtValue = {pk: 'Id', index: 16};
+            break;
+          case 'LAYER_SP_HD':
+            rtValue = {pk: 'id', index: 17};
+            break;
+          case 'LAYER_YQ':
+            rtValue = {pk: 'id', index: 18};
+            break;
         }
         return rtValue;
       },
@@ -2837,11 +3240,33 @@ width:100%;
 
       hasNullOrUndefined(v) {
         return !(v === null || v === undefined);
-      }
+      },
+      formatTime(number, format) {
+        let time = new Date(number)
+        let newArr = []
+        let formatArr = ['Y', 'M', 'D', 'h', 'm', 's']
+        newArr.push(time.getFullYear())
+        newArr.push(this.formatNumber(time.getMonth() + 1))
+        newArr.push(this.formatNumber(time.getDate()))
+
+        newArr.push(this.formatNumber(time.getHours()))
+        newArr.push(this.formatNumber(time.getMinutes()))
+        newArr.push(this.formatNumber(time.getSeconds()))
+
+        for (let i in newArr) {
+          format = format.replace(formatArr[i], newArr[i])
+        }
+        return format;
+      },
+      // 格式化日期，如月、日、时、分、秒保证为2位数
+      formatNumber(n) {
+        n = n.toString()
+        return n[1] ? n : '0' + n;
+      },
     }
   };
 </script>
-<style>
+<style lang="scss">
   * {
     font-family: 'Microsoft YaHei'
   }
@@ -2849,17 +3274,22 @@ width:100%;
   .class-vidoes {
     display: inline-block;
     float: right;
-    margin-right: 22px;
+    margin-right: 32px;
     padding: 3px 15px;
     margin-top: 4px;
     height: 26px;
     line-height: 22px;
-    background: #1080cc;
-    font-size: 10px;
-    border-radius: 3px;
-    color: #fff;
+      cursor:pointer;
+      color: #fff;
+      font-size: 12px;
+      background:linear-gradient(0deg,rgba(79,172,254,1),rgba(0,242,254,1));
+      border-image:linear-gradient(0deg, rgba(148,207,255,1), rgba(162,249,254,1)) 1 1;
+      box-shadow:0px 3px 7px 0px rgba(0, 0, 0, 0.35);
+      border-radius:11px;
   }
-
+  .class-vidoes:active{
+        background:linear-gradient(0deg,rgba(79,122,234,1),rgba(0,202,234,1));
+    }
   .fitem {
     border: 1px solid #ddd;
     margin: 2px 15px;
@@ -3070,10 +3500,8 @@ width:100%;
   }
 
   .qm-panel .item {
-    min-height: 32px;
+    height: 32px;
     width: 100%;
-	display:inline-block;
-	height:auto;
   }
 
   .qm-panel .item .key {
@@ -3144,4 +3572,86 @@ width:100%;
     background: #ebebeb;
     border-right: none;
   }
+
+  .sp-info {
+    width: 100%;
+    padding: 5px;
+    font-size: 14px;
+    .sp-info-row {
+      line-height: 32px;
+      margin: 10px 0;
+      span {
+        width: 70px;
+        padding: 5px;
+      }
+      .sp-info-value {
+        width: calc(100% - 80px);
+        background: rgba(245, 245, 245, 1);
+        border: 1px solid rgba(235, 238, 245, 1);
+        border-radius: 5px;
+        float: right;
+        padding: 0 10px;
+      }
+      .sp-info-cell {
+        width: 50%;
+        float: left;
+        margin-bottom: 15px;
+      }
+
+    }
+  }
+
+  .form {
+    width: 98%;
+    padding: 15px;
+    overflow: hidden;
+    font-family: "MicrosoftYaHei";
+    color: #64666A;
+    font-size: 13px;
+    clear: both;
+  }
+
+  .form > label {
+    float: left;
+    width: 49.5%;
+    height: 29px;
+    margin: 5px 0px;
+    font-weight: normal;
+    line-height: 29px;
+    vertical-align: middle;
+  }
+
+  .form > label.allrow {
+    width: 99%;
+  }
+  .form .mess{
+    float: left;
+    height: 68px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .form > label > span {
+    float: left;
+    width: 70px;
+    text-align: right;
+  }
+
+  .form  > div > label > span.wgxx {
+    float: left;
+    width: 100%;
+    text-align: left;
+    margin-left: 20px;
+    font-weight: normal;
+  }
+
+  .form > label > div {
+    margin: 0 10px 0 80px;
+    height: 27px;
+    line-height: 27px;
+    padding: 0 10px;
+    background: rgba(245, 245, 245, 1);
+    border: 1px solid rgba(235, 238, 245, 1);
+    border-radius: 5px;
+  }
+
 </style>

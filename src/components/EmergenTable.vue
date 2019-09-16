@@ -117,6 +117,15 @@
 
         },
         methods: {
+            //颜色列表
+            tableRowClassName({row, rowIndex}) {
+                if (rowIndex%2 === 0) {
+                    return 'warning-row';
+                } else {
+                    return 'success-row';
+                }
+                return '';
+            },
             getColorImg(path){
                 let colorpath = '';
                 let that = this;

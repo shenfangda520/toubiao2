@@ -2,15 +2,15 @@
 <!--后台管理-饭店管理-->
 <template>
     <div class="businessOperation">
-		<!--------------饭店管理右侧数据展示------>
+		<!--饭店管理右侧数据展示-->
 		<div id="right">
-			<!----------饭店管理-->
+			<!--饭店管理-->
 			<div class="box">
                 <div class="warning">
                     <a>餐饮污染源</a>
                 </div>
             </div>
-            <!-----------查询部分------->
+            <!--查询部分-->
 			<div class="search">
 				<span>饭店名称</span><el-input v-model="hotelName" placeholder="请输入内容"></el-input>
 				<span>饭店地址</span><el-input v-model="hotelAddress" placeholder="请输入内容"></el-input>
@@ -20,7 +20,7 @@
 				<el-button type="primary" class='btns' @click="">导出</el-button>
 			</div>
 			
-			<!--------------列表部分---------->
+			<!--列表部分-->
 			<div class="box">
                 <div class="warning">
                     <a>列表</a>
@@ -97,7 +97,7 @@
 			      :total="totalCount">
 			    </el-pagination>
 			</div>
-			<!--------------添加弹框部分--------------->
+			<!--添加弹框部分-->
 			<div class="popUp" v-if="isNew">
 	            <div class="mask"></div>
 	            <div class="succ-pop">
@@ -162,7 +162,7 @@
 	               </div>
 	            </div>
 	        </div>
-	        <!--------------编辑弹框部分--------------->
+	        <!--编辑弹框部分-->
 			<div class="popUp" v-if="isEdit">
 	            <div class="mask"></div>
 	            <div class="succ-pop">

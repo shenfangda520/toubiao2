@@ -2,7 +2,7 @@
     <div class="sanddustforecast">
         <!--沙尘预报-->
         <v-header></v-header>
-       <!---->
+        <!---->
         <img :src="ImgSrc" />
     </div>
 </template>

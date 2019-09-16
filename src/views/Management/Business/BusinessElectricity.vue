@@ -3,13 +3,13 @@
     <div class="electricity">
 		<!---->
 		<div class="right">
-			<!----------预警信息管理-->
+			<!--预警信息管理-->
 			<div class="box">
                 <div class="warning">
                     <a>区县用电量管理</a>
                 </div>
             </div>
-            <!-----------查询部分------->
+            <!--查询部分-->
 			<div class="search" style="">
 				<div class="block" style="">
 				    <span class="demonstration">时间</span>
@@ -62,7 +62,7 @@
 				</div>
 			</div>
 			
-			<!--------------列表部分---------->
+			<!--列表部分-->
 			<div class="box">
                 <div class="warning">
                     <a>列表</a>

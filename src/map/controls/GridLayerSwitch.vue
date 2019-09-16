@@ -1,7 +1,9 @@
 <template>
   <div class="grid-switch-content">
     <ul>
-      <li v-for="(item,index) in target" :data-type="item.value" @click="liClickEvent">{{item.name}}</li>
+      <li v-for="(item,index) in target" :data-type="item.value" @click="liClickEvent">
+        {{item.name}}
+      </li>
     </ul>
   </div>
 </template>
@@ -37,15 +39,17 @@
         if (element) {
           this.resetLi();
           let type = element.getAttribute('data-type');
-          element.style.backgroundColor = '#fff';
-          element.style.color = '#1080CC';
+          element.style.backgroundColor = '#1b2143';//'#fff';
+          element.style.color = '#12da88';//'#1080CC';
+          element.style.borderBottom = 'solid 3px #12da88';
           bus.$emit('gridLayerRefresh', type.toUpperCase())
         }
       },
       resetLi(){
         jQuery.find('.grid-switch-content li').forEach(function (value, index) {
-          value.style.backgroundColor = '#1080CC';
+          value.style.backgroundColor = '#1b2143';//'#1080CC';
           value.style.color = '#fff';
+          value.style.borderBottom = 'none';
         });
       }
     }
@@ -62,7 +66,8 @@
 
   .grid-switch-content ul {
     height: 37px;
-    border: solid 1px #1080CC;
+    /*border: solid 1px #1080CC;*/
+    /*border: solid 1px #1b2143;*/
   }
 
   .grid-switch-content li {
@@ -72,7 +77,8 @@
     width: 120px;
     line-height: 35px;
     color: #fff;
-    background-color: #1080CC;
+    /*background-color: #1080CC;*/
+    background-color: #1b2143;
   }
 
   .grid-switch-content li:hover{
@@ -80,7 +86,10 @@
   }
 
   .grid-switch-content li:first-child {
-    color: #1080CC;
-    background-color: #fff;
+    /*color: #1080CC;#12da88*/
+    /*background-color: #fff;*/
+    color: #12da88;
+    background-color: #1b2143;
+    border-bottom:solid 3px #12da88;
   }
 </style>

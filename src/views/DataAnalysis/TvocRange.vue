@@ -66,7 +66,6 @@
                             <a>筛选区域</a>
                         </div>
                     </div>
-                <p class="updateTime">数据更新时间：{{updateTime}}</p>
                     <!--表格-->
                     <div class="xuanxiantable">
                         <el-table
@@ -168,7 +167,6 @@
                             <a>筛选区域</a>
                         </div>
                     </div>
-                  <p class="updateTime">数据更新时间：{{updateTime}}</p>
                     <!--表格-->
                     <div class="xuanxiantable">
                         <el-table
@@ -240,7 +238,7 @@
                                         :picker-options="pickerOptions0">
                                 </el-date-picker>
                             </div>
-
+                            
                              <!--自定义-->
                             <div class="" v-show="ProStatisticalRankingsName=='自定义'?true:false">					
                             	<span class="day02">
@@ -271,7 +269,6 @@
                             <a>筛选区域</a>
                         </div>
                     </div>
-                  <p class="updateTime">数据更新时间：{{updateTime}}</p>
                     <!--表格-->
                     <div class="xuanxiantable">
                         <el-table
@@ -456,7 +453,6 @@
 		        timeDayEnd:'',
 		        timeHourStart:'',
 		        timeHourEnd:'',
-              updateTime:''
             }
         },
         created() {
@@ -535,7 +531,6 @@
         			console.log(res)
         			let t = this;
         			let allData = res.data.Data;
-              t.updateTime = allData[0].updatetime;
         			this.totalCountAll = allData.length;
         			if(allData){
         				//全市
@@ -861,9 +856,6 @@
 		    	}
 	        }
         }
-      .updateTime{
-        text-align: right;
-      }
         //title标题
         .warp3 {
             width: 96%;

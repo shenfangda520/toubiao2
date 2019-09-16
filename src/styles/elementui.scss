@@ -2,12 +2,21 @@
 .el-icon-close:hover {
   cursor: pointer;
 }
-.el-button{
-  background: #1b9d33;
+/*tabs*/
+.el-tabs__nav-wrap::after{
+  background-color: #000!important;
 }
-.el-pagination.is-background .el-pager li:not(.disabled).active {
-    background-color: #1b9d33!important;
-    color: #FFF;
+.el-tabs__nav-scroll{
+  background: #1B2143!important;
+  .el-tabs__active-bar{
+    background: #12DA88;
+  }
+  .el-tabs__item {
+    color: #fff!important;
+  }
+  .is-active{
+    color: #12DA88!important;
+  }
 }
 .el-progress-circle {
   width: 80px !important;
@@ -22,20 +31,17 @@
 }
 /*表格*/
 .el-table__body-wrapper {
-  tr {
-
-  }
   :hover {
     cursor: pointer;
   }
   overflow: inherit;
 }
-.el-table .has-gutter tr th{
-    background: #eef1f6!important;
-}
-.Like-winter .el-table .has-gutter tr th{
-background: #242953!important;
-}
+//.el-table .has-gutter tr th{
+//    background: #eef1f6!important;
+//}
+//.table-was .el-table .has-gutter tr th{
+//  background: #242953!important;
+//}
 tr {
   .cell {
     padding: 0 !important;
@@ -53,7 +59,14 @@ td {
     }
   }
 }
-
+.CaseSupervision{
+  .el-date-editor.el-input{
+    width: 140px!important;
+  }
+  .el-select{
+    width: 100px;
+  }
+}
 .table {
   .cell {
     font-size: 12px;
@@ -75,7 +88,6 @@ td {
       border: 1px solid #e0e0e0;
     }
     .el-input__inner{
-      //border: none!important;
       border-radius: 0;
     }
     .el-textarea__inner{
@@ -95,19 +107,14 @@ td {
     text-align: center !important;
   }
 }
-.Window_Three .el-table,.Window_Three .el-table__expanded-cell,.Window_Three .el-table th,.Window_Three .el-table tr{
-    background: #1d2339!important;
-    color: #fff;
-}
-html .Window_Three table, body .Window_Three table{
+
+html .table-was table, body .table-was table{
     border: none!important;
 }
-.Window_Three #pane-first_s{
+.table-was #pane-first_s{
     padding: 0 10px;
 }
-.Window_Three .el-table--enable-row-hover .el-table__body tr:hover>td{
-    background: none;
-}
+
 //tables样式
 .el-table .cell, .el-table th > div {
   padding: 0;
@@ -180,15 +187,14 @@ html .Window_Three table, body .Window_Three table{
     text-align: left!important;
   }
 }
-.Window_Three canvas{
+.table-was canvas{
     top: -40px!important;
 }
 .title-box{
-  .el-checkbox:nth-child(1){
-    margin-left: 30px;
-  }
+  padding-left: 10px;
   .el-checkbox{
     width: 26%!important;
+    color: #12DA88;
     overflow: hidden;
   }
 }
@@ -281,9 +287,8 @@ html .Window_Three table, body .Window_Three table{
         top: 100px!important;
     }
     .el-carousel__indicators{
-        //transform: translateX(10%)!important;
-        //left: 6%;
-      display: none;
+        transform: translateX(10%)!important;
+        left: 6%;
     }
     .el-carousel__item{
         width: 200px;
@@ -311,135 +316,210 @@ html .Window_Three table, body .Window_Three table{
   .calendar .month-container{
     height: 310px!important;
   }
-  .calendar_mom_juchang {
-    width: 100%;
-    position: relative;
-    .class2016{
-      left: 10%;
-    }
-    .class2017{
-      left: 33%;
-    }
-    .class2018{
-      left: 58%;
-    }
-    .class2019{
-      left: 83%;
-    }
-    .exacal-dw{
-      position: absolute;
-      top: 0;
-      z-index: -1;
-      .l-001{
-        width: 100%;
-        height: 40px;
-        line-height: 40px;
-        .ll1{
-          float: left;
-          width: 30%;
-          height: auto;
-          text-align: right;
-          .text{
-            display: inline-block;
-            text-align: right;
-            color: #000;
-          }
-          span{
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            line-height: 20px;
-            text-align: center;
-          }
-        }
-      }
-      li{
-        list-style: none;
-        width: 200px;
-        height: 80px;
-      }
-      li:nth-child(1){
-        margin-top: 206px;
-      }
-      li:nth-child(2){
-        margin-top: 210px;
-      }
-      li:nth-child(3){
-        margin-top: 215px;
-      }
-      li:nth-child(4){
-        margin-top: 210px;
-      }
-      li:nth-child(5){
-        margin-top: 216px;
-      }
-      li:nth-child(6){
-        margin-top: 205px;
-      }
-      li:nth-child(7){
-        margin-top: 210px;
-      }
-      li:nth-child(8){
-        margin-top: 210px;
-      }
-      li:nth-child(9){
-        margin-top: 210px;
-      }
-      li:nth-child(10){
-        margin-top: 215px;
-      }
-      li:nth-child(11){
-        margin-top: 206px;
-      }
-      li:nth-child(12){
-        margin-top: 210px;
-      }
-    }
-    .col-xs-2{
-      float: none!important;
-      position: relative;
-    }
-    .months-container{
-      position: absolute;
-    }
-    .month{
-      position: absolute;
-      top: 20px;
-    }
-    .month-container{
-      height: 280px!important;
-      margin-top: 10px;
-    }
-    .calendar_exaCalendar1{
-      width: 100%;
-        .months-container{
-          margin-left: 10%!important;
-        }
-    }
-    .calendar_exaCalendar2{
-      position: absolute;
-      width: 100%;
-      top: 0;
-      left: 33%;
-    }
-    .calendar_exaCalendar3{
-      width: 100%;
-      position: absolute;
-      top: 0;
-      left: 58%;
-    }
-    .calendar_exaCalendar4{
-      width: 100%;
-      position: absolute;
-      top: 0;
-      left: 83%;
-    }
-  }
-
 }
 .Window_Four .el-tabs__content{
     width: 100%!important;
     height: 100%!important;
     overflow: inherit;
+}
+//后台案件督查--案件录入
+#CaseIn{
+  .el-input__inner{
+    width: 200px!important;
+  }
+  .CaseIn_mid,.CaseIn_left,.CaseIn_right{
+    .describe{
+      span{
+        vertical-align: top;
+      }
+      .el-textarea{
+        width: 200px;
+      }
+    }
+  }
+  .el-upload--picture-card{
+    width: 200px!important;
+    height: 200px!important;
+    line-height: 20px;
+    padding-top: 60px;
+    img{
+      width: 40px!important;
+      height: 40px!important;
+    }
+    input[type="file"]{
+      display: none;
+    }
+  }
+}
+
+.contingencyplan{
+  .el-upload__input{
+    display: none!important;
+  }
+}
+//大数据资源-应急预案
+.ContingencyPlan{
+  .el-dialog{
+    margin-top: 60px!important;
+    width: 65%!important;
+  }
+  .imgDialog{
+    width: 50% !important;
+  }
+}
+//后台视频管理添加摄像头
+.businessOperation{
+  .class-boxdar{
+    .el-input__inner{
+      width: 215px!important;
+    }
+  }
+}
+/**gy样式*/
+.Like-winter ,.table_container ,.table_video,.table,#SimultaneousRate,#CityRanking{
+  /*表格*/
+  .el-table .cell{
+    text-align: center;
+  }
+  .el-table th, .el-table tr{
+    background-color: #161C3A;
+    color: #fff;
+  }
+  .el-table--enable-row-hover .el-table__body tr:hover>td{
+    background: none;
+  }
+  .el-table td, .el-table th.is-leaf{
+    border-bottom: 1px solid #0A0F2A;
+
+  }
+  .el-table--border td, .el-table--border th, .el-table__body-wrapper .el-table--border.is-scrolling-left~.el-table__fixed{
+    border-right: 1px solid #0A0F2A;
+  }
+  .el-table--border, .el-table--group{
+    border: 1px solid #0A0F2A;
+  }
+  .el-table--border::after, .el-table--group::after, .el-table::before{
+    background-color: #0A0F2A;
+  }
+  .el-table--scrollable-x .el-table__body-wrapper{
+    overflow-x: hidden;
+  }
+  .el-table .warning-row {
+    background: #1b2143;
+  }
+
+  .el-table .success-row {
+    background: #1E254F;
+  }
+  .el-table__empty-block{
+    background-color: #1b2143;
+  }
+  .el-table--border th, .el-table__fixed-right-patch{
+    border-bottom: 1px solid #0A0F2A;
+  }
+  .el-table--striped td{
+    background: none!important;
+  }
+
+  .el-select .el-input.is-focus .el-input__inner,.el-select .el-input__inner:focus{
+    border-color: #0BC940!important;
+  }
+}
+#BigDataSource,.Like-winter .title .monthSelect,.table-sleect{
+  /*选择框*/
+  .el-input__inner{
+    width: 124px;
+    background-color: rgba(27,33,67,1);
+    color: #fff;
+    border: 1px solid #0BC940;
+    border-radius: 16px;
+    text-align: left;
+  }
+  .el-date-editor.el-input, .el-date-editor.el-input__inner{
+    width: 128px!important;
+    color: #fff;
+    background: none;
+    background-color: rgba(27,33,67,1);
+  }
+  .el-input--mini .el-input__icon{
+    color:rgba(18, 218, 136, 1)!important;
+  }
+  .el-input__prefix{
+    display: none;
+  }
+  .el-input--prefix .el-input__inner{
+    padding-left: 10px;
+  }
+  .el-input--suffix .el-input__inner{
+    padding-right: 10px;
+  }
+  .el-picker-panel{
+    position: fixed;
+    right: 0;
+    z-index: 99;
+  }
+}
+
+#SimultaneousRate,#CityRanking{
+  .el-date-editor.el-input,.el-date-editor.el-input__inner{
+    width: 130px!important;
+  }
+  .el-input__inner{
+    width: 130px;
+    background-color: rgba(27,33,67,1);
+    color: #fff;
+    border: 1px solid #0BC940;
+    border-radius: 16px;
+    text-align: left;
+  }
+}
+/*右侧面板*/
+.main,.Meanratiosensornetwork{
+  .el-pagination__total{
+    color: #12DA88;
+  }
+  color: #fff;
+  .el-button{
+    border:none;
+    border-radius: 20px;
+    background:linear-gradient(0deg,rgba(79,172,254,1),rgba(0,242,254,1));
+    border-image:linear-gradient(0deg, rgba(148,207,255,1), rgba(162,249,254,1)) 1 1;
+    box-shadow:0px 3px 7px 0px rgba(0, 0, 0, 0.35);
+  }
+  .el-input__inner{
+      background-color: rgba(27,33,67,1);
+      color: #fff;
+      border: 1px solid #0BC940;
+      border-radius: 16px;
+      text-align: left;
+  }
+  .el-radio-button__inner{
+    background: none!important;
+    border: none!important;
+    border: 0!important;
+    color: #fff;
+    border-bottom: 2px solid #141a38;
+}
+
+.el-radio-button.is-active, .el-radio-button__inner.is-active{
+    border: 0!important;
+    border-bottom: 2px solid #13da88!important;
+}
+.el-radio-button__orig-radio:checked+.el-radio-button__inner{
+    background: none!important;
+    box-shadow: none!important;
+    border-bottom: 2px solid #13da88!important;
+    border-left: 0;
+    border-radius: 0;
+    color: #13da88;
+}
+.el-radio-button:first-child .el-radio-button__inner{
+    border-left: 0!important;
+}
+}
+.gs_box{
+  .el-checkbox__label{
+    color: #fff!important;
+  }
+
 }

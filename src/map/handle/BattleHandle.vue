@@ -1,7 +1,7 @@
 <template>
   <div class="battle_target">
     <ul title="" class="pollution_target">
-      <li v-for="(v,i) in pollutions" :data-index="i" :style="'color:'+(i===0?'#2c90e7':'#fff')+';background-color:'+(i===0?'#000':'rgba(3, 28, 41, 0.5)')" @click="pollutionEvent">{{v.text}}</li>
+      <li v-for="(v,i) in pollutions" :data-index="i" :style="'color:'+(i===0?'#12da88':'#fff')+';background-color:'+(i===0?'#000':'rgba(3, 28, 41, 0.5)')" @click="pollutionEvent">{{v.text}}</li>
     </ul>
   </div>
 </template>
@@ -86,8 +86,7 @@
         }
       };
     },
-    created() {
-    },
+    created() {},
     mounted() {
       this.initEvent();
     },
@@ -96,21 +95,21 @@
       },
       initEvent() {
         bus.$once('setButtleMap', this.setMap);
-        bus.$on('targetPollution', this.refreshMap);
+        //bus.$on('targetPollution', this.refreshMap);
       },
       setMap(map) {
         let t = this;
 //        map && (this.map = map);
         map && (this.map = map,
-          this.request(),
-          setTimeout(function () {
-            let checkedItem = t.datas[0];
-            t.displayField = checkedItem.displayField;
-            t.valueField = checkedItem.valueField;
-            t.type = checkedItem.type;
-            t.keyField = checkedItem.keyField;
-            t.request(checkedItem.type);
-          }, 800));
+          this.request());
+          // setTimeout(function () {
+          //   let checkedItem = t.datas[0];
+          //   t.displayField = checkedItem.displayField;
+          //   t.valueField = checkedItem.valueField;
+          //   t.type = checkedItem.type;
+          //   t.keyField = checkedItem.keyField;
+          //   t.request(checkedItem.type);
+          // }, 800));
 
 //        setTimeout(function(){
 //            t.refreshMap(3);
@@ -139,7 +138,7 @@
         let url = undefined;
         switch (t.type.toUpperCase()) {
           case 'MONITOR':
-            url = RequestHandle.getRequestUrl('MONPOLLUTION');
+            url = RequestHandle.getRequestUrl('LAYER_GS');
             break;
           case 'SENSE':
             url = RequestHandle.getRequestUrl('SENSEBATTLE');
@@ -694,9 +693,9 @@
         if (t.valueField === ckItem.text)
           return;
         t.valueField = ckItem.text;
-        childElement.parentElement.childNodes.forEach(v => (v.style.color = '#fff', v.style.backgroundColor = 'rgba(3, 28, 41, 0.5)'));
-
-        childElement.style.color = '#2c90e7';
+        //childElement.parentElement.childNodes.forEach(v => (v.style.color = '#fff', v.style.backgroundColor = 'rgba(3, 28, 41, 0.5)'));
+        for(let item  of childElement.parentElement.childNodes){item.style.color = '#fff', item.style.backgroundColor = 'rgba(3, 28, 41, 0.5)'};
+        childElement.style.color = '#12da88';
         childElement.style.backgroundcolor = '#333';
         t.lsMarkerDefaultOverlay.forEach(v => (t.map.removeOverlay(v)));
         t.lsLabelDefaultOverlay.forEach(v => (t.map.removeOverlay(v)));
@@ -732,17 +731,14 @@
 </script>
 <style scoped>
 
-  @media only screen and (min-width: 1400px) {
-    .battle_target{
-      top: 68px!important;
-    }
-  }
+
   .battle_target {
     position: absolute;
     width: 60px;
     right: 0;
-    top: 46px;
-    box-shadow: 0 0 5px #428bca;
+    top: 50%;
+    margin-top: -112px; 
+    box-shadow: 0 0 5px rgb(18, 218, 136);
   }
 
   .battle_target ul, li {
@@ -756,7 +752,8 @@
     height: 28px;
     width: 64px;
     line-height: 28px;
-    color: #2c90e7;
+    /*color: #2c90e7;*/
+    color:rgb(18, 218, 136);
     font-weight: bold;
     cursor: pointer;
   }

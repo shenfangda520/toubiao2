@@ -124,53 +124,5 @@ html, body {
       //background:-webkit-gradient(linear, 0 0, 0 bottom, from(#015eea), to(#01c4fa))!important;
     }
   }
-  .Window_Three table{
-      border: 1px solid #1080cc!important;
-      tr,td,th{
-          border: 1px solid #1080cc!important;
-      }
-  }
-  .Window_Three table tr{
-      height:28px;
-      font-size: 12px;
-  }
-  .Window_Three table th{
-      width: 143px;
-  }
-  .Window_Five, .Window_Four {
-    .el-table {
-      border: none !important;
-      th, td {
-        border: none !important;
-      }
-    }
-    table {
-      border: none !important;
-      th {
-        background: #0b253e !important;
-        border: none !important;
-        div {
-          background: none !important;
-          color: #fff;
-          border: none !important;
-        }
-      }
-      tr:nth-child(odd) {
-        background: #051427 !important;
-        border: none !important;
-        color: #fff;
-        td {
-          border: none !important;
-          background: none !important;
-        }
-      }
-      tr:nth-child(even) {
-        background: #22293c !important;
-        color: #fff;
-        td {
-          background: none !important;
-        }
-      }
-    }
-  }
+
 }

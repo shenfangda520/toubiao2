@@ -1,0 +1,87 @@
+.Like-winter{
+  .el-table .cell{
+    text-align: center;
+  }
+  .el-table th, .el-table tr{
+    background-color: #161C3A;
+    color: #fff;
+  }
+  .el-table--enable-row-hover .el-table__body tr:hover>td{
+    background: none;
+  }
+  .el-table td, .el-table th.is-leaf{
+    border-bottom: 1px solid #0A0F2A;
+
+  }
+  .el-table--border td, .el-table--border th, .el-table__body-wrapper .el-table--border.is-scrolling-left~.el-table__fixed{
+    border-right: 1px solid #0A0F2A;
+  }
+  .el-table--border, .el-table--group{
+    border: 1px solid #0A0F2A;
+  }
+  .el-table--border::after, .el-table--group::after, .el-table::before{
+    background-color: #0A0F2A;
+  }
+  .el-table--scrollable-x .el-table__body-wrapper{
+    overflow-x: hidden;
+  }
+  .el-table .warning-row {
+    background: #1b2143;
+  }
+
+  .el-table .success-row {
+    background: #1E254F;
+
+  }
+  .el-table--striped td{
+    background: #1E254F!important;
+  }
+  .el-table__empty-block{
+    background-color: #1b2143;
+  }
+  .el-table--border th, .el-table__fixed-right-patch{
+    border-bottom: 1px solid #0A0F2A;
+  }
+  .title .monthSelect{
+    .el-input__inner{
+      background-color: rgba(27,33,67,1)!important;
+      background-color: red!important;
+      color: #fff;
+      border: 1px solid #0BC940;
+      border-radius: 16px;
+      text-align: center;
+    }
+    .el-date-editor.el-input, .el-date-editor.el-input__inner{
+      width: 100px!important;
+      color: #fff;
+      background: none;
+      background-color: rgba(27,33,67,1)!important;
+    }
+    .el-input--mini .el-input__icon,.el-input__prefix{
+      display: none;
+    }
+    .el-input--prefix .el-input__inner{
+      padding-left: 10px;
+    }
+    .el-input--suffix .el-input__inner{
+      padding-right: 10px;
+    }
+    .el-picker-panel{
+      position: fixed;
+      right: 0;
+      z-index: 99;
+    }
+  }
+}
+.monthSelect{
+  .el-date-editor.el-input, .el-date-editor.el-input__inner{
+    width: 124px;
+  }
+  .el-input__inner{
+    background-color: rgba(27,33,67,1)!important;
+    color: #fff;
+    border: 1px solid #0BC940;
+    border-radius: 16px;
+    text-align: center;
+  }
+}

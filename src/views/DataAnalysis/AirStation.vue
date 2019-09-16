@@ -299,7 +299,7 @@
                 timevalue: '',
                 timevalueM:'',
                 //区县选项值
-                Tjvalue: '固安县',
+                Tjvalue: '广阳区',
                 //片区选项值
                 Pqvalue:'北部县区',
                 //
@@ -987,9 +987,8 @@
                         let tableData = {};//实时数据
                         tableData.Ranking = item.Ranking;//排名
                         tableData.Name = item.Name;//乡镇名称
-                        // let dateStr = item.AnalysisTime.replace("T",' ');
-                        // tableData.AnalysisTime = dateStr.slice(0,dateStr.indexOf("."));
-                        tableData.AnalysisTime = item.AnalysisTime.replace("T",' ');
+                        let dateStr = item.AnalysisTime.replace("T",' ');
+                        tableData.AnalysisTime = dateStr.slice(0,dateStr.indexOf("."));
                         tableData.Com_Index = item.Com_Index;//综合指数
                         tableData.Pm25 = item.Pm25;//Pm25
                         tableData.SO2 = item.SO2;//SO2
@@ -1221,10 +1220,10 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
+
     .AirStation {
         width: 100%;
         height: auto;
-
          /*************弹出框**********/
 	    .popUp {
 	        /*灰色遮罩层*/
@@ -1327,11 +1326,11 @@
                 }
                 .float002 {
                     float: left;
-                    margin-left: 10px;
+                    margin-left: 40px;
                 }
                 .float003 {
                     float: left;
-                    margin-left: 10px;
+                    margin-left: 40px;
                 }
             }
 

@@ -1,403 +1,191 @@
 <template>
-    <div class="header">
-        <div class="navbox">
-            <!--环境监测-->
-            <div class="logo">
-                <img src="../assets/img/logo1.png" alt="logo">
-                <a style="color: #fff;font-size:21px;font-weight: 500;line-height: 56px;font-family: 'Microsoft YaHei' ">固安县环境保护网格化管理平台</a>
-            </div>
-           <!---->
-            <ul class="bnav">
-                <!--<li><a href="#/">实时监测</a></li>-->
-                <!--<li>-->
-                    <!--<a style="padding: 0 10px" href="#/">-->
-                        <!--实时监测-->
-                    <!--</a>-->
-                <!--</li>-->
-                <!--气象预报-->
-                <!--<li>-->
-                    <!--<a style="padding: 0 10px">气象预报<i style="padding: 0 10px"></i></a>-->
-                    <!--<div class="Fouritem submenu same">-->
-                        <!--<a href="#/dynamicweather">动态风场</a><br/>-->
-                        <!--<a href="#/Weather">天气预报</a><br/>-->
-                        <!--<a href="#/SandDustForecast">沙尘预报</a><br/>-->
-                        <!--<a href="#/FogHazeForecast">雾霾预报</a><br/>-->
-                        <!--<a href="http://60.10.151.86:63317/langfang_release_web" target="_blank">空气质量</a>-->
-                    <!--</div>-->
-                <!--</li>-->
-
-                <!--大数据资源-->
-                <!--<li>-->
-                    <!--<a style="padding: 0 10px">大数据资源<i style="padding: 0 10px"></i></a>-->
-                    <!--<div class="Fiveitem submenu same">-->
-                        <!--<div>-->
-                            <!--<h3>排名</h3>-->
-                            <!--<a href="#/StateControl">省控排名</a>-->
-                            <!--<div class="line"></div>-->
-                            <!--<a href="#/TvocRange">TVOC排名</a>-->
-                        <!--</div>-->
-						<!--<div>-->
-                            <!--<h3>考核</h3>-->
-                            <!--<a href="#/CountyCheck">区县考核</a>-->
-                            <!--<div class="line"></div>-->
-                            <!--<a href="#/CityCheck">乡镇考核</a>-->
-                        <!--</div>-->
-                        <!--<div>-->
-                            <!--<h3>统计</h3>-->
-                            <!--<a href="#/TodayData">今日数据</a>-->
-                            <!--<div class="line"></div>-->
-                            <!--<a href="#/SimultaneRate">同期变化率</a><br>-->
-                            <!--<a href="#/RankingStatistics">排名统计</a>-->
-                        <!--</div>-->
-                    <!--</div>-->
-                <!--</li>-->
-
-                <!--系统后台-退出系统-->
-                <!--<li style="margin-right: 0;">-->
-                    <!--<span class="position-p"></span>-->
-                    <!--<img style="padding: 0 20px" src="../assets/img/btn_intercalate.png" class="activehov">-->
-                    <!--<div class="Sixitem submenu" v-if="isShow">-->
-                        <!--<a href="#/Management/BusinessManagement/Case-Review" class="houtai"><img src="../assets/img/btn_Backstage1.png" alt="">进入后台</a><br/>-->
-                        <!--<a class="tuichu" v-on:click="exit"><img src="../assets/img/btn_quit1.png" alt="">退出系统</a>-->
-                    <!--</div>-->
-                     <!--<div class="Sixitem submenu" v-else>-->
-                        <!--<a class="tuichu" v-on:click="exit"><img src="../assets/img/btn_quit1.png" alt="">退出系统</a>-->
-                    <!--</div>-->
-                <!--</li>-->
-            </ul>
+    <div class="atmoheader">
+        <div class="menus-left">
+            <span>环保监控平台</span>
+        </div>
+        <div class="menus-right">
+           <!--  <div class="target-panel">
+                <ul>
+                    <li v-for="(v,i) in tabmenus" @click="liClick(v,i)"><span :style='"color:"+(i===isChoose ? "#11DA88" : "#fff")'>{{v.label}}</span><div :class='i===isChoose && "menu-checked"'></div></li>
+                    <span class="exit" @click="toLogin">退出登录</span>
+                </ul>
+            </div> -->
         </div>
     </div>
 </template>
 
 <script>
+ import api from '../api/index'
     export default {
-        name: 'header',
-        data () {
+        name: 'atmoheader',
+        data() {
             return {
-                msg: 'App',
-                houtaiSrc: '../../static/imgs/mues/header/btn_Backstage2.png',
-                houtaiChesSrc: '../../static/imgs/mues/header/btn_Backstage1.png',
-                tuichuSrc: '../../static/imgs/mues/header/btn_quit2.png',
-                tuichuChesSrc: '../../static/imgs/mues/header/btn_quit1.png',
-                userMess:'',
-                isShow:true,
+                marqueeshowG:true,
+                marqueeshowI:false,
+                update:{},
+                tabmenus:[
+                    {
+                        path:'/',
+                        label:'实时监测'
+                    },{
+                        path:'/likewinter',
+                        label:'挂图作战'
+                    },{
+                        path:'/GridMap',
+                        label:'网格预测'
+                    },{
+                        path:'/BigDataSource/MeanRatioSensorNetwork',
+                        label:'大数据资源'
+                    }
+                ]
             }
         },
-        mounted(){
-        	this.isDuty = this.getlocal('userInfo').isDuty;
-            //右侧收放
-            const t = this;
-            //
-            $(".houtai").hover(function () {
-                $(".houtai img").attr('src', t.houtaiSrc);
-               // event.stopPropagation();
-            }, function () {
-                $(".houtai img").attr('src', t.houtaiChesSrc);
-            });
-            //
-            $(".tuichu").hover(function () {
-                $(".tuichu img").attr('src', t.tuichuSrc);
-               // event.stopPropagation();
-            }, function () {
-                $(".tuichu img").attr('src', t.tuichuChesSrc);
-            });
-
-            //右侧伸缩栏模块
-            $(".bnav li").hover(function () {
-               //console.log($(this).find('div'))
-                $(this).find('div').eq(0).css('display',"block")
-            }, function () {
-                $(this).find('div').eq(0).css('display',"none");
-            });
-
+        props: {
+            isChoose: {
+                type: Number,
+                default: 1
+            }
         },
-
+        mounted() {
+           this.judgmentBrowser();
+            api.GetAreaQualityRankRes().then(res =>{
+                console.log('test');
+                console.log(res);
+                this.update = res.data.Data;
+            })
+        },
         methods: {
-        	//获取本地
-		    getlocal(name) {
-		        let data = sessionStorage.getItem(name)
-		        if (data != null && data != '') {
-		            try {
-		                let obj = eval('(' + data + ')')
-		                return obj
-		            } catch (e) {
-		                return ''
-		            }
-		        } else {
-		            return ''
-		        }
-		    },
-            exit(){
-                this.$cookies.remove('auth')
-                setTimeout(() => {
-                    //
-                    this.$router.push('/login')
-                })
+            //菜单选择
+            liClick(v,i){
+                this.$router.push({path:v.path});
             },
-
-        }
+            //判断浏览器
+        	judgmentBrowser(){
+			    var ua = navigator.userAgent;
+				if(/chrome/i.test(ua)){
+					this.marqueeshowG = true;
+                	this.marqueeshowI = false;
+				}else {
+					this.marqueeshowG = false;
+                	this.marqueeshowI = true;
+				}
+			},
+            //退出登录
+            toLogin(){
+                if (process.env.API_ROOT === 'TEST' || process.env.API_ROOT === 'DEV') {
+                    console.log('test环境');
+                    window.open('http://58.132.207.211:6915/#/Login','_self')
+                } else {
+                    console.log('prod环境');
+                    window.open('http://120.52.157.162:8061/#/Login','_self')
+                }
+            }
+        },
     }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-    .header {
+    .atmoheader{
         width: 100%;
-        height: 56px;
-        .navbox{
-            width: 100%;
-            height: 56px;
-            background: #1b9d33;
-            position: absolute;
-            top: 0;
-            left: 0;
-            box-shadow:9px 0px 18px rgba(36,148,242,0.53);
-            .position-p{
-                position: absolute;
-                display: inline-block;
-                width: 25px;
-                height: 25px;
-                border: 1px solid #e5e5dd;
-                top: 16px;
-                left: 26px;
+        height:86px;
+        background:rgba(27,33,67,1);
+        box-shadow:0px 1px 16px 2px rgba(27,33,67,0.8);
+        .menus-left{
+            float: left;
+            width: 400px;
+            height: 86px;
+            line-height: 86px;
+            background: url("../../static/images/Logo/Logo.png") 30px center no-repeat;
+            span{
+                font-size: 18px;
+                font-family:MicrosoftYaHei;
+                font-weight:400;
+                color:rgba(255,255,255,1)
             }
-            .logo {
+        }
+        .menus-cont{
+            float: left;
+            height: 86px;
+            width: 200px;
+            line-height: 86px;
+            color: #fff;
+            img{
+                margin-top: 34px;
                 float: left;
-                width: auto;
-
-                img {
-                    width: 40px;
-                    height: 40px;
-                    margin-top: -9px;
-                    margin-left: 20px;
-                    margin-right: 2px;
-                }
-
+                line-height: 86px;
+                width: 18px;
+            }
+            .winBox {
+                display: inline-block;
+                width:170px;
+                height:86px;
+                overflow:hidden;
+                position:relative;
+                float: left;
+            }
+            .scroll {
+                /*width的大小是根据下面li的长度和多少个li而定的，需注意！*/
+                width:800px;
+                position:absolute;
+                left:0px;
+                top:0px;
+            }
+            .scroll li {
+                width:170px;
+                float:left;
+                line-height:86px;
+                text-align:center;
             }
 
-            .bnav {
-                /*width: 604px;*/
-                float: right;
-                height: 56px;
-
-                h3:hover {
-                    cursor: alias;
-                }
-
-                li {
-                    float: left;
-                    width: auto;
-                    height: 56px;
-                    list-style: none;
-                    line-height: 56px;
-                    position: relative;
-                    margin-right: 15px;
-                    padding: 0 10px;
-                    .activehov {
-                        transition: all 2s;
-                    }
-
-                    .activehov:hover {
-                        transform: rotate(3600deg);
-                    }
-
-                    p {
-                        margin: 0;
-                    }
-
-                    i {
-                        color: #fff;
-                        padding: 0 15px;
-                    }
-
-                    :active {
-                        color: #0070CE;
-                    }
-
-                    a {
-                        color: #dee9f5;
-                        padding: 0 20px;
-                        font-size: 16px;
-                        font-family: '微软雅黑';
-                        cursor: pointer;
-
-                        i {
-                            display: inline-block;
-                            width: 9px;
-                            height: 6px;
-                            margin-left: 2px;
-                            background: url("../assets/img/icon_sanjiao.png") no-repeat;
-                        }
-
-                    }
-                    :hover {
-                        text-decoration: none;
-                    }
-
-                    .line {
-                        height: 10px;
-                        width: 1px;
-                        background: #DDDDDD;
-                        margin: 0 13px;
+        }
+        .menus-right{
+            float: right;
+            width: 548px;
+            height:86px;
+            .target-panel{
+                 .exit{
                         display: inline-block;
-                    }
-
-                    .same {
-                        z-index: 100;
-                        display: none;
-                        background: #fff;
-                        box-shadow: 0 0 5px #ccc;
-                        //border: 1px solid #ccc;
-                        border-radius: 0 0 4px 4px;
-                        padding: 4px 20px 20px 20px;
-                        text-align: left;
-                        line-height: 20px;
-
-                        div {
-                            text-align: left;
-                            padding: 0;
-                        }
-
-                        a {
-                            color: #666;
-                            font-size: 14px;
-                            padding: 0;
-                            font-family: "Microsoft YaHei";
+                        height: 34px;
+                        line-height: 34px;
+                        border-left: 1px solid rgba(255,255,255,0.4);
+                        margin: 27px 30px 0 30px;
+                        padding-left: 30px;
+                        &:hover{
                             cursor: pointer;
-                            font-weight: normal;
                         }
-
-                        h3 {
-                            margin: 16px 0 8px 0;
-                            color: #333333;
-                            font-size: 14px;
-                            font-weight: bold;
-                        }
-
-                        :hover:not(h3) {
-                            color: #0070CE;
-                        }
-
                     }
-                    .Twoitem {
-                        position: absolute;
-                        top: 56px;
-                        left: 0;
-                        width: 126px;
-                    }
-
-                    .Threeitem {
-                        position: absolute;
-                        top: 56px;
-                        left: 0;
-                        width: 277px;
-                    }
-
-                    .Fouritem {
-                        text-align: left;
-                        display: none;
-                        z-index: 100;
-                        width: 126px;
-                        position: absolute;
-                        top: 56px;
-                        left: 0;
-                        background: #fff;
-                        line-height: 30px;
-                        box-shadow: 0 0 5px #ccc;
-                        padding: 10px 20px 10px;
-
-                        a {
-                            padding-left: 10px;
-                            color: #666;
-                            font-size: 14px;
-                            font-family: "Microsoft YaHei";
-                            cursor: pointer;
-
-                        }
-
-                        :hover {
-                            color: #0070CE;
-                        }
-
-                    }
-                    .Fiveitem {
-                        width: 220px;
-                        position: absolute;
-                        top: 56px;
-                        right: 0px;
-                        box-shadow: 0 0 5px #ccc;
-                    }
-
-                    .Sixitem {
-                        display: none;
-                        z-index: 100;
-                        width: 100px;
-                        position: absolute;
-                        top: 56px;
-                        right: 0;
-                        background: #fff;
-                        line-height: 25px;
-                        padding: 10px 0;
-                        box-shadow: 0 0 5px #ccc;
-
-                        a {
-                            color: #666;
-                            font-size: 12px;
-                            padding: 0 10px;
-                            font-family: "Microsoft YaHei";
-                            margin-left: -17px;
-                            cursor: pointer;
-
-                            img {
-                                vertical-align: middle;
-                                padding-right: 6px;
-                                padding-left: 18px;
-                                margin-top: -2px;
-                            }
-
-                        }
-                        :hover {
-                            cursor: pointer;
-                            color: #1080cc;
-                        }
-
-                    }
-                    .none {
-                        display: none;
-                    }
-
+                ul{
+                    list-style:none;
+                    margin:0;
+                    padding:0;
+                    background:#1B2143;
+                    color:#fff;
                 }
-                >
-                :hover {
-
-                    a {
-                        color: #fff;
-                        font-weight: bold;
-                    }
-
-                    i {
-                        font-size: 18px;
-                        font-weight: bold;
-                    }
-
+                li{
+                    line-height:86px;
                     cursor: pointer;
-                    background: #0070CE;
-                }
-                .active {
-
-                    a {
-                        color: #FFFFFF;
-                        font-weight: bold;
+                    float: left;
+                    text-align: center;
+                    font-weight:400;
+                    font-size:16px;
+                    margin-left: 30px;
+                    /*width:80px;*/
+                    position: relative;
+                    .menu-checked{
+                        position: absolute;
+                        width:15px;
+                        height:4px;
+                        display: inline-block;
+                        text-align: center;
+                        background:#12DA88;
+                        line-height:86px;
+                        margin-top:80px;
+                        bottom: 4px;
+                        left: calc(50% - 8px);
                     }
-
-                    i {
-                        color: #fff;
-                        font-weight: bold;
-                    }
-
                 }
             }
         }
     }
-
 </style>

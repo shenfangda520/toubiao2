@@ -1,24 +1,23 @@
 <template>
     <div class="Tone">
-        <img :src="'../../static/imgs/main/legend/'+legendSrc" />
-        <!--<ul>-->
-            <!--<li style="background:#b6b6b6 "></li>-->
-            <!--<li style="background:#2ae232 "></li>-->
-            <!--<li style="background:#fde73b "></li>-->
-            <!--<li style="background:#feb534 "></li>-->
-            <!--<li style="background:#fc5c46 "></li>-->
-            <!--<li style="background:#da285c "></li>-->
-            <!--<li style="background:#9d0c35 "></li>-->
-        <!--</ul>-->
-        <!--<ol>-->
-            <!--<li>离线</li>-->
-            <!--<li>优</li>-->
-            <!--<li>良</li>-->
-            <!--<li>轻度</li>-->
-            <!--<li>中度</li>-->
-            <!--<li>重度</li>-->
-            <!--<li>严重</li>-->
-        <!--</ol>-->
+        <ul>
+            <li style="background:#b6b6b6 "></li>
+            <li style="background:#2ae232 "></li>
+            <li style="background:#fde73b "></li>
+            <li style="background:#feb534 "></li>
+            <li style="background:#fc5c46 "></li>
+            <li style="background:#da285c "></li>
+            <li style="background:#9d0c35 "></li>
+        </ul>
+        <ol>
+            <li>离线</li>
+            <li>优</li>
+            <li>良</li>
+            <li>轻度</li>
+            <li>中度</li>
+            <li>重度</li>
+            <li>严重</li>
+        </ol>
     </div>
 </template>
 <script>
@@ -29,17 +28,10 @@
         data() {
             return {
                 //页面数据
-              legendSrc:'AQI.png'
             };
-        },
-        mounted(){
-          bus.$on('targetLegend',this.targetLegend);
         },
         methods: {
             // 所有方法
-          targetLegend(type){
-            this.legendSrc = (type+'.png') || 'AQI.png';
-          }
         }
     };
 </script>
@@ -47,11 +39,6 @@
     .Tone {
         width: 100%;
         height: 100%;
-        img{
-          width:430px;
-          height:53px;
-        }
-        /*
         ol {
             li {
                 list-style: none;
@@ -74,7 +61,7 @@
                 float: left;
 
             }
-        }*/
+        }
     }
 </style>
 

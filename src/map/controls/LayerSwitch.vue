@@ -24,7 +24,7 @@
         <!--<el-slider id="slider_1" data-attr="1" v-model="sliderValue1" :disabled="disabledSlider1" @change="sliderChangeEvent"></el-slider>-->
         <!--</div>-->
       </li>
-      <li :id="layers[2].id" data-attr="2" @click="radioClick">
+      <li :id="layers[2].id" data-attr="2" @click="radioClick" v-if="false">
         <!--<img :src="imgsrc" alt="" v-if="">-->
         <div class="circle">
           <div class="circle-mini"></div>

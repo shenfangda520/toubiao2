@@ -7,10 +7,8 @@
   		</li>
   		<li style="padding-right: 10px;">预警级别：{{warningLevel}}</li>
   		<li class="content">
-  			<!--<i>|</i>-->
   			<marquee direction=left>{{content}}</marquee>
   		</li>
-  		<!--<li><i>|</i>企业应急状态：{{Responded}}家已响应, {{UnResponded}}家未响应</li>-->
   	</ul>
   </div>
 </template>

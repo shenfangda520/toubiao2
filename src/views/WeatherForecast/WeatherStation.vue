@@ -2,15 +2,7 @@
     <div class="weatherstation">
         <!--气象站-->
         <v-header></v-header>
-        <iframe
-                frameborder="0"
-                width="100%"
-                height="100%"
-                :src="WeatherStationUrl"
-                scrolling="no"
-        >
-
-        </iframe>
+        <iframe frameborder="0" width="100%" height="100%" :src="WeatherStationUrl" scrolling="no"></iframe>
     </div>
 </template>
 
@@ -42,7 +34,7 @@
 <style lang="scss" scoped>
     .weatherstation {
         width: 100%;
-        height: calc(100% - 56px);
+        height: calc(100% - 86px);
         overflow: hidden;
     }
 </style>

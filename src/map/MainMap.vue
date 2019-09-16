@@ -1,7 +1,7 @@
 <template>
   <div class="main-map-content">
     <div id="main_map"></div>
-    <main-layer-handle></main-layer-handle>
+    <main-layer-handle v-show='false'></main-layer-handle>
     <el-dialog title="" :visible.sync="dialogVisible" size="large" width="90%" top="2%" @close="dialogCloseEvent">
       <div class="target-panel">
         <ul>
@@ -21,24 +21,24 @@
       <div id="search_char"></div>
     </el-dialog>
     <!--弹出框面板-->
-    <!--<el-dialog :visible.sync="wachiVisible" top="6vh" width="85%" :before-close="wachhandleClose">-->
-      <!--<div class="dianlode">-->
-        <!--&lt;!&ndash;&ndash;&gt;-->
-        <!--<largedata v-show="clokue === 'WRWDB'"></largedata>-->
-        <!--<fixedscs v-show="clokue === 'GDYTJ'"></fixedscs>-->
-        <!--<airstation v-show="clokue === 'XZKQZ'"></airstation>-->
-        <!--<meanratio v-show="clokue === 'SKJZB'"></meanratio>-->
-      <!--</div>-->
-    <!--</el-dialog>-->
+    <el-dialog :visible.sync="wachiVisible" top="6vh" width="90%" :before-close="wachhandleClose">
+      <div class="dianlode">
+        <!---->
+        <largedata v-show="clokue === 'WRWDB'"></largedata>
+        <fixedscs v-show="clokue === 'GDYTJ'"></fixedscs>
+        <airstation v-show="clokue === 'XZKQZ'"></airstation>
+        <meanratio v-show="clokue === 'SKJZB'"></meanratio>
+      </div>
+    </el-dialog>
     <!--<history-handle></history-handle>-->
-    <!--<div class="left-bottom">-->
-      <!--<revolving-menu></revolving-menu>-->
-    <!--</div>-->
+    <div class="left-bottom" v-if="false">
+      <revolving-menu></revolving-menu>
+    </div>
   </div>
 </template>
 <script>
   import BMap from 'BMap'
-  import MainLayerHandle from '@/map/controls/MainLayerHandle'
+  import MainLayerHandle from '@/map/controls/MainLayerHandleNew'
   import MapHandle from '@/map/controls/MapHandle'
   //污染物对比
   import largedata from '@/views/DataAnalysis/LargeDataResources'
@@ -216,9 +216,10 @@
       ready() {
         let map = new BMap.Map('main_map', {enableMapClick: false});
         //map.centerAndZoom('廊坊', 10);
-        map.centerAndZoom(new BMap.Point(116.297599,39.33959), this.zoom);
+        map.centerAndZoom(new BMap.Point(116.707599,39.55959), this.zoom);
         map.enableScrollWheelZoom();
-        mapStyle && map.setMapStyle(mapStyle);
+        map.setMapStyle({style:'midnight'});
+        // mapStyle && map.setMapStyle(mapStyle);
         this.map = map;
         this.$parent.map = map;
         let t = this;
@@ -227,8 +228,8 @@
         map.addEventListener('tilesloaded', function () {
           bus.$emit('setPolygonMap',map);
           bus.$emit('setToolMap', map);
-          bus.$emit('setGSMarkerVisible', map.getZoom() <= 9);
-          bus.$emit('setMainValueLabel', t.map.getZoom() >= t.zoom);//setMainValueLabel
+          // bus.$emit('setGSMarkerVisible', map.getZoom() <= 9);
+          // bus.$emit('setMainValueLabel', t.map.getZoom() >= t.zoom);//setMainValueLabel
         });
       },
 
@@ -403,7 +404,7 @@
     left: 0;
   }
   .main-map-content {
-    height: calc(100% - 56px);
+    height: calc(100% - 86px);
     width: 100%;
     margin: 0;
     padding: 0;

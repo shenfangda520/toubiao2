@@ -2,34 +2,32 @@
 <template>
     <div class="CaseReview">
 		<div id="right">
-			<!----------明星巡查员-->
+			<!--明星巡查员-->
 			<div class="box">
                 <div class="warning">
                     <a>明星巡查员</a>
                 </div>
             </div>
-            <!-----------查询部分------->
+            <!--查询部分-->
 			<div class="search">
 				<div class="block" style="margin-top: 20px;">
-				    <!--<span class="demonstration">网格名称</span>
-				    <el-input v-model="gridName" placeholder="请输入内容"></el-input>-->
+				    <span class="demonstration">乡镇名称</span>
+				    <el-input v-model="xiangzhenName" placeholder="请输入内容"></el-input>
 				    <span class="demonstration">巡查员姓名</span>
-				    <!--<el-input v-model="griderName" placeholder="请输入内容"></el-input>-->
-				    <el-select v-model="griderName" clearable placeholder="请选择">
+				    <el-select v-model="griderName" filterable  @change="AddSelectName" placeholder="请选择">
 					    <el-option
 					      v-for="item in griderOptions"
 					      :key="item.value"
-					      :label="item.name"
-					      :value="item.userId">
+					      :label="item.Name"
+					      :value="item.Id">
 					    </el-option>
 					</el-select>
 				    <el-button type="primary" class='btns' @click='GetMonitoringDay'>查询</el-button>
 				    <el-button type="primary" class='btns' @click='ExportStarExcel'>导出</el-button>
-				    <el-button type="primary" class='btns' @click='isAdd=true'>添加</el-button>
+				    <el-button type="primary" class='btns' @click='handleAdd'>添加</el-button>
 				</div>
 			</div>
-			
-			<!--------------列表部分---------->
+			<!--列表部分-->
 			<div class="box">
                 <div class="warning">
                     <a>列表</a>
@@ -37,30 +35,43 @@
            	</div>
            	<el-table
 			    :data="ListData"
+				border
 			    style="width: 100%">
+				<el-table-column
+						prop="TownName"
+						label="所属乡镇"
+						width="">
+				</el-table-column>
+				<el-table-column
+						prop="VillageName"
+						label="所属村庄"
+						width="">
+				</el-table-column>
 			    <el-table-column
-			      prop="userName"
+			      prop="MemberName"
 			      label="巡查员姓名"
 			      width="">
 			    </el-table-column>
 			    <el-table-column
-			      prop="createTime"
+			      prop="CreatedTime"
 			      label="日期">
 			    </el-table-column>
 			    <el-table-column
-			      prop="event"
-			      label="事迹">
+			      prop="Deeds"
+			      label="事迹"
+				  :show-overflow-tooltip="true"
+				>
 			    </el-table-column>
 			    <el-table-column
-			      prop="money"
+			      prop="Bonus"
 			      label="奖金">
 			    </el-table-column>
 			    <el-table-column
 			      label="操作"
-			      width="200">
+			      width="100">
 			      <template scope="scope">
 			        <div>
-			        	<el-button @click="handleExamineClick(scope.row)" type="text" size="small" class='eidt'>编辑</el-button>
+			        	<el-button @click="handleExamineClick(scope.row)" type="text" size="small" class='eidt'>查看</el-button>
 			        </div>
 			      </template>
 			    </el-table-column>
@@ -77,112 +88,48 @@
 			      :total="totalCount">
 			    </el-pagination>
 			</div>
-			<!--------------添加弹框部分--------------->
-			<div class="popUp" v-if="isAdd">
-	            <div class="mask"></div>
-	            <div class="succ-pop reply">
-	                <div class="title">
-	                    <a>明星巡查员</a>
-	                    <div class="el-icon-close" @click="isAdd=false"></div>
-	                </div>
-	                <div class="content">
-						<div class="block">
-						    <span>巡查员姓名</span>
-						    <el-select v-model="AddGriderName" @change="AddSelect" placeholder="请选择">
-							    <el-option
-							      v-for="item in AddGriderOptions"
-							      :key="item.value"
-							      :label="item.name"
-							      :value="item.userId">
-							    </el-option>
-							</el-select>
-						    <i>*</i>
-					  	</div>
-					  	<div class="block">
-						    <span>奖金</span>
-						    <el-input v-model="AddMoney" placeholder=""></el-input>
-						    <i>*</i>
-					  	</div>
-					  	<div class="block">
-					  		<span class="left">事迹</span>
-						  	<el-input
+			<!--添加-查看-部分-->
+			<el-dialog title="提示" :visible.sync="dialogVisible" width="500px">
+				<div class="tanchuan-box">
+					<div class="block">
+						<span>巡查员名称：</span>
+						<el-select v-model="AddGriderName" @change="AddSelect" placeholder="请选择">
+							<el-option
+									v-for="item in AddGriderOptions"
+									:key="item.value"
+									:label="item.Name"
+									:value="item.Id">
+							</el-option>
+						</el-select>
+					</div>
+					<div class="block">
+						<span>奖金：</span>
+						<el-input v-model="Bonus" placeholder="请输入内容"></el-input>
+					</div>
+					<div class="block kysay">
+						<span>事迹：</span>
+						<el-input
 								type="textarea"
-								:rows="3"
-								placeholder=""
-								v-model="AddStory"
-								>
-							</el-input>
-						</div>
-						<div class="block" style="margin-bottom: 20px;">
-					  		<span class="left">说明</span>
-						  	<el-input
+								:rows="4"
+								placeholder="请输入内容"
+								v-model="Deeds">
+						</el-input>
+					</div>
+					<div class="block kysay">
+						<span>备注：</span>
+						<el-input
 								type="textarea"
-								:rows="3"
-								placeholder=""
-								v-model="AddDescribe"
-								>
-							</el-input>
-						</div>
-						<el-row style='position: absolute;bottom: 30px;right: 30px;'>
-							<el-button type="primary" @click='AddOver'>确定</el-button>
-							<el-button plain @click='isAdd=false'>取消</el-button>
-						</el-row>
-	               </div>
-	            </div>
-	        </div>
-	        <!--------------编辑弹框部分--------------->
-			<div class="popUp" v-if="isEdit">
-	            <div class="mask"></div>
-	            <div class="succ-pop reply">
-	                <div class="title">
-	                    <a>明星巡查员</a>
-	                    <div class="el-icon-close" @click="isEdit=false"></div>
-	                </div>
-	                <div class="content">
-						<div class="block">
-						    <span>巡查员名称</span>
-						    <el-select v-model="EditGriderName" @change="EditSelect" clearable placeholder="请选择">
-							    <el-option
-							      v-for="item in EditGriderOptions"
-							      :key="item.value"
-							      :label="item.name"
-							      :value="item.userId">
-							    </el-option>
-							</el-select>
-						    <i>*</i>
-					  	</div>
-					  	<div class="block">
-						    <span>奖金</span>
-						    <el-input v-model="EditMoney" clearable placeholder=""></el-input>
-						    <i>*</i>
-					  	</div>
-					  	<div class="block">
-					  		<span class="left">事迹</span>
-						  	<el-input
-								type="textarea"
-								:rows="3"
-								placeholder=""
-								v-model="EditStory"
-								>
-							</el-input>
-						</div>
-						<div class="block" style="margin-bottom: 20px;">
-					  		<span class="left">备注</span>
-						  	<el-input
-								type="textarea"
-								:rows="3"
-								placeholder=""
-								v-model="EditDescribe"
-								>
-							</el-input>
-						</div>
-						<el-row style='position: absolute;bottom: 30px;right: 30px;'>
-							<el-button type="primary" @click='EditOver'>确定</el-button>
-							<el-button plain @click='isEdit=false'>取消</el-button>
-						</el-row>
-	               </div>
-	            </div>
-	        </div>
+								:rows="4"
+								placeholder="请输入内容"
+								v-model="Remarks">
+						</el-input>
+					</div>
+				</div>
+				<span slot="footer" class="dialog-footer">
+				<el-button @click="dialogVisible = false">取 消</el-button>
+				<el-button type="primary" @click="AddOver">确 定</el-button>
+			  </span>
+			</el-dialog>
 		</div>
     </div>
 </template>
@@ -194,171 +141,165 @@
         name: 'CaseReview',
         data() {
             return {
-		        tableData:[],
-			    currentPage: 1,
-			    pageSize:10,
-				totalCount:1,
-				InfoData:[],
-				ListData:[],
-				pageNo:1,
-	         //网格
-	         gridName:'',
-	         //添加
-	         griderName:'',//巡查员姓名
-	         griderOptions:[],//巡查员姓名列表
-	         //添加
-	         AddGriderName:'',
-	         AddGriderOptions:[],
-	         isAdd:false,
-	         AddDescribe:'',//说明
-	         AddMoney:'',//奖金
-	         AddStory:'',//事迹
-	         AddObj:{},
-	         //编辑
-	         userId:'',
-	         EditObj:{},
-	          EditGriderName:'',
-	         EditGriderOptions:[],
-	         isEdit:false,
-	         EditDescribe:'',//说明
-	         EditMoney:'',//奖金
-	         EditStory:'',//事迹
-	         id:''
+                tableData: [],
+                currentPage: 1,
+                pageSize: 10,
+                totalCount: 1,
+                InfoData: [],
+                ListData: [],
+                pageNo: 1,
+                dialogVisible:false,
+                //乡镇名称
+                xiangzhenName: '',
+                //添加
+                Bonus:'',
+                Deeds:'',
+                Remarks:'',
+                Reward:'',
+                griderName: '', //巡查员姓名
+                griderOptions: [], //巡查员姓名列表
+                AddGriderName: '',
+                AddGriderOptions: [],
+                AddObj: {}
             }
         },
         created(){
-        	this.GetMonitoringDay();
-        	this.GetGridName();
+
         },
         mounted() {
-        	
+            this.GetMonitoringDay();
+            this.GetGridName();
         },
         computed: {
             
         },
         methods: {
-        	//点击编辑
+            //
+            handleAdd(){
+                this.Bonus = '';
+                this.Deeds = '';
+                this.Remarks = '';
+                this.AddGriderName = '';
+                this.dialogVisible = true;
+			},
+            //
+            handleClose(done) {
+                this.$confirm('确认关闭？')
+                    .then(_ => {
+                        done();
+                    })
+                    .catch(_ => {});
+            },
+        	//点击查看
         	handleExamineClick(val){
+                const _this = this;
+                _this.dialogVisible = true;
         		console.log(val)
-        		this.isEdit = true;
-        		this.userId = val.userId;
-        		this.EditGriderName = val.userName;
-        		this.EditMoney = val.money;
-        		this.EditStory = val.event;
-        		this.id = val.id;
-        		console.log(val);
+				let Id = val.Id;
+                api.GetStarmemberGridName(Id).then(res=>{
+                    console.log(res.data);
+                    _this.Bonus = res.data.Data.Bonus;
+                    _this.Deeds = res.data.Data.Deeds;
+                    _this.Remarks = res.data.Data.Remarks;
+                    _this.AddGriderName = res.data.Data.GridMember;
+				})
         	},
       		//分页
       		 handleSizeChange(val) {
         		console.log(`每页 ${val} 条`);
-//      		this.GetMonitoringDay(10,val);
       		},
+			//
       		handleCurrentChange(val) {
 				this.pageNo = val;
 				this.GetMonitoringDay();
       		},
       		//获取巡查员姓名
       		GetGridName(){
-      			let t = this;
+				//
       			api.GetStarGridName().then(res=>{
       				console.log(res);
-      				this.griderOptions = res.data.data;
-      				this.AddGriderOptions = res.data.data;
-      				this.EditGriderOptions = res.data.data;
+					this.griderOptions = res.data.Data;
+      				this.AddGriderOptions = res.data.Data;
       			})
       		},
       		//获取列表
       		GetMonitoringDay(){
-      			let t = this;
-      			let userId = this.griderName;
-      			let pageSize = this.pageSize;
-      			let pageNo = this.pageNo;
-      			t.ListData = [];
-      			api.GetStarList(userId,pageSize,pageNo).then(result=>{
+      			const _this = this;
+      			let townname = _this.xiangzhenName || '';
+      			let membername = _this.AddObj.Name || '';
+      			let star = 1;//明星
+      			let PageSize = _this.pageSize;
+      			let PageIndex = _this.pageNo;
+      			_this.ListData = [];
+      			api.GetStarList(townname, membername, star,PageIndex,PageSize).then(result=>{
       				console.log(result)
       				if(result){
-      					let InfoData = result.data.data.rows;
-      					t.totalCount = result.data.data.total;
-//    					console.log(InfoData)
-//    					console.log('11')
+      					let InfoData = result.data.Data;
+                        _this.totalCount = result.data.TotalRowsCount;
       					if(InfoData){
       						InfoData.forEach(item=>{
 								let tableData = {};
-								tableData.userId = item.userId;
-								tableData.userName = item.userName;
-								tableData.createTime = t.Format(item.createTime);
-								tableData.event = item.event;
-								tableData.money = item.money;
-								tableData.id = item.id;
-		                        t.ListData.push(tableData);
+								tableData.CreatedTime = item.CreatedTime.replace('T',' ');
+                                tableData.Deeds = item.Deeds;
+                                tableData.Bonus = item.Bonus;
+                                tableData.Id = item.Id;
+                                tableData.MemberName = item.MemberName;
+                                tableData.TownName = item.TownName;
+                                tableData.VillageName = item.VillageName;
+		                        _this.ListData.push(tableData);
 							})
       					}
       				}
 				});
       		},
+			//
+            AddSelectName(val){
+                this.AddObj = {};
+                this.AddObj = this.griderOptions.find((item)=>{
+					//console.log(item);
+					if (val === item.Id) {
+					    return item;
+					}
+                });
+                console.log(this.AddObj);
+			},
       		//添加下拉选择
       		AddSelect(val){
       			console.log(val)
       			this.AddObj = {};  
-			    this.AddObj = this.AddGriderOptions.find((item)=>{//this.ruleForm  
-			    return item.userId === val;//筛选出匹配数据  
-			    });  
-      		},
-      		//编辑下拉选择
-      		EditSelect(val){
-      			console.log(val)
-      			this.EditObj = {};  
-			    this.EditObj = this.EditGriderOptions.find((item)=>{//this.ruleForm  
-			    return item.userId === val;//筛选出匹配数据  
-			    });  
+			    this.AddObj = this.AddGriderOptions.find((item)=>{return item.Id === val});
       		},
       		//添加确定
       		AddOver(){
-      			let t = this;
-      			let userId = this.AddObj.userId;
-      			let userName = this.AddObj.name;
-      			let money = this.AddMoney;
-      			let event = this.AddStory;
-      			let comment = this.AddDescribe;
-      			if(!this.AddGriderName||this.AddMoney==''){
-      				 this.$message({
-				          message: '必填项不可为空',
-				          type: 'warning'
-				    });
+      			const _this = this;
+      			let GridMember = _this.AddObj.Id;//巡查员
+      			let Deeds = _this.Deeds;//事迹
+      			let Bonus = _this.Bonus;//奖金
+      			let Reward = _this.Reward;//奖罚
+      			let Remarks = _this.Remarks;//备注
+      			if(!_this.AddGriderName||_this.Bonus==''){
+                    _this.$message({message: '必填项不可为空', type: 'warning'});
       			}else{
-      				api.AddStarEvent(userId,userName,money,event,comment).then(res=>{
-      					t.GetMonitoringDay();
-      					t.isAdd = false;
-      				})
-      			}
-      		},
-      		//编辑确定
-      		EditOver(){
-      			let t = this;
-      			let id = this.id;
-      			let userName = this.EditObj.name?this.EditObj.name:this.EditGriderName;
-      			let userId = this.EditObj.userId?this.EditObj.userId:this.userId;
-      			let money = this.EditMoney;
-      			let event = this.EditStory;
-      			let comment = this.EditDescribe;
-      			console.log(userId)
-      			if(!this.EditGriderName||this.EditMoney==''){
-      				 this.$message({
-				          message: '必填项不可为空',
-				          type: 'warning'
-				    });
-      			}else{
-      				api.EditStarEvent(id,userId,userName,money,event,comment).then(res=>{
-      					t.GetMonitoringDay();
-      					t.isEdit = false;
+      				api.AddStarEvent(GridMember, Deeds, Bonus, Reward, Remarks).then(res=>{
+                        if (res.data.Status === 1) {
+                            _this.$message({showClose: true, message: '添加成功', type: 'success'});
+                            _this.GetMonitoringDay();
+                        } else {
+                            _this.$message({showClose: true, message: '添加失败', type: 'error'});
+                        }
+                        _this.dialogVisible = false;
       				})
       			}
       		},
       		//导出
       		ExportStarExcel(){
-      			let t = this;
-      			let userId = this.griderName;
-      			api.ExportStarExcel(userId);
+                const _this = this;
+                let townname = _this.xiangzhenName || '';
+                let membername = _this.AddObj.Name || '';
+                let star = 1;//明星
+                let PageSize = _this.pageSize;
+                let PageIndex = _this.pageNo;
+      			api.ExcelOutPutMemberExcel(townname, membername, star,PageIndex,PageSize);
       		},
       		 //分页数据
             setPageTable(pageSize, pageNum) {
@@ -372,39 +313,7 @@
                 }
                 this.tableData = rtValue;
             },
-            
-		    handleRemove(file, fileList) {
-		        console.log(file, fileList);
-		    },
-		    handlePreview(file) {
-		        console.log(file);
-		    },
-		    Format(timestamp){
-				//时间戳是整数，否则要parseInt转换
-				var time = new Date(timestamp*1000);
-				var year = time.getFullYear();
-				var month = time.getMonth()+1;
-				var day = time.getDate()+' ';
-				var h = time.getHours() + ':';
-		        var m = time.getMinutes() + ':';
-		        var s = time.getSeconds();
-				if(month<10){
-					month = "0" + month;
-				}
-				if(day<10){
-					day = "0" + day;
-				}
-				if(h<10){
-					h = "0" + h;
-				}
-				if(m<10){
-					m = "0" + m;
-				}
-				if(s<10){
-					s = "0" + s
-				}
-				return year+'-'+month+'-'+day +h+m+s;
-			},
+
         }, 
     }
 </script>
@@ -426,6 +335,23 @@
 	overflow: hidden;
 	padding: 20px;
 	background-color: #f6fbff;
+	.tanchuan-box{
+		width: 100%;
+		height: auto;
+		.block{
+			width: 96%;
+			margin-top: 15px;
+			margin-left: -20px;
+			span{
+				display: inline-block;
+				width: 100px;
+				text-align: right;
+			}
+			.el-textarea{
+				width: 200px;
+			}
+		}
+	}
 	.left{
 		float: left;
 	}
@@ -490,171 +416,6 @@
     	margin-left: 170px;
     	padding-bottom: 90px;
     }
-    /*************弹出框**********/
-    .popUp {
-        /*灰色遮罩层*/
-        .mask {
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            position: fixed;
-            left: 0;
-            top: 0;
-            z-index: 998;
-        }
-        /*****添加弹出框内容********/
-        .reply {
-            width: 400px;
-            height: 500px;
-            background: #fff;
-            position: fixed;
-            left: 50%;
-            top: 50%;
-            margin-left: -200px;
-            margin-top: -250px;
-            z-index: 999;
-            border-radius: 10px;
-            .title {
-                width: 100%;
-                height: 50px;
-                line-height: 50px;
-                text-align: left;
-                border-bottom: 2px solid #3a90b3;
-                a {
-                    color: #3a90b3;
-                    font-size: 18px;
-                    padding-left: 20px;
-                }
-                div {
-                    margin-top: 15px;
-                    float: right;
-                    width: 24px;
-                    height: 24px;
-                    color: #363636;
-                    margin-right: 6px;
-                }
-            }
-            .content{
-            	padding: 0 40px;
-            	text-align: right;
-            	.block{
-            		float:left;
-            		margin-top:20px;
-            		span{
-            			display: inline-block;
-            			width: 70px;
-            			text-align: right;
-            		}
-            	}
-            	.el-textarea{
-					width: 200px;
-				}
-            }
-            
-        }
-        /*//分配弹框*/
-        .distribute{
-        	width: 400px;
-        	height: 224px;
-        	margin-left: -200px;
-	    	margin-top: -112px;
-	    	background: #fff;
-            position: fixed;
-            left: 50%;
-            top: 50%;
-            z-index: 999;
-            border-radius: 10px;
-            .title {
-                width: 100%;
-                height: 50px;
-                line-height: 50px;
-                text-align: left;
-                border-bottom: 2px solid #3a90b3;
-                /*margin-bottom:26px;*/
-                a {
-                    color: #3a90b3;
-                    font-size: 18px;
-                    padding-left: 20px;
-                }
-                div {
-                    margin-top: 15px;
-                    float: right;
-                    width: 24px;
-                    height: 24px;
-                    color: #363636;
-                    margin-right: 6px;
-                }
-            }
-	    	.content{
-	    		margin-left: 30px;
-	    		margin-top: 20px;
-	    	}
-        }
-        /*查看弹框*/
-        .examine{
-        	width: 655px;
-            height: 690px;
-            background: #fff;
-            position: fixed;
-            left: 50%;
-            top: 50%;
-            margin-left: -327px;
-            margin-top: -345px;
-            z-index: 999;
-            border-radius: 10px;
-            .title {
-                width: 100%;
-                height: 50px;
-                line-height: 50px;
-                text-align: left;
-                border-bottom: 2px solid #3a90b3;
-                /*margin-bottom:26px;*/
-                a {
-                    color: #3a90b3;
-                    font-size: 18px;
-                    padding-left: 20px;
-                }
-                div {
-                    margin-top: 15px;
-                    float: right;
-                    width: 24px;
-                    height: 24px;
-                    color: #363636;
-                    margin-right: 6px;
-                }
-            }
-            .content{
-            	padding: 0 40px;
-            	text-align: right;
-            	.block{
-            		float:left;
-            		margin-top:20px;
-            		span{
-            			display: inline-block;
-            			width: 60px;
-            			text-align: right;
-            		}
-            	}
-            	.el-textarea{
-					width: 506px;
-				}
-	    	}
-        	
-        } 
-        .imgBox{
-			img{
-				width: 200px;
-				height: 200px;
-			}
-			span{
-				vertical-align: top;
-			}
-			
-		}
-		.secSpan{
-			margin-left: 35px;
-		}  
-    } 
-      
+
 }
 </style>

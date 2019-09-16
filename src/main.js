@@ -2,6 +2,7 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 import App from './App'
+//import 'babel-polyfill'
 import router from './router'
 import store from './store'
 import axios from 'axios';
@@ -10,13 +11,14 @@ Vue.prototype.$axios = axios;
 import './js/rem.js'
 //公用组件导入
 import Header from './components/Header'
-import PaneldataGrid from './components/grid_new'
 import Progress from './components/progress'
 import MapHandle from './map/controls/MapHandle'
 //引入ElementUI
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
-
+//注册全局过滤器
+import filters from './filters';
+Object.keys(filters).forEach(k => Vue.filter(k, filters[k]));
 // 引入样式
 import 'vue-easytable/libs/themes-base/index.css'
 import 'quill/dist/quill.core.css'
@@ -33,7 +35,6 @@ import '../static/calendpoll/bootstrap-year-calendar.css'
 import '../static/calendpoll/bootstrap-year-calendar'
 //公共组件全局注册
 Vue.component('v-header', Header);
-Vue.component('v-Paneldagrid', PaneldataGrid);
 Vue.component('v-progress', Progress);
 Vue.component('map-handle', MapHandle);
 

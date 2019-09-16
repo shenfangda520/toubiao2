@@ -2,17 +2,7 @@
     <div class="DynamicWindField">
         <!--动态风场-->
         <v-header></v-header>
-        <iframe
-                frameborder="0"
-                width="100%"
-                height="100%"
-                :src="DynamicWindFieldUrl"
-                scrolling="no"
-                id="iframetest"
-        >
-
-        </iframe>
-        <!--https://airwise.zc12369.com/-->
+        <iframe frameborder="0" width="100%" height="100%" :src="DynamicWindFieldUrl" scrolling="no" id="iframetest"></iframe>
     </div>
 </template>
 
@@ -23,7 +13,6 @@
         data() {
             return {
                 DynamicWindFieldUrl: 'https://airwise.zc12369.com/',
-
             }
         },
         mounted() {

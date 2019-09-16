@@ -185,6 +185,15 @@
                 console.log(val)
                 this.yjindex = val;
             },
+            //颜色列表
+            tableRowClassName({row, rowIndex}) {
+                if (rowIndex%2 === 0) {
+                    return 'warning-row';
+                } else {
+                    return 'success-row';
+                }
+                return '';
+            },
             //点击查询
             SearchNotice(){
                 // let ndt = new Date();

@@ -2,19 +2,19 @@
 <template>
     <div class="CaseReview">
 		<div id="right">
-			<!----------签到统计-->
+			<!--签到统计-->
 			<div class="box">
                 <div class="warning">
                     <a>签到统计</a>
                 </div>
             </div>
-            <!-----------查询部分------->
+            <!--查询部分-->
 			<div class="search">
-				<div class="block" style="margin-top: 20px;">
-				    <!--<span class="demonstration">村庄名称</span>
-				    <el-input v-model="villageName" placeholder="请输入内容" clearable></el-input>-->
+				<div class="block" style="width: 100%;margin-top: 20px;">
+					<span class="demonstration">乡镇名称</span>
+				    <el-input v-model="villageName" placeholder="请输入内容" clearable></el-input>
 				    <span class="demonstration">巡查员姓名</span>
-				    <el-input v-model="patrollerName" placeholder="请输入内容"></el-input>
+				    <el-input v-model="patrollerName" placeholder="请输入内容" clearable></el-input>
 				</div>
 				<div class="block" style="margin-top: 20px;">
 					 <span class="demonstration">起始时间</span>
@@ -38,7 +38,7 @@
 				</div>
 			</div>
 			
-			<!--------------列表部分---------->
+			<!--列表部分-->
 			<div class="box">
                 <div class="warning">
                     <a>列表</a>
@@ -46,22 +46,30 @@
            	</div>
            	<el-table
 			    :data="ListData"
+				border
 			    style="width: 100%">
+				<el-table-column
+						prop="TownName"
+						label="所属乡镇">
+				</el-table-column>
+				<el-table-column
+						prop="VillageName"
+						label="所属村庄">
+				</el-table-column>
 			    <el-table-column
-			      prop="username"
-			      label="巡查员姓名"
-			      width="">
+			      prop="MemberName"
+			      label="巡查员姓名">
 			    </el-table-column>
 			    <el-table-column
-			      prop="mobile"
+			      prop="Mobile"
 			      label="联系方式">
 			    </el-table-column>
 			    <el-table-column
-			      prop="checkIn"
+			      prop="CheckIn"
 			      label="签到时间">
 			    </el-table-column>
 			    <el-table-column
-			      prop="checkout"
+			      prop="Checkout"
 			      label="签退时间">
 			    </el-table-column>
 			</el-table>
@@ -92,7 +100,7 @@
 			    currentPage: 1,
 			    pagesize:10,
 				TotalRowsCount:null,
-				totalCount:'',
+				totalCount:1,
 				InfoData:[],
 				ListData:[],
 				pageNo:1,
@@ -104,14 +112,11 @@
 	         patrollerName:''
             }
         },
-        created(){
-
-        },
+        created(){},
         mounted() {
             this.GetMonitoringDay();
         },
-        computed: {
-        },
+        computed: {},
         methods: {
             //开始时间选择
         	startChange(val){
@@ -125,36 +130,37 @@
       		 handleSizeChange(val) {
         		console.log(`每页 ${val} 条`);
       		},
+			//
       		handleCurrentChange(val) {
-      			let t = this;
       			this.pageNo = val;
 				this.GetMonitoringDay();
       		},
       		//获取列表
       		GetMonitoringDay(){
-      			let t = this;
-      			// let Name = encodeURI(this.patrollerName);
-      			let Name = this.patrollerName;
+      			const _this = this;
+      			let TownName = encodeURI(this.villageName);
+      			let Name = encodeURI(this.patrollerName);
 				let BeginTime = this.CaseStartTime?this.CaseStartTime:'';
 				let EndTime = this.CaseEndTime?this.CaseEndTime:'';
 				let PageSize = 10;
 				let PageIndex = this.pageNo;
       			this.ListData = [];
-      			api.GetStaff(Name,BeginTime,EndTime,PageIndex,PageSize).then(result=>{
+      			api.GetStaff(TownName,Name,BeginTime,EndTime,PageIndex,PageSize).then(result=>{
       				console.log(result)
       				if(result){
-      					let InfoData = result.data.Data.Data;
-      					t.totalCount = result.data.Data.TotlePageNum;
-//    					console.log(InfoData)
-//    					console.log('11')
+      					let InfoData = result.data.Data;
+                        _this.totalCount = result.data.TotalRowsCount;
+
       					if(InfoData){
       						InfoData.forEach(item=>{
 								let tableData = {};
-								tableData.username = item.username;
-		                        tableData.checkIn = item.checkIn;//案发时间
-		                        tableData.checkout = item.checkout;
-		                        tableData.mobile = item.mobile;//责任主体
-		                        t.ListData.push(tableData);
+								tableData.Checkout = item.Checkout || '--';
+		                        tableData.CheckIn = item.CheckIn || '--';//案发时间
+		                        tableData.MemberName = item.MemberName || '--';
+		                        tableData.Mobile = item.Mobile || '--';//责任主体
+                                tableData.TownName = item.TownName || '--';
+                                tableData.VillageName = item.VillageName || '--';//责任主体
+                                _this.ListData.push(tableData);
 							})
       					}
       				}
@@ -163,13 +169,14 @@
       		
       		//导出
       		GetExportCase(){
-      			let t = this;
-      			let Name = encodeURI(this.patrollerName);
-				let BeginTime = this.CaseStartTime?this.CaseStartTime:'';
-				let EndTime = this.CaseEndTime?this.CaseEndTime:'';
+                const _this = this;
+                let TownName = encodeURI(_this.villageName);
+      			let Name = encodeURI(_this.patrollerName);
+				let BeginTime = _this.CaseStartTime?_this.CaseStartTime:'';
+				let EndTime = _this.CaseEndTime?_this.CaseEndTime:'';
 				let PageSize = 10;
-				let PageIndex = this.pageNo;
-      			api.StaffExcelOutPut(Name,BeginTime,EndTime,PageIndex,PageSize);
+				let PageIndex = _this.pageNo;
+      			api.StaffExcelOutPut(TownName,Name,BeginTime,EndTime,PageIndex,PageSize);
       		},
 		    handleRemove(file, fileList) {
 		        console.log(file, fileList);
@@ -197,12 +204,8 @@
 	display:inline-block;
 	width:200px;
 	height:200px;
-	/*padding:5px;*/
-	/*margin:5px 20px 20px 0;*/
 	border:1px solid #d1dbe5;
-	/*border-radius:4px;*/
-	/*transition:all .3s;*/
-	/*box-shadow:0 2px 4px 0 rgba(0,0,0,.12), 0 0 6px 0 rgba(0,0,0,.04);*/
+
 }
 .img-list .img-upload{
 	float:left;
@@ -346,176 +349,7 @@
     	margin-left: 170px;
     	padding-bottom: 90px;
     }
-    /*************弹出框**********/
-    .popUp {
-        /*灰色遮罩层*/
-        .mask {
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            position: fixed;
-            left: 0;
-            top: 0;
-            z-index: 998;
-        }
-        /*****回复弹出框内容********/
-        .reply {
-            width: 655px;
-            height: 690px;
-            background: #fff;
-            position: fixed;
-            left: 50%;
-            top: 50%;
-            margin-left: -327px;
-            margin-top: -345px;
-            z-index: 999;
-            border-radius: 10px;
-            .title {
-                width: 100%;
-                height: 50px;
-                line-height: 50px;
-                text-align: left;
-                border-bottom: 2px solid #3a90b3;
-                a {
-                    color: #3a90b3;
-                    font-size: 18px;
-                    padding-left: 20px;
-                }
-                div {
-                    margin-top: 15px;
-                    float: right;
-                    width: 24px;
-                    height: 24px;
-                    color: #363636;
-                    margin-right: 6px;
-                }
-            }
-            .content{
-            	padding: 0 40px;
-            	text-align: right;
-            	.block{
-            		float:left;
-            		margin-top:20px;
-            		span{
-            			display: inline-block;
-            			width: 60px;
-            			text-align: right;
-            		}
-            	}
-            	.el-textarea{
-					width: 506px;
-				}
-				.el-upload .el-upload--picture-card{
-					width: 200px!important;
-					height: 200px!important;
 
-				}
-            }
-            
-        }
-        /*//分配弹框*/
-        .distribute{
-        	width: 400px;
-        	height: 224px;
-        	margin-left: -200px;
-	    	margin-top: -112px;
-	    	background: #fff;
-            position: fixed;
-            left: 50%;
-            top: 50%;
-            z-index: 999;
-            border-radius: 10px;
-            .title {
-                width: 100%;
-                height: 50px;
-                line-height: 50px;
-                text-align: left;
-                border-bottom: 2px solid #3a90b3;
-                /*margin-bottom:26px;*/
-                a {
-                    color: #3a90b3;
-                    font-size: 18px;
-                    padding-left: 20px;
-                }
-                div {
-                    margin-top: 15px;
-                    float: right;
-                    width: 24px;
-                    height: 24px;
-                    color: #363636;
-                    margin-right: 6px;
-                }
-            }
-	    	.content{
-	    		margin-left: 30px;
-	    		margin-top: 20px;
-	    	}
-        }
-        /*查看弹框*/
-        .examine{
-        	width: 655px;
-            height: 690px;
-            background: #fff;
-            position: fixed;
-            left: 50%;
-            top: 50%;
-            margin-left: -327px;
-            margin-top: -345px;
-            z-index: 999;
-            border-radius: 10px;
-            .title {
-                width: 100%;
-                height: 50px;
-                line-height: 50px;
-                text-align: left;
-                border-bottom: 2px solid #3a90b3;
-                /*margin-bottom:26px;*/
-                a {
-                    color: #3a90b3;
-                    font-size: 18px;
-                    padding-left: 20px;
-                }
-                div {
-                    margin-top: 15px;
-                    float: right;
-                    width: 24px;
-                    height: 24px;
-                    color: #363636;
-                    margin-right: 6px;
-                }
-            }
-            .content{
-            	padding: 0 40px;
-            	text-align: right;
-            	.block{
-            		float:left;
-            		margin-top:20px;
-            		span{
-            			display: inline-block;
-            			width: 60px;
-            			text-align: right;
-            		}
-            	}
-            	.el-textarea{
-					width: 506px;
-				}
-	    	}
-        	
-        } 
-        .imgBox{
-			img{
-				width: 200px;
-				height: 200px;
-			}
-			span{
-				vertical-align: top;
-			}
-			
-		}
-		.secSpan{
-			margin-left: 35px;
-		}  
-    } 
       
 }
 </style>

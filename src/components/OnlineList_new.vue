@@ -1,73 +1,37 @@
 <template>
     <div class="OnlineList">
         <!--工地-->
-       <div class="main">
-                    <!--选项查询-->
-                    <div class="first">
-                        <div class="tables">
-                            <!--选项-->
-                            <a style="background: #fff">当前时间</a>
-                        </div>
-                        <div class="shijian">
-                            <!--时间选择-->
-                            <div class="block">
-                                <el-date-picker
-                                        v-model="value2"
-                                        type="datetime"
-                                        placeholder="选择日期时间"
-                                        align="right"
-                                        :picker-options="pickerOptions1">
-                                </el-date-picker>
-                            </div>
-                        </div>
-                        <div class="btnns">
-                            <button @click="btnClickEvent">查询</button>
-                        </div>
-                    </div>
-                    <!--排名-->
-                    <div class="table_container">
-                        <el-table
-                                :data="tableData"
-                                border
-                                stripe
-                                highlight-current-row
-                                @current-change="RowCurrentChange"
-                            >
-                            <el-table-column
-                                    property="ranking"
-                                    label="排名"
-                                    width="54">
-                            </el-table-column>
-                            <el-table-column
-                                    property="Grid"
-                                    label="网格名称"
-                                    width="80">
-                            </el-table-column>
-                            <el-table-column
-                                    property="name"
-                                    label="名称"
-                                    >
-                            </el-table-column>
-                            <el-table-column
-                                    property="aqi"
-                                    :label="labelType"
-                                    width="100">
-                            </el-table-column>
-                        </el-table>
-                        <!--分页条-->
-                        <div class="Pagination" style="text-align: left;margin-top: 10px;">
-                            <el-pagination
-                                    background
-                                    @size-change="handleSizeChange"
-                                    @current-change="handleCurrentChange"
-                                    :current-page="currentPage"
-                                    :page-size="pagesize"
-                                    layout="total, prev, pager, next"
-                                    :total="totalCount">
-                            </el-pagination>
-                        </div>
+        <div class="main">
+            <!--选项查询-->
+            <div class="first">
+                <div class="tables">
+                    <!--选项-->
+                    <a style="background: #12DA88;color: #fff">当前时间</a>
+                </div>
+                <div class="shijian">
+                    <!--时间选择-->
+                    <div class="block">
+                        <el-date-picker v-model="value2" size="small" type="datetime" placeholder="选择日期时间" align="right" :picker-options="pickerOptions1"></el-date-picker>
                     </div>
                 </div>
+                <div class="btnns">
+                    <button @click="btnClickEvent">查询</button>
+                </div>
+            </div>
+            <!--排名-->
+            <div class="table_container">
+                <el-table :data="tableData" border :row-class-name="tableRowClassName" @current-change="RowCurrentChange" style="width: 100%">
+                    <el-table-column property="ranking" label="排名" width="60"></el-table-column>
+                    <el-table-column property="Grid" label="网格名称" width="92"></el-table-column>
+                    <el-table-column property="name" label="名称"></el-table-column>
+                    <el-table-column property="aqi" :label="labelType" width="80"></el-table-column>
+                </el-table>
+                <!--分页条-->
+                <div class="Pagination" style="text-align: left;margin-top: 10px;">
+                    <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage" :page-size="pagesize" layout="total, prev, pager, next" :total="totalCount"></el-pagination>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -125,13 +89,13 @@
             }
         },
         created() {
+
+        },
+        mounted() {
             //初始化数据接入
             this.InitializationDataMethod();
             //指标切换
             bus.$on('refreshDustTarget', this.refreshTable);
-        },
-        mounted() {
-            //右侧收放
         },
         methods: {
             //排序
@@ -142,15 +106,22 @@
                     return value2 - value1
                 }
             },
+            //颜色列表
+            tableRowClassName({row, rowIndex}) {
+                if (rowIndex%2 === 0) {
+                    return 'warning-row';
+                } else {
+                    return 'success-row';
+                }
+                return '';
+            },
             //初数据始化列表
             InitializationDataMethod() {
                 //
                 api.GetDustHourRanking().then(res => {
                     let data = res.data.Data;
-                    //
                     this.SetDataList(data, this.type);
                     this.totalCount = this.allData.length;
-                    //
                     this.setPageTable(10, 1);
                 })
 
@@ -369,89 +340,82 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-
     .OnlineList {
         width: 430px;
         height: auto;
         img {
-                position: absolute;
-                top: 40%;
-                left: -17px;
-                cursor: pointer;
-                float: left;
-            }
+            position: absolute;
+            top: 40%;
+            left: -17px;
+            cursor: pointer;
+            float: left;
+        }
         .main {
-                height: auto;
-
-                .kbiaoti {
-                    padding: 10px 0px;
-                }
-
-                .bluexian {
-                    width: 26px;
-                    border: 1px solid #1080cc;
-                    margin: 0 auto;
-                }
-
-                .first {
-                    width: 100%;
-                    height: 44px;
-                    margin-top: 30px;
-
-                    .tables {
+            height: auto;
+            .kbiaoti {
+                padding: 10px 0px;
+            }
+            .bluexian {
+                width: 26px;
+                border: 1px solid #1080cc;
+                margin: 0 auto;
+            }
+            .first {
+                width: 100%;
+                height: 44px;
+                margin-top: 30px;
+                .tables {
+                    float: left;
+                    margin-left: 14px;
+                    a {
+                        padding: 0 15px;
                         float: left;
-                        margin-left: 14px;
-
-                        a {
-                            padding: 0 15px;
-                            float: left;
-                            text-decoration: none;
-                            color: #666;
-                            display: inline-block;
-                            line-height: 34px;
-                            width: 100px;
-                            height: 34px;
-                            margin-right: 16px;
-                            border: solid 1px #ccc;
-                            background: #fff;
-                            border-radius: 2px;
-                        }
-
-                    }
-                    .shijian {
-                        float: left;
-                        margin-left: 6px;
-                    }
-
-                    .btnns {
-                        float: left;
-                        margin-left: 6px;
-
-                        button {
-                            border: none;
-                            width: 80px;
-                            height: 34px;
-                            background: #1b9d33;
-                            color: #fff;
-                            border-radius: 4px;
-                        }
-
+                        text-decoration: none;
+                        color: #666;
+                        display: inline-block;
+                        line-height: 34px;
+                        width: 100px;
+                        height: 34px;
+                        margin-right: 16px;
+                        border: solid 1px #ccc;
+                        background: #fff;
+                        border-radius: 2px;
                     }
                 }
-                .tqbiaoti {
-                    width: 100%;
-                    height: 22px;
-                    padding-left: 20px;
-                    text-align: left;
-                    margin-left: 16px;
-                    border-left: solid 3px #2a6496;
+                .shijian {
+                    float: left;
+                    margin-left: 6px;
                 }
+                .btnns {
+                    float: left;
+                    margin-left: 6px;
+                    button {
+                        border: none;
+                        width: 80px;
+                        height: 34px;
+                        color: #fff;
+                        border-radius: 20px;
+           background:linear-gradient(0deg,rgba(79,172,254,1),rgba(0,242,254,1));
+    border-image:linear-gradient(0deg, rgba(148,207,255,1), rgba(162,249,254,1)) 1 1;
+    box-shadow:0px 3px 7px 0px rgba(0, 0, 0, 0.35);
+                    }
+                }
+            }
 
-                .table_container {
-                    margin-left: 16px;
-                }
+            .tqbiaoti {
+                width: 100%;
+                height: 22px;
+                padding-left: 20px;
+                text-align: left;
+                margin-left: 16px;
+                border-left: solid 3px #2a6496;
+            }
+            .table_container {
+                margin-left: 10px;
 
             }
-    }
 
+        }
+
+    }
 </style>

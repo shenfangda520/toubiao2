@@ -1,79 +1,21 @@
 <template>
     <div class="Paneldatavideo">
-                <!--企业污染源-->
-                <div class="main">
-                    <!--顶部title-->
-                    <div class="tables">
-                        <!--选项-->
-                        <!--<a id="shishi">网格污染源数量超标统计</a>-->
-                        <!--<div class="xian"></div>-->
-                    </div>
-                    <!--污染数量表格-->
-                    <!--<div class="table_container" style="margin-top: 15px">-->
-                        <!--<el-table-->
-                                <!--:data="tableList"-->
-                                <!--border-->
-                                <!--stripe-->
-                                <!--highlight-current-row-->
-                                <!--style="width: 400px">-->
-                            <!--<el-table-column-->
-                                    <!--property="NetworkName"-->
-                                    <!--label="网格名称"-->
-                                    <!--width="100">-->
-                            <!--</el-table-column>-->
-                            <!--<el-table-column-->
-                                    <!--property="PollutionSourceNum"-->
-                                    <!--label="污染源数量"-->
-                                    <!--width="140">-->
-                            <!--</el-table-column>-->
-                            <!--<el-table-column-->
-                                    <!--property="PollutionSourceCBNum"-->
-                                  <!--label="超标污染源数量"-->
-                            <!--&gt;-->
-                            <!--</el-table-column>-->
-                        <!--</el-table>-->
-                    <!--</div>-->
-                    <!--企业污染表格-->
-                    <div class="table_container" style="margin-top: 15px">
-                        <el-table
-                                :data="tableData"
-                                border
-                                stripe
-                                highlight-current-row
-                                @current-change="RowCurrentChange"
-                                style="width: 400px">
-                            <el-table-column
-                                    property="WanggeName"
-                                    label="网格名称"
-                                    width="80">
-                            </el-table-column>
-                            <el-table-column
-                                    property="NetworkName"
-                                    label="企业名称"
-                                    width="220">
-                            </el-table-column>
-
-                            <el-table-column
-                                    property="Statues"
-                                    label="是否超标"
-                            >
-                            </el-table-column>
-                        </el-table>
-                        <!--分页条-->
-                        <div class="Pagination" style="text-align: left;margin-top: 10px;">
-                            <el-pagination
-                                    background
-                                    @current-change="handleCurrentChange"
-                                    :current-page="currentPage"
-                                    :page-size="pagesize"
-                                    layout="total, prev, pager, next"
-                                    :total="totalCount">
-                            </el-pagination>
-                        </div>
-                    </div>
+        <!--企业污染源-->
+        <div class="main">
+            <!--企业污染表格-->
+            <div class="table_container" style="margin-top: 15px">
+                <el-table :data="tableData" border stripe highlight-current-row @current-change="RowCurrentChange" style="width: 400px">
+                    <el-table-column property="WanggeName" label="网格名称" width="80"></el-table-column>
+                    <el-table-column property="NetworkName" label="企业名称" width="220"></el-table-column>
+                    <el-table-column property="Statues" label="是否超标"></el-table-column>
+                </el-table>
+                <!--分页条-->
+                <div class="Pagination" style="text-align: left;margin-top: 10px;">
+                    <el-pagination background @current-change="handleCurrentChange" :current-page="currentPage" :page-size="pagesize" layout="total, prev, pager, next" :total="totalCount"></el-pagination>
                 </div>
             </div>
-
+        </div>
+    </div>
 </template>
 
 <script>
@@ -124,20 +66,14 @@
 
             }
         },
-        created() {
-            ////
-            bus.$on('targetPollution', this.changeTypeCer);
-            ////
-            this.GetListqyData()
-        },
-
+        created() {},
         mounted() {
-
             //实时累计切换
-            $('.first .tables a').on('click', function () {
-                $(this).addClass('bai').siblings().removeClass('bai')
-            })
-
+            $('.first .tables a').on('click', function () {$(this).addClass('bai').siblings().removeClass('bai')})
+            //
+            bus.$on('targetPollution', this.changeTypeCer);
+            //
+            this.GetListqyData()
         },
         methods: {
             //初始化数据
@@ -145,8 +81,16 @@
                 let sudata = data;
                 this.SetDataList(sudata)
                 this.totalCount = this.allData.length;
-
                 this.setPageTable(10, 1);
+            },
+            //颜色列表
+            tableRowClassName({row, rowIndex}) {
+                if (rowIndex%2 === 0) {
+                    return 'warning-row';
+                } else {
+                    return 'success-row';
+                }
+                return '';
             },
             //排序
             compare(propertyName) {
@@ -165,7 +109,6 @@
             //页码变更
             handleCurrentChange(val) {
                 this.setPageTable(10, val);
-                //console.log(val)
             },
             changeTypeCer(val,val2){
                 //this.allData = [];

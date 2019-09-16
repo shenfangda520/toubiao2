@@ -1,122 +1,74 @@
 <template>
     <div class="StaticDustwarp">
         <!--静态原清单测面板-->
-       <div class="main">
-                    <!---->
-                    <div class="tables">
-                        <!--选项-->
-                        <strong class="font-color">大气排放源清单</strong>
-                        <font @click="showwarp2 = !showwarp2">{{showwarp2?'收起∧':'展开∨'}}</font>
-                    </div>
-                    <div class="warp-t">
-                        <div class="title-daqi">
-                            <div class="shuxian"></div>
-                            <div class="title-text">
-                                部门分类
-                            </div>
-                        </div>
-                        <div class="title-box">
-                            <el-checkbox-group
-                                    v-model="checkedCities1"
-                                    @change="changeIschecked"
-                                    :min="1"
-                                    :max="4"
-                            >
-                                <el-checkbox v-for="city in cities" :label="city.value" :key="city.value">{{city.label}}</el-checkbox>
-                            </el-checkbox-group>
-                        </div>
-                    </div>
-                    <!---->
-                    <transition name="el-zoom-in-top">
-                       <div v-show="showwarp2"  id="content">
-
-                           <!--图标-->
-                               <div class="title-daqi">
-                                   <div class="shuxian"></div>
-                                   <div class="title-text">
-                                       县（市、区）排放量分布
-                                   </div>
-                               </div>
-                           <!---->
-                               <div class="bing_item_one" id="bing_item_twoo" style="width: 360px;height: 180px;padding-left: 15px"></div>
-                              <!---->
-                               <div class="title-daqi">
-                                   <div class="shuxian"></div>
-                                   <div class="title-text">
-                                       行业排放量分布
-                                   </div>
-                               </div>
-                               <!---->
-                               <div class="bing_item_one" id="bing_item_one" style="width: 360px;height: 180px;padding-left: 15px"></div>
-                           <!---->
-                       </div>
-                   </transition>
-                    <!---->
-                    <div class="sousuo">
-                        <!--<div class="sleft">-->
-                            <!--<el-input v-model="filters.name" @keyup.enter.native="searchAsName" placeholder="名称"></el-input>-->
-                        <!--</div>-->
-                        <!--<div class="sright">-->
-                            <!--<el-button type="primary"  @click="searchAsName">搜索</el-button>-->
-                        <!--</div>-->
-                        <div class="title-daqi">
-                            <div class="shuxian"></div>
-                            <div class="title-text">
-                                <!--SO2排放总量：{{so2Name}}（吨）-->
-                                <div class="bing_text"> <span>企业总数量：{{qiyeNum}}</span></div>
-                            </div>
-                        </div>
-
+        <div class="main">
+            <!---->
+            <div class="tables">
+                <!--选项--> <strong class="font-color">大气排放源清单</strong>
+                <font style="color: #12DA88" @click="showwarp2 = !showwarp2">{{showwarp2?'收起∧':'展开∨'}}</font>
+            </div>
+            <div class="warp-t">
+                <div class="title-daqi">
+                    <div class="shuxian"></div>
+                    <div class="title-text">部门分类</div>
+                </div>
+                <div class="title-box">
+                    <el-checkbox-group v-model="checkedCities1" @change="changeIschecked" :min="1" :max="4">
+                        <el-checkbox v-for="city in cities" :label="city.value" :key="city.value">{{city.label}}</el-checkbox>
+                    </el-checkbox-group>
+                </div>
+            </div>
+            <!---->
+            <transition name="el-zoom-in-top">
+                <div v-show="showwarp2" id="content">
+                    <!--图标-->
+                    <div class="title-daqi">
+                        <div class="shuxian"></div>
+                        <div class="title-text">县（市、区）排放量分布</div>
                     </div>
                     <!---->
-                    <div class="table_container">
-                        <el-table
-                                :data="tableData"
-                                border
-                                stripe
-                                highlight-current-row
-                                @current-change="RowCurrentChange"
-                                style="width: 430px">
-                            <el-table-column
-                                    property="name"
-                                    label="名称"
-                                    width="180">
-                            </el-table-column>
-                            <el-table-column
-                                    property="Industry"
-                                    label="行业"
-                                    >
-                            </el-table-column>
-                            <!--<el-table-column-->
-                                    <!--property="Emission"-->
-                                    <!--label="排放物"-->
-                                   <!--&gt;-->
-                            <!--</el-table-column>-->
-                            <el-table-column
-                                    property="EmissionAmount"
-                                    label="排放量(吨)"
-
-                            >
-                            </el-table-column>
-                            <el-table-column
-                                    property="netName"
-                                    label="网络名称">
-                            </el-table-column>
-                        </el-table>
-                        <!--分页条-->
-                        <div class="Pagination" style="text-align: left;margin-top: 10px;">
-                            <el-pagination
-                                    background
-                                    @size-change="handleSizeChange"
-                                    @current-change="handleCurrentChange"
-                                    :current-page="currentPage"
-                                    :page-size="pagesize"
-                                    layout="total, prev, pager, next"
-                                    :total="totalCount">
-                            </el-pagination>
+                    <div class="bing_item_one" id="bing_item_twoo" style="width: 360px;height: 180px;padding-left: 15px"></div>
+                    <!---->
+                    <div class="title-daqi">
+                        <div class="shuxian"></div>
+                        <div class="title-text">行业排放量分布</div>
+                    </div>
+                    <!---->
+                    <div class="bing_item_one" id="bing_item_one" style="width: 360px;height: 180px;padding-left: 15px"></div>
+                    <!---->
+                </div>
+            </transition>
+            <!---->
+            <div class="sousuo">
+                <!--<div class="sleft">-->
+                <!--<el-input v-model="filters.name" @keyup.enter.native="searchAsName" placeholder="名称"></el-input>-->
+                <!--</div>-->
+                <!--<div class="sright">-->
+                <!--<el-button type="primary" @click="searchAsName">搜索</el-button>-->
+                <!--</div>-->
+                <div class="title-daqi">
+                    <div class="shuxian"></div>
+                    <div class="title-text">
+                        <!--SO2排放总量：{{so2Name}}（吨）-->
+                        <div class="bing_text"> <span>企业总数量：{{qiyeNum}}</span>
                         </div>
                     </div>
                 </div>
+            </div>
+            <!---->
+            <div class="table_container">
+                <el-table :data="tableData" border stripe highlight-current-row @current-change="RowCurrentChange" style="width: 430px">
+                    <el-table-column property="name" label="名称" width="180"></el-table-column>
+                    <el-table-column property="Industry" label="行业"></el-table-column>
+                    <el-table-column property="EmissionAmount" label="排放量(吨)"></el-table-column>
+                    <el-table-column property="netName" label="网络名称"></el-table-column>
+                </el-table>
+                <!--分页条-->
+                <div class="Pagination" style="text-align: left;margin-top: 10px;">
+                    <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage" :page-size="pagesize" layout="total, prev, pager, next" :total="totalCount"></el-pagination>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -138,6 +90,8 @@
                 so2Name:'----',
                 //lable类型
                 labelType: 'so2',
+                //存放数据
+                ALLdata: [],
                 //输入框
                 filters: {name: ''},
                 //列表数据
@@ -264,8 +218,7 @@
             InitializationDataMethod(data, type) {
                 // console.log(data)
                 this.type = type;
-                let sudata = data;
-                this.SetDataList(sudata, type)
+                this.SetDataList(data, type)
                //////////
             },
             //污染源类别
@@ -406,6 +359,9 @@
                         orient: 'right',
                         y:'center',
                         left: 165,
+                        textStyle: {
+                            color:'#fff'
+                        },
                         //data: ['广阳区','安次区','永清','大厂','香河','文安','开发区']
                         data:lenData
                     },
@@ -478,6 +434,9 @@
                         orient: 'right',
                         y:'center',
                         left: 165,
+                        textStyle: {
+                            color:'#fff'
+                        },
                         //data: ['工业企业源','汽修','干洗','餐饮油烟','移动源','加油站','施工扬尘源']
                         data:lenData
                     },
@@ -531,80 +490,6 @@
                         ]
                     }]
                 });
-                //
-                //let checkarr = [];
-                //触动当前方法
-                // myChart.on('legendselectchanged', function(obj) {
-                //     let selected = obj.selected;
-                //     let legend = obj.name;
-                //
-                //     //判断selected对象中是否被选中
-                //     if(selected[legend] == false){
-                //         //点击时候添加至数组
-                //         console.log('选中我了')
-                //         console.log(obj.name)
-                //         switch (obj.name){
-                //             case '工业企业源':
-                //                 checkarr.push('ps001');
-                //                 break;
-                //             case '干洗':
-                //                 checkarr.push('ps002');
-                //                 break;
-                //             case '汽修':
-                //                 checkarr.push('ps003');
-                //                 break;
-                //             case '施工扬尘源':
-                //                 checkarr.push('ps004');
-                //                 break;
-                //             case '餐饮油烟':
-                //                 checkarr.push('ps005');
-                //                 break;
-                //             case '加油站':
-                //                 checkarr.push('ps006');
-                //                 break;
-                //             case '移动源':
-                //                 checkarr.push('ps007');
-                //                 break;
-                //         }
-                //
-                //     }else {
-                //         //取消时候删除
-                //         console.log('取消我了')
-                //         console.log(obj.name)
-                //         let data = '';
-                //         switch (obj.name){
-                //             case '工业企业源':
-                //                 data = 'ps001';
-                //                 break;
-                //             case '干洗':
-                //                 data = 'ps002';
-                //                 break;
-                //             case '汽修':
-                //                 data = 'ps003';
-                //                 break;
-                //             case '施工扬尘源':
-                //                 data = 'ps004';
-                //                 break;
-                //             case '餐饮油烟':
-                //                 data = 'ps005';
-                //                 break;
-                //             case '加油站':
-                //                 data = 'ps006';
-                //                 break;
-                //             case '移动源':
-                //                 data = 'ps007';
-                //                 break;
-                //         }
-                //         checkarr.splice(checkarr.indexOf(data), 1);
-                //     }
-                //     //
-                //     _this.InitialClass = checkarr.toString();
-                //     //
-                //     console.log(checkarr);
-                //     //列表数据请求
-                //     _this.ChenageGetDataList(('&sourceType='+ _this.InitialClass), _this.CategoryPollution, _this.page);
-                // });
-
             },
             //分页数据
             setPageTable(pageSize, pageNum) {
@@ -681,7 +566,7 @@
 <style lang="scss" scoped>
 
     .StaticDustwarp {
-        width: 430px;
+        width:100%;
         height: auto;
         .warp-t{
             .title-box{
@@ -696,7 +581,7 @@
             .shuxian{
                 width: 3px;
                 height: 24px;
-                background: #1FA1FF;
+                background: #12DA88;
                 float: left;
                 margin-left: 10px;
             }
@@ -706,26 +591,27 @@
                 line-height: 24px;
                 padding-left: 10px;
                 text-align: left;
+                color: #12DA88;
             }
         }
         .tables {
-            border-bottom: solid 1px #ccc;
+            border-bottom: solid 1px #000;
             margin-bottom: 10px;
             height: 40px;
 
             .font-color{
                 display: inline-block;
                 text-align: center;
-                width: 180px;
+                width: 140px;
                 font-size: 16px;
-                color: #1FA1FF;
+                color: #12DA88;
                 float: left;
                 margin-left: 5px;
-                border-bottom: solid 2px #1FA1FF;
+                border-bottom: solid 2px #12DA88;
             }
             font {
                     float: right;
-                    margin-right: 20px;
+                    margin-right: 40px;
                 }
             }
         .symume {
@@ -742,7 +628,7 @@
                     label {
                         margin: 0;
                         vertical-align: middle;
-                        color: #666;
+                        color: #12DA88;
                     }
                     .labeled {
                         color: #2494f2;
@@ -795,7 +681,7 @@
                         background-image: url('../../static/imgs/originallist/ps006checked.png');
                     }
                 }
-                border-bottom: solid 1px #ccc;
+                border-bottom: solid 1px #000;
             }
         .fenbutu {
                 padding-top: 20px;
@@ -842,7 +728,7 @@
             }
         .sousuo {
                 width: 100%;
-                border-bottom: solid 1px #ccc;
+                border-bottom: solid 1px #000;
                 height: 50px;
                 padding-top: 15px;
                 .sleft {

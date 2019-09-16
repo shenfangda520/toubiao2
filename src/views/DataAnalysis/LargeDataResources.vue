@@ -215,7 +215,7 @@
                 endHour: '',
                 upData: {
                     index:'AQI',
-                    pointName: '固安党校',
+                    pointName: '河北工业大学',
                     startTime: '',
                     endTime: '',
                     Type: '小时'
@@ -428,34 +428,9 @@
                             containLabel: true
                         },
                         toolbox: {
-                          show: true,
-                          feature: {
-                            saveAsImage: {show: true},
-                            mark: {show: true},
-                            dataView: {show: false, readOnly: false,
-                              optionToContent: function (opt) {
-                                var  axisData = opt.xAxis[0].data; //坐标数据
-                                var series = opt.series; //折线图数据
-                                var tdHeads = '<td  style="padding: 0 10px">时间</td>'; //表头
-                                var tdBodys = ''; //数据
-                                series.forEach(function (item) {
-                                  //组装表头
-                                  tdHeads += '<td style="padding: 0 10px">'+item.name+'</td>';
-                                });
-                                var table = '<table border="1" style="width: 98%;margin-left:20px;border-collapse:collapse;font-size:14px;text-align:center"><tbody><tr>'+tdHeads+' </tr>';
-                                for (var i = 0, l = axisData.length; i < l; i++) {
-                                  for (var j = 0; j < series.length; j++) {
-                                    //组装表数据
-                                    tdBodys += '<td>'+series[j].data[i]+'</td>';
-                                  }
-                                  table += '<tr><td style="padding: 0 10px">'+axisData[i]+'</td>'+tdBodys+'</tr>';
-                                  tdBodys = '';
-                                }
-                                table += '</tbody></table>';
-                                return table;
-                              }
-                            },
-                          }
+                            feature: {
+                                saveAsImage: {}
+                            }
                         },
                         xAxis: {},
                         yAxis: {
@@ -539,11 +514,11 @@
                     let pointNames = res.data.Data;//
                     pointNames.forEach(item => {
                         const tableData1 = {};//
-                        if(item.indexOf('固安')!==-1){
+                        // if(item.indexOf('固安')!==-1){
                         	tableData1.value = item;//
 	                        tableData1.label = item;//
 	                        this.oneoptions.push(tableData1);//
-                        }
+                        // }
                     })
                 })
             },
@@ -553,7 +528,7 @@
                 let ndt7 = new Date(ndt);
                 ndt7.setDate(ndt.getDate() - 3);
                 //pointName监测点名称；startTime开始时间；endTime结束时间
-                let pointName = encodeURI(params.pointName) || encodeURI('固安党校');
+                let pointName = encodeURI(params.pointName) || encodeURI('河北工业大学');
                 let startTime = params.startTime || (ndt7.getFullYear() + '-' + (ndt7.getMonth() + 1) + '-' + ndt7.getDate());
                 let endTime = params.endTime || (ndt.getFullYear() + '-' + (ndt.getMonth() + 1) + '-' + ndt.getDate());
                 if (this.upData.Type == '天'){

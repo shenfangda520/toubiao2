@@ -1,618 +1,322 @@
 <template>
-    <!--冬防战报页面-->
-    <div class="Like-winter htt-winter">
-        <div class="title htt-title">
-            <div class="text_left">
-                <div class="oline1">
-                    <font>{{twotime}}</font> 我县实时AQI为 <span>{{LfAirWinterPre.aqi}}</span>
-                </div>
-                <div class="oline1">
-                    环京组倒排:<font>截止{{onetime}}</font> ，月倒排 <span>{{hjpaim}}</span>
-                </div>
-            </div>
-            <h1>今日战报</h1>
+    <!--挂图作战-->
+    <div class="Like-winter">
+        <div class="like-header">
+            <!--首页部分-->
+            <v-header :isChoose="1"></v-header>
         </div>
-        <div class="warp_box htt-all">
-            <div class="Window_one htt-one">
-                <!--预警控制模块 -->
-                <div class="tt-text">
-                    <p>预警控制</p>
-                </div>
-                <!--保优保良菜单-->
-                <div class="tt-tab" v-show="hengtab">
-                    <div class="tt-tab-l">
-                        今日控制目标:
-                    </div>
-                    <div class="tt-tab-r">
-                        <el-tabs v-model="activeName_b" @tab-click="actvieChange">
-                            <el-tab-pane v-for="(item,index) in SouDataList" :label="item"  :name="item"></el-tab-pane>
-                            <!---->
-                        </el-tabs>
-                    </div>
-                </div>
-                <!--显示内容部分-->
-                <div class="item_text4">
-                    <!--选择控制指标时候启用-->
-                    <div class="item-kz-class">
-                        <!--控制目标-->
-                        <div class="kz-class" v-show="activeName_jrkz">
-                            <!---->
-                            <div class="qxtable" style="margin-top: 5px;height:22px;margin-left: 0px">
-                                <i></i> <span v-if="yujingData[0]">{{yujingData[0].Time || '--'}}时，我市累计AQI为{{yujingData[0].LfAccuAqi}}，首要污染物为{{yujingData[0].PrimaryPollution || '--'}}</span>
-                            </div>
-                            <!--控制值-->
-                            <div class="detail">
-                                <div style="float: left;margin-left: 3%" v-if="yujingData[0]">{{yujingData[0].ControlItem}}</div>
-                                <winter-progress
-                                style="margin-top: 40px;margin-left: 16%"
-                                v-if="yujingData[0]"
-                                :left="parseInt(yujingData[0].LfAccuValue/yujingData[0].LfAlarmValue*100) > 99?100 :parseInt(yujingData[0].LfAccuValue/yujingData[0].LfAlarmValue*100)"
-                                :color="CoBackgroundsColor(yujingData[0].LfAlarmValue - yujingData[0].LfAccuValue)"
-                                :width="parseInt(yujingData[0].LfAccuValue/yujingData[0].LfAlarmValue*100) > 99?100 :parseInt(yujingData[0].LfAccuValue/yujingData[0].LfAlarmValue*100)"
-                                :CurrentCumulative="parseInt(yujingData[0].LfAccuValue)"
-                                :WarningValue="yujingData[0].LfAlarmValue ? yujingData[0].LfAlarmValue : '--'"
-                                ></winter-progress>
-                            </div>
-                            <!---->
-                            <div class="qxtable_bottom" style="margin:20px 0 10px 0">
-                                <div class="pp_tit" style="float: left;width: 100%">
-                                    <i></i><a>站点累计</a>
-                                </div>
-                            </div>
-                            <!--站点累计-->
-                            <div class="winter_top_table" style="width: 100%;">
-                                <table border="1" style="width: 100%;border-color: #1e68d1;"  v-if="yujingData[0]">
-                                    <!--<caption>This is a table caption</caption>-->
-                                    <tr>
-                                        <td><span>站点</span></td>
-                                        <td><span>累计值</span></td>
-                                        <td><span>达标状态</span></td>
-                                        <!--<td><span>后续控制值</span></td>-->
-                                        <td><span>实时浓度</span></td>
-                                    </tr>
-                                    <tr v-for="(item,index) in yujingData[0].GskAlarms">
-                                        <td>
-                                            <span>{{item.PointName}}</span>
-                                        </td>
-                                        <td>
-                                            <span>{{item.AccuValue}}</span>
-                                        </td>
-                                        <td>
-                                            <span v-if="item.StandardState < 0" style="color: #00B83F">↓{{item.StandardState}}</span>
-                                            <span v-if="item.StandardState > 0" style="color: red">↑{{item.StandardState}}</span>
-                                        </td>
-                                        <!--<td>-->
-                                            <!--<span v-if="item.FutureControlValue < 0" style="color: #00B83F">↓{{item.FutureControlValue}}</span>-->
-                                            <!--<span v-if="item.FutureControlValue > 0" style="color: red">↑{{item.FutureControlValue}}</span>-->
-                                        <!--</td>-->
-                                        <td>
-                                            <span>{{item.RealValue}}</span>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-                            <!--tuli-->
-                            <img style="float: left;margin-top: 4px;margin-bottom: 50px" src="../../assets/img/dabiao1_03.jpg" alt="">
-                            <!---->
-                        </div>
-                        <!--今日若保-->
-                        <div class="rb-class" v-show="activeName_jrrb">
-                            <!---->
-                            <div class="qxtable" style="margin-top: 5px;height:22px;margin-left: 0px">
-                                <!--<i></i> <span v-if="yujingData[0]">{{yujingData[0].Time}}，我县累计AQI为{{yujingData[0].LfAccuAqi}}，首要污染物为{{yujingData[0].PrimaryPollution}}</span>-->
-                                <i></i> <span v-if="iscallData">{{iscallData.Time || '--'}}时，我县累计AQI为{{iscallData.LfAccuAqi}}，首要污染物为{{iscallData.PrimaryPollution || '--'}}</span>
-                            </div>
-                            <!--站点控制-->
-                            <div class="winter_bao_top">
-                                <div class="bao_left" style="line-height: 30px">
-                                    <dl>
-                                        <dt><span style="display:inline-block;width: 80px;height: 14px"></span></dt>
-                                        <dd><span style="display:inline-block;width: 80px;font-size: 12px">今日控制目标</span></dd>
-                                        <dd><span style="display:inline-block;width: 60px;font-size: 12px">当前累计</span></dd>
-                                        <dd><span style="display:inline-block;width: 60px;font-size: 12px">剩余控制</span></dd>
-                                    </dl>
-                                </div>
-                                <div class="bao_right">
-
-                                    <dl>
-                                        <dt><span class="w_title">PM2.5</span></dt>
-                                        <dd><span class="w_value" :style="AqiBackgroundsColor(iscallData.alarmPm25,'PM2.5')">{{iscallData.alarmPm25}}</span><i class="jb_dian" v-show="red_dian"></i></dd>
-                                        <dd><span class="w_value" :style="AqiBackgroundsColor(iscallData.AccuPm25,'PM2.5')">{{iscallData.AccuPm25}}</span><i class="jb_dian" v-show="red_dian"></i></dd>
-                                        <dd><span class="w_value" :style="backroundlicolor(iscallData.AccuPm25,iscallData.FutureControlPm25Value)">{{iscallData.FutureControlPm25Value}}</span><i class="jb_dian" v-show="red_dian"></i></dd>
-                                    </dl>
-                                    <dl>
-                                        <dt><span class="w_title">PM10</span></dt>
-                                        <dd><span class="w_value" :style="AqiBackgroundsColor(iscallData.alarmPm10,'PM10')">{{iscallData.alarmPm10}}</span><i class="jb_dian" v-show="red_dian"></i></dd>
-                                        <dd><span class="w_value" :style="AqiBackgroundsColor(iscallData.AccuPm10,'PM10')">{{iscallData.AccuPm10}}</span><i class="jb_dian" v-show="red_dian"></i></dd>
-                                        <dd><span class="w_value" :style="backroundlicolor(iscallData.AccuPm10,iscallData.FutureControlPm10Value)">{{iscallData.FutureControlPm10Value}}</span><i class="jb_dian" v-show="red_dian"></i></dd>
-                                    </dl>
-                                    <dl>
-                                        <dt><span class="w_title">SO2</span></dt>
-                                        <dd><span class="w_value" :style="AqiBackgroundsColor(iscallData.alarmSo2,'SO2')">{{iscallData.alarmSo2}}</span></dd>
-                                        <dd><span class="w_value" :style="AqiBackgroundsColor(iscallData.AccuSo2,'SO2')">{{iscallData.AccuSo2}}</span></dd>
-                                        <dd><span class="w_value" :style="backroundlicolor(iscallData.AccuSo2,iscallData.FutureControlSo2Value)">{{iscallData.FutureControlSo2Value}}</span></dd>
-                                    </dl>
-                                    <dl>
-                                        <dt><span class="w_title">NO2</span></dt>
-                                        <dd><span class="w_value" :style="AqiBackgroundsColor(iscallData.alarmNo2,'NO2')">{{iscallData.alarmNo2}}</span></dd>
-                                        <dd><span class="w_value" :style="AqiBackgroundsColor(iscallData.AccuNo2,'NO2')">{{iscallData.AccuNo2}}</span></dd>
-                                        <dd><span class="w_value" :style="backroundlicolor(iscallData.AccuNo2,iscallData.FutureControlNo2Value)">{{iscallData.FutureControlNo2Value}}</span></dd>
-                                    </dl>
-                                    <dl>
-                                        <dt><span class="w_title">CO</span></dt>
-                                        <dd><span class="w_value" :style="AqiBackgroundsColor(iscallData.alarmCo,'CO')">{{iscallData.alarmCo}}</span></dd>
-                                        <dd><span class="w_value" :style="AqiBackgroundsColor(iscallData.AccuCo,'CO')">{{iscallData.AccuCo}}</span></dd>
-                                        <dd><span class="w_value" :style="backroundlicolor(iscallData.AccuCo,iscallData.FutureControlCoValue)">{{iscallData.FutureControlCoValue}}</span></dd>
-                                    </dl>
-                                    <dl>
-                                        <dt><span class="w_title">O3</span></dt>
-                                        <dd><span class="w_value" :style="AqiBackgroundsColor(iscallData.alarmO3,'O3')">{{iscallData.alarmO3}}</span></dd>
-                                        <dd><span class="w_value" :style="AqiBackgroundsColor(iscallData.AccuO3,'O3')">{{iscallData.AccuO3}}</span></dd>
-                                        <dd><span class="w_value" :style="backroundlicolor(iscallData.AccuO3,iscallData.FutureControlO3Value)">{{iscallData.FutureControlO3Value}}</span></dd>
-                                    </dl>
-                                </div>
-                            </div>
-                            <!---->
-                            <div class="qxtable_bottom">
-                                <div class="pp_tit" style="float: left;width: 100%">
-                                    <i></i><a>站点累计</a>
-                                </div>
-                                <!--选择器-->
-                                <div class="pp_tab" style="float: left;margin:5px 0 8px 6px ;line-height: 20px">
-                                    <ul class="tb_ul">
-                                        <li v-for="(cell,index) in items" @click="selectStyle(cell,index)"
-                                            :class="{'bottomColor': (index === selected)}">
-                                            {{cell.select}}
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <!--累计站点-->
-                            <div class="winter_top_table" style="width: 100%;">
-                                <table border="1" style="width: 100%;border-color: #1e68d1;">
-                                    <!--<caption>This is a table caption</caption>-->
-                                    <tr>
-                                        <td><span>站点</span></td>
-                                        <td><span>累计值</span></td>
-                                        <td><span>达标状态</span></td>
-                                        <!--<td><span>后续控制值</span></td>-->
-                                        <td><span>实时浓度</span></td>
-                                    </tr>
-                                    <tr v-for="(item,index) in xuanzeData">
-                                        <td>
-                                            <span>{{item.PointName}}</span>
-                                        </td>
-                                        <td>
-                                            <span>{{item.AccuValue}}</span>
-                                        </td>
-                                        <td>
-                                            <span v-if="item.StandardState < 0" style="color: #00B83F">↓{{item.StandardState}}</span>
-                                            <span v-if="item.StandardState > 0" style="color: red">↑{{item.StandardState}}</span>
-                                        </td>
-                                        <!--<td>-->
-                                            <!--<span v-if="item.FutureControlValue < 0" style="color: #00B83F">↓{{item.FutureControlValue}}</span>-->
-                                            <!--<span v-if="item.FutureControlValue > 0" style="color: red">↑{{item.FutureControlValue}}</span>-->
-                                        <!--</td>-->
-                                        <td>
-                                            <span>{{item.RealValue}}</span>
-                                        </td>
-                                    </tr>
-
-                                </table>
-                            </div>
-                            <!--tuli-->
-                            <img style="float: left;margin-top: 4px;margin-bottom:50px;" src="../../assets/img/dabiao1_03.jpg" alt="">
-                            <!---->
+        <!---->
+        <div class="warp-gtzz">
+            <!--左边部分-->
+            <div class="warp-left">
+                <!--空气质量天数-->
+                <div class="kq-num comclass">
+                    <div class="title">
+                        <div class="titleText">
+                            <span class="line"></span>空气质量天数等级分布
                         </div>
                     </div>
-                   <!---->
+                  <div class="selecFine">
+                    <span v-for="(v,i) in [{label:'优良天'},{label:'重污染天'}]" @click="Select(v,i)" :style="'color:'+(isSelect===i?'#12DA88':'#fff')">{{v.label}}</span>
+                  </div>
+                    <div id="airQuality"></div>
                 </div>
-            </div>
-            <div class="Window_Two htt-two" style="margin-left: 20px;position: relative">
-                <!--今日战报地图模块-->
-                <div class="class-fx">
-                  <weather></weather>
-                </div>
-                <router-link to="/">
-                    <el-button class="qjmap"
-                               style="position: absolute;top: 5px;right: 5px;z-index: 20;color: #fff;background: #2494F2;border: none">
-                        全局地图
-                    </el-button>
-                </router-link>
-                <battle-map style="width: 100%;height: 100%"></battle-map>
-            </div>
-            <div class="Window_Three htt-three" style="margin-left: 20px">
-                <!--综合指数与优良天数同比排名/县市区月考核-->
-                <el-tabs v-model="activeName_s" @tab-click="">
-                    <el-tab-pane label="乡镇月考核" name="first_s">
-
-					  	<el-tabs v-model="active_tab" @tab-click="GetCountyCheckData">
-					  		<el-tab-pane label="全市" name="all">
-
-					  		</el-tab-pane>
-					  		<el-tab-pane label="中部县区组" name="mid">
-
-					  		</el-tab-pane>
-					  		<el-tab-pane label="固安" name="guan">
-
-					  		</el-tab-pane>
-					  	</el-tabs>
-
-					  	 <el-table
-					      :data="CityTableData"
-					      style="width: 100%">
-					      <el-table-column
-					        prop="Name"
-					        label="乡镇">
-					      </el-table-column>
-					      <el-table-column
-					        prop="Com_Index"
-					        label="综合指数">
-					      </el-table-column>
-					      <!--<el-table-column-->
-					        <!--prop="Waring_Num"-->
-					        <!--label="累计进入倒排前十次数"-->
-					        <!--v-if='active_tab=="all"'>-->
-					      <!--</el-table-column>-->
-					      <!--<el-table-column-->
-					        <!--prop="Waring_Num"-->
-					        <!--label="累计进入倒排前三次数"-->
-					        <!--v-else>-->
-					      <!--</el-table-column>-->
-                 <el-table-column
-                   prop="Range"
-                   label="月倒排">
-                 </el-table-column>
-					    </el-table>
-					    <div class="block">
-                            <el-pagination
-									background
-									@size-change="handleSizeChange"
-                                   @current-change="handleCurrentChange"
-                                   :current-page="currentPage"
-                                   :page-size="pagesize"
-                                   layout="total, prev, pager, next, jumper"
-                                   :total="totalCount">
-                            </el-pagination>
+                <!--空气质量预报-->
+                <div class="kq-yb comclass">
+                    <div class="title">
+                        <div class="titleText">
+                            <span class="line"></span>空气质量预报
                         </div>
-                    </el-tab-pane>
-                    <el-tab-pane label="县(市、区)月考核" name="second_s">
-                        <el-tabs v-model="activeName_z" @tab-click="">
-                            <div class="qxtable"><i></i>廊坊市市区组月考核({{month}}月1日-{{month}}月{{day}}日)</div>
-                            <div class="table_container" style="padding: 0 10px;">
-                                <table border='1' cellspacing="0" style="width: 100%;">
-                            		<tr>
-                            			<th>考核组</th>
-                            			<th>县(市、区)</th>
-                            			<th>月综合指数</th>
-                            			<th>月倒排</th>
-                            		</tr>
-                            		<tr>
-                            			<td rowspan="3">市区组</td>
-                            			<td>{{shiQuData.length&&shiQuData[0].gridname}}</td>
-                            			<td>{{shiQuData.length&&shiQuData[0].complexindex}}</td>
-                            			<td>{{shiQuData.length&&shiQuData[0].rank_total}}</td>
-                            		</tr>
-                            		<tr>
-                            			<td>{{shiQuData.length&&shiQuData[1].gridname}}</td>
-                            			<td>{{shiQuData.length&&shiQuData[1].complexindex}}</td>
-                            			<td>{{shiQuData.length&&shiQuData[1].rank_total}}</td>
-                            		</tr>
-                            		<tr>
-                            			<td>{{shiQuData.length&&shiQuData[2].gridname}}</td>
-                            			<td>{{shiQuData.length&&shiQuData[2].complexindex}}</td>
-                            			<td>{{shiQuData.length&&shiQuData[2].rank_total}}</td>
-                            		</tr>
-                            	</table>
-                            </div>
-                            <div class="qxtable"><i></i>廊坊市环京县市组月考核({{month}}月1日-{{month}}月{{day}}日)</div>
-                            <div class="table_container" style="padding: 0 10px;">
-                                <table border='1' cellspacing="0" style="width: 100%;">
-                            		<tr>
-                            			<th>考核组</th>
-                            			<th>县(市、区)</th>
-                            			<th>月综合指数</th>
-                            			<th>月倒排</th>
-                            		</tr>
-                            		<tr>
-                            			<td rowspan="5">环京县市组</td>
-                            			<td>{{huanJingData.length&&huanJingData[0].gridname}}</td>
-                            			<td>{{huanJingData.length&&huanJingData[0].complexindex}}</td>
-                            			<td>{{huanJingData.length&&huanJingData[0].rank_total}}</td>
-                            		</tr>
-                            		<tr>
-                            			<td>{{huanJingData.length&&huanJingData[1].gridname}}</td>
-                            			<td>{{huanJingData.length&&huanJingData[1].complexindex}}</td>
-                            			<td>{{huanJingData.length&&huanJingData[1].rank_total}}</td>
-                            		</tr>
-                            		<tr>
-                            			<td>{{huanJingData.length&&huanJingData[2].gridname}}</td>
-                            			<td>{{huanJingData.length&&huanJingData[2].complexindex}}</td>
-                            			<td>{{huanJingData.length&&huanJingData[2].rank_total}}</td>
-                            		</tr>
-                            		<tr>
-                            			<td>{{huanJingData.length&&huanJingData[3].gridname}}</td>
-                            			<td>{{huanJingData.length&&huanJingData[3].complexindex}}</td>
-                            			<td>{{huanJingData.length&&huanJingData[3].rank_total}}</td>
-                            		</tr>
-                            		<tr>
-                            			<td>{{huanJingData.length&&huanJingData[4].gridname}}</td>
-                            			<td>{{huanJingData.length&&huanJingData[4].complexindex}}</td>
-                            			<td>{{huanJingData.length&&huanJingData[4].rank_total}}</td>
-                            		</tr>
-                            	</table>
-                            </div>
-                            <div class="qxtable"><i></i>廊坊市南部县市组月考核({{month}}月1日-{{month}}月{{day}}日)</div>
-                            <div class="table_container" style="padding: 0 10px;">
-                                <table border='1' cellspacing="0" style="width: 100%;">
-                            		<tr>
-                            			<th>考核组</th>
-                            			<th>县(市、区)</th>
-                            			<th>月综合指数</th>
-                            			<th>月倒排</th>
-                            		</tr>
-                            		<tr>
-                            			<td rowspan="4">南部县市组</td>
-                            			<td>{{nanBuData.length&&nanBuData[0].gridname}}</td>
-                            			<td>{{nanBuData.length&&nanBuData[0].complexindex}}</td>
-                            			<td>{{nanBuData.length&&nanBuData[0].rank_total}}</td>
-                            		</tr>
-                            		<tr>
-                            			<td>{{nanBuData.length&&nanBuData[1].gridname}}</td>
-                            			<td>{{nanBuData.length&&nanBuData[1].complexindex}}</td>
-                            			<td>{{nanBuData.length&&nanBuData[1].rank_total}}</td>
-                            		</tr>
-                            		<tr>
-                            			<td>{{nanBuData.length&&nanBuData[2].gridname}}</td>
-                            			<td>{{nanBuData.length&&nanBuData[2].complexindex}}</td>
-                            			<td>{{nanBuData.length&&nanBuData[2].rank_total}}</td>
-                            		</tr>
-                            	</table>
-                            </div>
-                        </el-tabs>
-                    </el-tab-pane>
-                </el-tabs>
+                    </div>
+                    <div class="yichu">
+                        <div class="data_water1">
+                            <p v-if="WeatherWinterPre[0].date">{{WeatherWinterPre[0].date}}</p>
+                            <a>AQI日报范围<span>{{WeatherWinterPre[0].minaqi}}-{{WeatherWinterPre[0].maxaqi}}</span></a><br/>
+                            <!---->
+                            <a>级别 <span class="tian"></span><span v-show="onelan"><img
+                                    :src="'../../../static/imgs/mues/cainuan/'+this.getImagesTarget(WeatherWinterPre[0].minQuality)+'.png'"
+                                    alt=""><i>~</i></span><span><img
+                                    :src="'../../../static/imgs/mues/cainuan/'+this.getImagesTarget(WeatherWinterPre[0].maxQuality)+'.png'"
+                                    alt=""></span></a><br/>
+                            <a>首要污染物<span>{{WeatherWinterPre[0].mainpoll}}</span></a>
+                            <a>天气 <span style="font-size: 14px;padding-left: 20px">{{WeatherWinterPre[0].tq}}</span></a>
+                            <a :title="`${WeatherWinterPre[0].temp}℃，${WeatherWinterPre[0].wd}，${WeatherWinterPre[0].ws}`">{{WeatherWinterPre[0].temp}}℃，{{WeatherWinterPre[0].wd}}，{{WeatherWinterPre[0].ws}}</a>
+                        </div>
+                        <div class="data_water2">
+                            <p v-if="WeatherWinterPre[1].date">{{WeatherWinterPre[1].date}}</p>
+                            <a>AQI日报范围<span>{{WeatherWinterPre[1].minaqi}}-{{WeatherWinterPre[1].maxaqi}}</span></a><br/>
+                            <!---->
+                            <a>级别 <span class="tian"></span><span v-show="twolan"><img
+                                    :src="'../../../static/imgs/mues/cainuan/'+this.getImagesTarget(WeatherWinterPre[1].minQuality)+'.png'"
+                                    alt=""><i>~</i></span><span><img
+                                    :src="'../../../static/imgs/mues/cainuan/'+this.getImagesTarget(WeatherWinterPre[1].maxQuality)+'.png'"
+                                    alt=""></span></a><br/>
+                            <a>首要污染物<span>{{WeatherWinterPre[1].mainpoll}}</span></a>
+                            <a>天气 <span style="font-size: 14px;padding-left: 20px">{{WeatherWinterPre[1].tq}}</span></a>
+                            <a :title="`${WeatherWinterPre[1].temp}℃，${WeatherWinterPre[1].wd}，${WeatherWinterPre[1].ws}`">{{WeatherWinterPre[1].temp}}℃，{{WeatherWinterPre[1].wd}}，{{WeatherWinterPre[1].ws}}</a>
+                        </div>
+                        <div class="data_water3" v-if="WeatherWinterPre[2]">
+                            <p v-if="WeatherWinterPre[2].date">{{WeatherWinterPre[2].date}}</p>
+                            <a>AQI日报范围<span>{{WeatherWinterPre[2].minaqi}}-{{WeatherWinterPre[2].maxaqi}}</span></a><br/>
+                            <!---->
+                            <a>级别 <span class="tian"></span><span v-show="treelan"><img
+                                    :src="'../../../static/imgs/mues/cainuan/'+this.getImagesTarget(WeatherWinterPre[2].minQuality)+'.png'"
+                                    alt=""><i>~</i></span><span><img
+                                    :src="'../../../static/imgs/mues/cainuan/'+this.getImagesTarget(WeatherWinterPre[2].maxQuality)+'.png'"
+                                    alt=""></span></a><br/>
+                            <a>首要污染物<span>{{WeatherWinterPre[2].mainpoll}}</span></a>
+                            <a>天气 <span style="font-size: 14px;padding-left: 20px">{{WeatherWinterPre[2].tq}}</span></a>
+                            <a :title="`${WeatherWinterPre[2].temp}℃，${WeatherWinterPre[2].wd}，${WeatherWinterPre[2].ws}`">{{WeatherWinterPre[2].temp}}℃，{{WeatherWinterPre[2].wd}}，{{WeatherWinterPre[2].ws}}</a>
+                        </div>
+                    </div>
+
+                </div>
             </div>
-            <div class="Window_Four htt-four" style="margin-top: -54px">
-                <!--大气污染、燃煤数据、用电量数据、经济数据-->
-                <el-tabs v-model="activeName_t" @tab-click="">
-                    <el-tab-pane label="案件处理率同比" name="fourth_t">
-                    	<div id="CaseDeal" style="width: 366px;height: 500px;"></div>
-                    </el-tab-pane>
-                    <el-tab-pane label="案件类型占比" name="first_t">
-                        <div class="select" style="text-align: right;">
-                            <select id="TypeSelect" @change="GetCaseTypePie">
-								<option value='1'>近一周</option>
-								<option value="2">近一月</option>
-								<option value="3" selected>近一年</option>
-							</select>
-                    	</div>
-                    	<div id="CaseType" style="width: 100%;height: 100%;"></div>
-                    </el-tab-pane>
-                </el-tabs>
+            <!--中间部分-->
+            <div class="warp-conter">
+                <!--地图模块-->
+                <div class="map-was comclass">
+                    <div class="class-fx">
+                        <weather></weather>
+                    </div>
+                    <!---->
+                    <battle-map style="width: 100%;height: 100%"></battle-map>
+                </div>
+                <!--数据报表-->
+                <div class="table-was comclass">
+                    <!--空气质量、工地扬尘、企业在线监测、餐饮监测-->
+                    <div class="choose">
+                        <ul>
+                            <li v-for="(v,i) in timeTabs" @click="timeClick(v,i+1)"><span
+                                    :style='"color:"+(i+1===isChoose ? "#11DA88" : "#fff")'>{{v.label}}</span>
+                                <div :class='i+1===isChoose && "checked"'></div>
+                            </li>
+                        </ul>
+                        <div class="inline" :style="'display:'+(isCustom ? 'inline-block':'none')"></div>
+                        <!---->
+                        <div class="table-sleect" v-if="isChoose===1">
+                            <el-select v-model="rankingVal" size="mini" class="select" @change="handleClickKKK">
+                                <el-option
+                                        v-for="item in rankingOptions"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                </el-option>
+                            </el-select>
+                        </div>
+                        <div class="table-sleect" v-if="isChoose===2">
+                            <el-select v-model="rankingVal2" size="mini" class="select">
+                                <el-option
+                                        v-for="item in rankingOptions2"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                </el-option>
+                            </el-select>
+                        </div>
+                    </div>
+                    <!--空气质量-->
+                    <div class="tab_container" v-if="isChoose===1">
+                        <el-table :data="kongqiData" border stripe :row-class-name="tableRowClassName">
+                            <el-table-column property="xuhao" label="排名" width="80"></el-table-column>
+                            <el-table-column property="wlname" label="网格名称"></el-table-column>
+                            <el-table-column property="jiancedian" label="监测点"></el-table-column>
+                            <el-table-column property="chaowrw" :label="arAQI"></el-table-column>
+                        </el-table>
+                    </div>
+                    <!--工地扬尘pm25-->
+                    <div class="tab_container" v-if="isChoose===2&&rankingVal2==='pm25'">
+                        <el-table :data="PM25Data" border stripe :row-class-name="tableRowClassName">
+                            <el-table-column property="ranking" label="排名" width="80"></el-table-column>
+                            <el-table-column property="gridName" label="网格名称" :show-overflow-tooltip="true"></el-table-column>
+                            <el-table-column property="stationname" label="工地" :show-overflow-tooltip="true"></el-table-column>
+                            <el-table-column property="pm25" label="PM2.5"></el-table-column>
+                        </el-table>
+                    </div>
+                    <!--工地扬尘pm10-->
+                    <div class="tab_container" v-if="isChoose===2&&rankingVal2==='pm10'">
+                        <el-table :data="PM10Data" border stripe :row-class-name="tableRowClassName">
+                            <el-table-column property="ranking" label="排名" width="80"></el-table-column>
+                            <el-table-column property="gridName" label="网格名称" :show-overflow-tooltip="true"></el-table-column>
+                            <el-table-column property="stationname" label="工地" :show-overflow-tooltip="true"></el-table-column>
+                            <el-table-column property="pm10" label="PM10"></el-table-column>
+                        </el-table>
+                    </div>
+                    <!--企业在线监测-->
+                    <div class="tab_container" v-if="false">
+                        <el-table :data="EnterpriseData" border stripe :row-class-name="tableRowClassName">
+                            <el-table-column property="SerialNumber" label="序号" width="80"></el-table-column>
+                            <el-table-column property="gridName" label="网格名称" :show-overflow-tooltip="true"></el-table-column>
+                            <el-table-column property="stationname" label="企业" :show-overflow-tooltip="true"></el-table-column>
+                            <el-table-column property="overItem" label="超标指标"></el-table-column>
+                        </el-table>
+                    </div>
+                    <!--餐饮监测-->
+                    <div class="tab_container" v-if="isChoose===3">
+                        <el-table :data="TvocData" border stripe :row-class-name="tableRowClassName">
+                            <el-table-column property="SerialNumber" label="排名" width="80"></el-table-column>
+                            <el-table-column property="gridName" label="网格名称" :show-overflow-tooltip="true"></el-table-column>
+                            <el-table-column property="stationname" label="饭店名称" :show-overflow-tooltip="true"></el-table-column>
+                            <el-table-column property="overItem" label="实时浓度"></el-table-column>
+                        </el-table>
+                    </div>
+
+                </div>
             </div>
-            <div class="Window_Five htt-five" style="margin-left: 20px;margin-top: -54px">
-                <!--空气质量、工地扬尘、企业在线监测、TOVC监测-->
-                <el-tabs v-model="activeName_f" @tab-click="BusTableClick()">
-                    <el-tab-pane label="空气质量监测" name="first_f">
-                        <div class="table_container">
-                            <el-tabs v-model="activeName_AQI" @tab-click="handleClickKKK">
-                                <el-tab-pane label="AQI" name="aqi"></el-tab-pane>
-                                <el-tab-pane label="PM2.5" name="pm25"></el-tab-pane>
-                                <el-tab-pane label="PM10" name="pm10"></el-tab-pane>
-                                <el-tab-pane label="SO2" name="so2"></el-tab-pane>
-                                <el-tab-pane label="O3" name="o3"></el-tab-pane>
-                                <el-tab-pane label="NO2" name="no2"></el-tab-pane>
-                                <el-tab-pane label="CO" name="co"></el-tab-pane>
+            <!--右边部分-->
+            <div class="warp-right">
+                <!--预警控制-->
+                <div class="yj-was comclass">
+                    <div class="yj-title">预警控制</div>
+                    <!--保优保良菜单-->
+                    <div class="tt-tab" v-show="hengtab">
+                        <div class="tt-tab-l">
+                            今日控制目标:
+                        </div>
+                        <div class="tt-tab-r">
+                            <el-tabs v-model="activeName_b" @tab-click="actvieChange">
+                                <el-tab-pane v-for="(item,index) in SouDataList" :label="item"  :name="item"></el-tab-pane>
+                                <!---->
                             </el-tabs>
-                            <el-table
-                                    :data="kongqiData"
-                                    border
-                                    stripe
-                                    highlight-current-row
-                            >
-                                <el-table-column
-                                        property="xuhao"
-                                        label="排名"
-                                        width="80"
-                                >
-                                </el-table-column>
-                                <el-table-column
-                                        property="wlname"
-                                        label="网格名称"
-                                >
-                                </el-table-column>
-                                <el-table-column
-                                        property="jiancedian"
-                                        label="监测点"
-                                >
-                                </el-table-column>
-                                <el-table-column
-                                        property="chaowrw"
-                                        :label="arAQI"
-                                >
-                                </el-table-column>
-                            </el-table>
                         </div>
-                    </el-tab-pane>
-                    <el-tab-pane label="工地扬尘监测" name="second_f" @tab-click="BusTableClick(1)" v-if="false">
-                        <el-tabs v-model="activeName_w">
-                            <el-tab-pane label="PM2.5" name="first_w">
-                                <div class="table_container">
-                                    <el-table
-                                            :data="PM25Data"
-                                            border
-                                            stripe
-                                            highlight-current-row
-                                    >
-                                        <el-table-column
-                                                property="ranking"
-                                                label="排名"
-                                                width="80"
-                                        >
-                                        </el-table-column>
-                                        <el-table-column
-                                                property="gridName"
-                                                label="网格名称"
-                                        >
-                                        </el-table-column>
-                                        <el-table-column
-                                                property="stationname"
-                                                label="工地"
-                                        >
-                                        </el-table-column>
-                                        <el-table-column
-                                                property="pm25"
-                                                label="PM2.5"
-                                        >
-                                        </el-table-column>
-                                    </el-table>
+                    </div>
+                    <!--显示内容部分-->
+                    <div class="item_text4">
+                        <!--选择控制指标时候启用-->
+                        <div class="item-kz-class">
+
+                            <!--今日若保-->
+                            <div class="rb-class" v-show="activeName_jrrb">
+                                <!---->
+
+                                <div class="title">
+                                    <div class="titleText">
+                                        <span class="line"></span><span v-if="iscallData">{{iscallData.Time}}时，我区累计AQI为{{iscallData.LfAccuAqi}}，首要污染物为{{iscallData.PrimaryPollution || '--'}}</span>
+                                    </div>
                                 </div>
-                            </el-tab-pane>
-                            <el-tab-pane label="PM10" name="second_w">
-                                <div class="table_container">
-                                    <el-table
-                                            :data="PM10Data"
-                                            border
-                                            stripe
-                                            highlight-current-row
-                                    >
-                                        <el-table-column
-                                                property="ranking"
-                                                label="排名"
-                                                width="80"
-                                        >
-                                        </el-table-column>
-                                        <el-table-column
-                                                property="gridName"
-                                                label="网格名称"
-                                        >
-                                        </el-table-column>
-                                        <el-table-column
-                                                property="stationname"
-                                                label="工地"
-                                        >
-                                        </el-table-column>
-                                        <el-table-column
-                                                property="pm10"
-                                                label="PM10"
-                                        >
-                                        </el-table-column>
-                                    </el-table>
+                                <!--站点控制-->
+                                <div class="winter_bao_top">
+                                    <div class="bao_left" style="line-height: 30px">
+                                        <dl>
+                                            <dt><span style="display:inline-block;width: 80px;height: 14px"></span></dt>
+                                            <dd><span style="display:inline-block;width: 80px;font-size: 12px">今日控制目标</span></dd>
+                                            <dd><span style="display:inline-block;width: 60px;font-size: 12px">当前累计</span></dd>
+                                            <dd><span style="display:inline-block;width: 60px;font-size: 12px">剩余控制</span></dd>
+                                        </dl>
+                                    </div>
+                                    <div class="bao_right">
+
+                                        <dl>
+                                            <dt><span class="w_title">PM2.5</span></dt>
+                                            <dd><span class="w_value" :style="AqiBackgroundsColor(iscallData.alarmPm25,'PM2.5')">{{iscallData.alarmPm25}}</span><i class="jb_dian" v-show="red_dian"></i></dd>
+                                            <dd><span class="w_value" :style="AqiBackgroundsColor(iscallData.AccuPm25,'PM2.5')">{{iscallData.AccuPm25}}</span><i class="jb_dian" v-show="red_dian"></i></dd>
+                                            <dd><span class="w_value" :style="backroundlicolor(iscallData.AccuPm25,iscallData.FutureControlPm25Value)">{{iscallData.FutureControlPm25Value}}</span><i class="jb_dian" v-show="red_dian"></i></dd>
+                                        </dl>
+                                        <dl>
+                                            <dt><span class="w_title">PM10</span></dt>
+                                            <dd><span class="w_value" :style="AqiBackgroundsColor(iscallData.alarmPm10,'PM10')">{{iscallData.alarmPm10}}</span><i class="jb_dian" v-show="red_dian"></i></dd>
+                                            <dd><span class="w_value" :style="AqiBackgroundsColor(iscallData.AccuPm10,'PM10')">{{iscallData.AccuPm10}}</span><i class="jb_dian" v-show="red_dian"></i></dd>
+                                            <dd><span class="w_value" :style="backroundlicolor(iscallData.AccuPm10,iscallData.FutureControlPm10Value)">{{iscallData.FutureControlPm10Value}}</span><i class="jb_dian" v-show="red_dian"></i></dd>
+                                        </dl>
+                                        <dl>
+                                            <dt><span class="w_title">SO2</span></dt>
+                                            <dd><span class="w_value" :style="AqiBackgroundsColor(iscallData.alarmSo2,'SO2')">{{iscallData.alarmSo2}}</span></dd>
+                                            <dd><span class="w_value" :style="AqiBackgroundsColor(iscallData.AccuSo2,'SO2')">{{iscallData.AccuSo2}}</span></dd>
+                                            <dd><span class="w_value" :style="backroundlicolor(iscallData.AccuSo2,iscallData.FutureControlSo2Value)">{{iscallData.FutureControlSo2Value}}</span></dd>
+                                        </dl>
+                                        <dl>
+                                            <dt><span class="w_title">NO2</span></dt>
+                                            <dd><span class="w_value" :style="AqiBackgroundsColor(iscallData.alarmNo2,'NO2')">{{iscallData.alarmNo2}}</span></dd>
+                                            <dd><span class="w_value" :style="AqiBackgroundsColor(iscallData.AccuNo2,'NO2')">{{iscallData.AccuNo2}}</span></dd>
+                                            <dd><span class="w_value" :style="backroundlicolor(iscallData.AccuNo2,iscallData.FutureControlNo2Value)">{{iscallData.FutureControlNo2Value}}</span></dd>
+                                        </dl>
+                                        <dl>
+                                            <dt><span class="w_title">CO</span></dt>
+                                            <dd><span class="w_value" :style="AqiBackgroundsColor(iscallData.alarmCo,'CO')">{{iscallData.alarmCo}}</span></dd>
+                                            <dd><span class="w_value" :style="AqiBackgroundsColor(iscallData.AccuCo,'CO')">{{iscallData.AccuCo}}</span></dd>
+                                            <dd><span class="w_value" :style="backroundlicolor(iscallData.AccuCo,iscallData.FutureControlCoValue)">{{iscallData.FutureControlCoValue}}</span></dd>
+                                        </dl>
+                                        <dl>
+                                            <dt><span class="w_title">O3</span></dt>
+                                            <dd><span class="w_value" :style="AqiBackgroundsColor(iscallData.alarmO3,'O3')">{{iscallData.alarmO3}}</span></dd>
+                                            <dd><span class="w_value" :style="AqiBackgroundsColor(iscallData.AccuO3,'O3')">{{iscallData.AccuO3}}</span></dd>
+                                            <dd><span class="w_value" :style="backroundlicolor(iscallData.AccuO3,iscallData.FutureControlO3Value)">{{iscallData.FutureControlO3Value}}</span></dd>
+                                        </dl>
+                                    </div>
                                 </div>
-                            </el-tab-pane>
-                        </el-tabs>
-                    </el-tab-pane>
-                    <el-tab-pane label="企业在线监测" name="third_f" @tab-click="BusTableClick(2)">
-                        <div class="table_container">
-                            <el-table
-                                    :data="EnterpriseData"
-                                    border
-                                    stripe
-                                    highlight-current-row
-                            >
-                                <el-table-column
-                                        property="SerialNumber"
-                                        label="序号"
-                                        width="80"
-                                >
-                                </el-table-column>
-                                <el-table-column
-                                        property="gridName"
-                                        label="网格名称"
-                                >
-                                </el-table-column>
-                                <el-table-column
-                                        property="stationname"
-                                        label="企业"
-                                >
-                                </el-table-column>
-                                <el-table-column
-                                        property="overItem"
-                                        label="超标指标"
-                                >
-                                </el-table-column>
-                            </el-table>
+                                <!---->
+                                <div class="qxtable_bottom">
+                                   <!---->
+                                    <div class="title">
+                                        <div class="titleText">
+                                            <span class="line"></span>站点累计
+                                        </div>
+                                    </div>
+                                    <!--选择器-->
+                                    <div class="pp_tab">
+                                        <ul class="tb_ul">
+                                            <li v-for="(cell,index) in items" @click="selectStyle(cell,index)"
+                                                :class="{'bottomColor': (index === selected)}">
+                                                {{cell.select}}
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <!--累计站点-->
+                                <div class="winter_top_table" style="width: 100%;">
+                                    <table border="1" style="width: 100%;border-color:#000">
+                                        
+                                        <tr>
+                                            <td><span>站点</span></td>
+                                            <td><span>累计值</span></td>
+                                            <td><span>达标状态</span></td>
+                                            <!--<td><span>后续控制值</span></td>-->
+                                            <td><span>实时浓度</span></td>
+                                        </tr>
+                                        <tr v-for="(item,index) in xuanzeData">
+                                            <td>
+                                                <span>{{item.PointName}}</span>
+                                            </td>
+                                            <td>
+                                                <span>{{item.AccuValue}}</span>
+                                            </td>
+                                            <td>
+                                                <span v-if="item.StandardState < 0" style="color: #00B83F">↓{{item.StandardState}}</span>
+                                                <span v-if="item.StandardState > 0" style="color: red">↑{{item.StandardState}}</span>
+                                            </td>
+
+                                            <td>
+                                                <span>{{item.RealValue}}</span>
+                                            </td>
+                                        </tr>
+
+                                    </table>
+                                </div>
+                                <!--tuli-->
+                                <img style="float: left;margin-top: 4px;margin-bottom:50px;" src="../../assets/img/dabiao1_03.jpg" alt="">
+                                <!---->
+                            </div>
                         </div>
-                    </el-tab-pane>
-                    <el-tab-pane label="TVOC监测" name="fourth_f" v-if="false">
-                        <div class="table_container">
-                            <el-table
-                                    :data="TvocData"
-                                    border
-                                    stripe
-                                    highlight-current-row
-                            >
-                                <el-table-column
-                                        property="SerialNumber"
-                                        label="排名"
-                                        width="80"
-                                >
-                                </el-table-column>
-                                <el-table-column
-                                        property="gridName"
-                                        label="网格名称"
-                                >
-                                </el-table-column>
-                                <el-table-column
-                                        property="stationname"
-                                        label="监测点"
-                                >
-                                </el-table-column>
-                                <el-table-column
-                                        property="overItem"
-                                        label="TVOC"
-                                >
-                                </el-table-column>
-                            </el-table>
+                        <!---->
+                    </div>
+                </div>
+                <!--六项污染物贡献率-->
+                <div class="gxl-was comclass">
+                    <div class="title">
+                        <div class="titleText">
+                            <span class="line"></span>用电量统计
                         </div>
-                    </el-tab-pane>
-                </el-tabs>
-            </div>
-            <div class="Window_six htt-six" style="margin-left: 20px;margin-top: 20px">
-                <!--空气质量预报模块-->
-                <div class="tt-text">
-                    <p>空气质量预报</p>
-                </div>
-                <!--aqiColor 2018.12.29-->
-                <div class="data_water1" v-if="WeatherWinterPre[0]">
-                    <p v-if="WeatherWinterPre[0].date">{{WeatherWinterPre[0].date}}</p>
-                    <a>AQI日报范围<span>{{WeatherWinterPre[0].minaqi}}-{{WeatherWinterPre[0].maxaqi}}</span></a><br/>
-                    <!---->
-                    <a>级别 <span class="tian"></span><span v-show="onelan"><img
-                            :src="'../../../static/imgs/mues/cainuan/'+this.getImagesTarget(WeatherWinterPre[0].minQuality)+'.png'"
-                            alt=""><i>~</i></span><span><img
-                            :src="'../../../static/imgs/mues/cainuan/'+this.getImagesTarget(WeatherWinterPre[0].maxQuality)+'.png'"
-                            alt=""></span></a><br/>
-                    <a>首要污染物<span>{{WeatherWinterPre[0].mainpoll}}</span></a>
-                    <a>天气 <span style="font-size: 14px;padding-left: 20px">{{WeatherWinterPre[0].tq}}</span></a>
-                    <a :title="`${WeatherWinterPre[0].temp_low}-${WeatherWinterPre[0].temp_high}℃，${WeatherWinterPre[0].wd}，${WeatherWinterPre[0].ws}`">{{WeatherWinterPre[0].temp_low}}-{{WeatherWinterPre[0].temp_high}}℃，{{WeatherWinterPre[0].wd}}，{{WeatherWinterPre[0].ws}}</a>
-                </div>
-                <div class="data_water2" v-if="WeatherWinterPre[1]">
-                    <p v-if="WeatherWinterPre[1].date">{{WeatherWinterPre[1].date}}</p>
-                    <a>AQI日报范围<span>{{WeatherWinterPre[1].minaqi}}-{{WeatherWinterPre[1].maxaqi}}</span></a><br/>
-                    <!---->
-                    <a>级别 <span class="tian"></span><span v-show="twolan"><img
-                            :src="'../../../static/imgs/mues/cainuan/'+this.getImagesTarget(WeatherWinterPre[1].minQuality)+'.png'"
-                            alt=""><i>~</i></span><span><img
-                            :src="'../../../static/imgs/mues/cainuan/'+this.getImagesTarget(WeatherWinterPre[1].maxQuality)+'.png'"
-                            alt=""></span></a><br/>
-                    <a>首要污染物<span>{{WeatherWinterPre[1].mainpoll}}</span></a>
-                    <a>天气 <span style="font-size: 14px;padding-left: 20px">{{WeatherWinterPre[1].tq}}</span></a>
-                    <a :title="`${WeatherWinterPre[1].temp_low}-${WeatherWinterPre[1].temp_high}℃，${WeatherWinterPre[1].wd}，${WeatherWinterPre[1].ws}`">{{WeatherWinterPre[1].temp_low}}-{{WeatherWinterPre[1].temp_high}}℃，{{WeatherWinterPre[1].wd}}，{{WeatherWinterPre[1].ws}}</a>
-                </div>
-                <div class="data_water3" v-if="WeatherWinterPre[2]">
-                    <p v-if="WeatherWinterPre[2].date">{{WeatherWinterPre[2].date}}</p>
-                    <a>AQI日报范围<span>{{WeatherWinterPre[2].minaqi}}-{{WeatherWinterPre[2].maxaqi}}</span></a><br/>
-                    <!---->
-                    <a>级别 <span class="tian"></span><span v-show="treelan"><img
-                            :src="'../../../static/imgs/mues/cainuan/'+this.getImagesTarget(WeatherWinterPre[2].minQuality)+'.png'"
-                            alt=""><i>~</i></span><span><img
-                            :src="'../../../static/imgs/mues/cainuan/'+this.getImagesTarget(WeatherWinterPre[2].maxQuality)+'.png'"
-                            alt=""></span></a><br/>
-                    <a>首要污染物<span>{{WeatherWinterPre[2].mainpoll}}</span></a>
-                    <a>天气 <span style="font-size: 14px;padding-left: 20px">{{WeatherWinterPre[2].tq}}</span></a>
-                    <a :title="`${WeatherWinterPre[2].temp_low}-${WeatherWinterPre[2].temp_high}℃，${WeatherWinterPre[2].wd}，${WeatherWinterPre[2].ws}`">{{WeatherWinterPre[2].temp_low}}-{{WeatherWinterPre[2].temp_high}}℃，{{WeatherWinterPre[2].wd}}，{{WeatherWinterPre[2].ws}}</a>
+                      <div class="monthSelect">
+                        <el-date-picker
+                          v-model="MonthVal"
+                          type="date"
+                          size="mini"
+                          @change="getSixPollution"
+                        value-format="yyyy-MM-dd">
+                        </el-date-picker>
+                      </div>
+                    </div>
+                  <div id="sixPollution"></div>
                 </div>
             </div>
         </div>
@@ -661,6 +365,31 @@
                 activeName_w: 'first_w',
                 //默认选中经济数据
                 activeName_j: 'first_j',
+                isChoose: 1,
+                isCustom: false,
+                timeTabs: [
+                    {label: '空气质量监测'},
+                    {label: '工地扬尘监测'}, 
+                   // {label: '企业在线监测'},
+                    {label: '餐饮监测'}
+                 ],
+                //
+                rankingOptions: [
+                    {value: 'aqi', label: 'AQI'},
+                    {value: 'no2', label: 'NO2'},
+                    {value: 'so2', label: 'SO2'},
+                    {value: 'pm25', label: 'PM2.5'},
+                    {value: 'pm10', label: 'PM10'},
+                    {value: 'co', label: 'CO'},
+                    {value: 'o3', label: 'O3'}
+                ],
+                rankingVal: 'aqi',
+                //
+                rankingOptions2: [
+                    {value: 'pm25', label: 'PM2.5'},
+                    {value: 'pm10', label: 'PM10'},
+                ],
+                rankingVal2: 'pm25',
                 //天气预报板块01
                 onelan: true,
                 //天气预报板块02
@@ -699,20 +428,6 @@
                 huanJingData:[],
                 //南部县市组
                 nanBuData:[],
-                //大气污染改善pm2.5数据
-                pm25: {ymin: 60, ymax: 105, vd: 15, data: [100, 85, 66, 61]},
-                //大气污染改善pm10数据
-                pm10: {ymin: 100, ymax: 160, vd: 20, data: [159, 137, 112, 108]},
-                //大气污染改善so2数据
-                so2: {ymin: 10, ymax: 40, vd: 10, data: [36, 24, 18, 13]},
-                //大气污染改善no2数据
-                no2: {ymin: 40, ymax: 55, vd: 5, data: [49, 47, 52, 47]},
-                //大气污染改善co数据
-                co: {ymin: 3.0, ymax: 3.9, vd: 0.3, data: [3.6, 3.4, 3.5, 3.1]},
-                //大气污染改善o3数据
-                o3: {ymin: 160, ymax: 220, vd: 20, data: [165, 171, 182, 217]},
-                //大气污染改善综指数据
-                zz: {ymin: 6, ymax: 9, vd: 1, data: [8.86, 7.89, 7.11, 6.82]},
                 //用电量数据
                 Diandata: {},
                 //控制目标数据
@@ -720,108 +435,13 @@
                 //预警数据
                 yujingAallData: [],
                 //市三区考核数据
-                shisanquData: [
-                    {
-                        shiname: '广阳区',
-                        pm25: '51',
-                        bianhua: '-44.57%',
-                        rink: '1'
-                    },
-                    {
-                        shiname: '安次区',
-                        pm25: '49',
-                        bianhua: '-43.68%',
-                        rink: '2'
-                    },
-                    {
-                        shiname: '开发区',
-                        pm25: '51',
-                        bianhua: '-37.80%',
-                        rink: '3'
-                    }
-                ],
+                shisanquData: [],
                 //南部县市考核数据
-                nanbuData: [
-                    {
-                        shiname: '文安县',
-                        pm25: '58',
-                        bianhua: '-58.87%',
-                        rink: '1'
-                    },
-                    {
-                        shiname: '大城县',
-                        pm25: '58',
-                        bianhua: '-54.33%',
-                        rink: '2'
-                    },
-                    {
-                        shiname: '霸州市',
-                        pm25: '65',
-                        bianhua: '-48.41%',
-                        rink: '3'
-                    },
-
-                ],
+                nanbuData: [],
                 //环京县市考核数据
-                huanjingData: [
-                    {
-                        shiname: '大厂县',
-                        pm25: '51',
-                        bianhua: '-56.78%',
-                        rink: '1'
-                    },
-                    {
-                        shiname: '三河市',
-                        pm25: '51',
-                        bianhua: '-56.41%',
-                        rink: '2'
-                    },
-                    {
-                        shiname: '香河县',
-                        pm25: '48',
-                        bianhua: '-55.56%',
-                        rink: '3'
-                    },
-                    {
-                        shiname: '固安县',
-                        pm25: '51',
-                        bianhua: '-54.87%',
-                        rink: '4'
-                    },
-                    {
-                        shiname: '永清县',
-                        pm25: '58',
-                        bianhua: '-53.23%',
-                        rink: '5'
-                    }
-                ],
+                huanjingData: [],
                 //能源消耗数据
-                nenyuanData: [
-                    {
-                        zhibiao: '规模以上工业能耗',
-                        danwei: '万吨标准煤',
-                        qiansan: '504.23',
-                        zensu: '-2.86'
-                    },
-                    {
-                        zhibiao: '规模以上工业单位增加值能耗',
-                        danwei: '吨标准煤/万元',
-                        qiansan: '0.846',
-                        zensu: '-5.32'
-                    },
-                    {
-                        zhibiao: '全社会用电',
-                        danwei: '亿千瓦时',
-                        qiansan: '203.83',
-                        zensu: '4.93'
-                    },
-                    {
-                        zhibiao: '#工业用电量',
-                        danwei: '亿千瓦时',
-                        qiansan: '132.40',
-                        zensu: '0.17'
-                    }
-                ],
+                nenyuanData: [],
                 //区县用电量时间
                 DianTime: '',
                 //距离年底时间
@@ -892,26 +512,22 @@
 		        all:'all',
 		        mid:'mid',
 		        guan:'guan',
-                hjpaim:''
+                hjpaim:'',
+              /*gy*/
+              MonthVal:'',
+              sixPollutionData:[],
+              isSelect:0,
+              fineData:[],
+              badData:[],
+              xAxis:[],
             };
+
         },
         created() {
-            //更新时间
-            this.OneTimesData(-1);
-            //时间更新
-            this.TwoTimesData();
+          this.MonthVal = this.getYesterday(); //前一天
         },
         mounted() {
             const _this = this;
-            //mounted 挂载结束状态=====
-            setTimeout(()=>{
-                //初始化显示预警控制优
-                _this.selectStyle ({select:'PM2.5'},0);
-                //初始化控制目标
-                _this.actvieChange({name:"PM2.5"});
-                _this.GetCaseTypePie();//案件类型占比饼图
-                _this.GetCaseDealPer();//案件处理率对比
-            },1200)
             //初始化页面所有数据
             _this.getInitDataList();
             //默认选中优
@@ -919,13 +535,29 @@
             //
             _this.GetCurrentMonth();
             //获取月考核数据
-            _this.GetMonthCheck();
+            // _this.GetMonthCheck();
             //冬防倒计时
             _this.WinterCountDown();
             //获取乡镇月考核数据
-            _this.GetCountyCheckData();
+            // _this.GetCountyCheckData();
             //
-            _this.intekqzlChange('aqi')
+            _this.intekqzlChange('aqi');
+            //
+            setTimeout(()=>{
+                //初始化显示预警控制优
+                _this.selectStyle ({select:'PM2.5'},0);
+                //初始化控制目标
+                _this.actvieChange({name:"PM2.5"});
+                // _this.GetCaseTypePie();//督查案件占比饼图
+                //_this.renderSixPie();//六项污染物贡献率饼图
+              _this.getAirQualityData();
+              _this.getSixPollution();
+
+            },1200)
+            //更新时间
+            _this.OneTimesData(-1);
+            //时间更新
+            _this.TwoTimesData();
 			//reisze事件
             window.onresize = () => {
                 return (() => {
@@ -963,8 +595,16 @@
         	GetCurrentMonth(){
         		let now = new Date();
         		this.month = now.getMonth()+1;
-        		this.day = now.getDate();
+        		this.day = now.getDate()-1;
         	},
+          getYesterday(){
+            let day1 = new Date();
+            day1.setTime(day1.getTime()-24*60*60*1000);
+            let month = (day1.getMonth()+1)<10?('0'+(day1.getMonth()+1)):(day1.getMonth()+1);
+            let day = day1.getDate()<10?('0'+(day1.getDate())):(day1.getDate());
+            let s1 = day1.getFullYear()+"-" + month + "-" + day;
+            return s1;
+          },
             //获取乡镇月考核数据
 			GetCountyCheckData(){
 				switch (this.active_tab){
@@ -975,7 +615,7 @@
         				this.area = '中';
         			break;
         			case 'guan':
-        				this.area = '固';
+        				this.area = '广';
         			break;
         			default:
         			break;
@@ -988,13 +628,8 @@
         		api.GetAssessment(Time,area,isQuarter).then(res=>{
         		  //console.log(res)
         			let i = 1;
-        			let allData;
         			if(res&&isQuarter){
-        			  if(!area){
-                  allData = res.data.Data.slice(0,10);
-                }else{
-                  allData = res.data.Data;
-                }
+        				let allData = res.data.Data;
         				this.totalCount = allData.length;
         				allData.forEach(item=>{
         					let table = {};
@@ -1002,7 +637,7 @@
         					table.Com_Index = item.Com_Index;
    							table.list = item.list;
    							table.Name = item.Name;
-   							table.Waring_Num = item.Waring_Num?item.list[0].Rank_Num:'';
+   							table.Waring_Num = item.Com_IndexRank;
    							//table.Waring_Num = item.Waring_Num;
    							t.WholeCityData.push(table);
         				})
@@ -1045,9 +680,9 @@
             //
             handleClickKKK(val){
                 //
-                console.log(val.label)
-                this.arAQI = val.label;
-                this.intekqzlChange(val.name);
+                console.log(val)
+                this.arAQI = val==='pm25'?'PM2.5':val.toUpperCase();
+                this.intekqzlChange(val);
             },
             //今日控制目标切换事件
             selectStyle (cell,index) {
@@ -1111,28 +746,12 @@
             },
             //跟新数据时间2
             TwoTimesData() {
-                var date = new Date(),
-                    Y = date.getFullYear(),
-                    m = date.getMonth() + 1,
-                    d = date.getDate(),
-                    H = date.getHours() - 1,
-                    i = date.getMinutes(),
-                    s = date.getSeconds();
-                if (m < 10) {
-                    m = '0' + m;
-                }
-                if (d < 10) {
-                    d = '0' + d;
-                }
-                if (H < 10) {
-                    H = '0' + H;
-                }
-                if (i < 10) {
-                    i = '0' + i;
-                }
-                if (s < 10) {
-                    s = '0' + s;
-                }
+                var date = new Date(), Y = date.getFullYear(), m = date.getMonth() + 1, d = date.getDate(), H = date.getHours() - 1, i = date.getMinutes(), s = date.getSeconds();
+                if (m < 10) {m = '0' + m;}
+                if (d < 10) {d = '0' + d;}
+                if (H < 10) {H = '0' + H;}
+                if (i < 10) {i = '0' + i;}
+                if (s < 10) {s = '0' + s;}
                 var p = H + '时';
                 this.twotime = p;
             },
@@ -1182,119 +801,30 @@
 
                // bus.$emit('targetPollution', typecode);
             },
-            //案件处理率同比
-            GetCaseDealPer(){
-            	let t = this;
-            	api.GetCaseDealPer().then(res=>{
-            		console.log(res);
-            		let data = res.data.data;
-            		let name = [];
-            		let benyue = [];
-            		let shangyue = [];
-            		data.forEach(item=>{
-            			name.push(item.name);
-            			benyue.push(item.benyu.replace('%',''));
-            			shangyue.push(item.shangyu.replace('%',''))
-            		})
-            		t.CaseDealPer(name,benyue,shangyue);
-            	})
-            },
-            // 案件处理率同比
-             CaseDealPer(name,benyue,shangyue) {
-             	console.log(name)
-             	console.log(benyue)
-             	console.log(shangyue);
-                // 基于准备好的dom，初始化echarts实例
-                let myChart = echarts.init(document.getElementById('CaseDeal'));
-				let option = {
-				    tooltip: {
-				        trigger: 'axis',
-				        axisPointer: {
-				            type: ''
-				        },
-              formatter:'{b}<br/>{a0}:{c0}%<br />{a1}:{c1}%'
-            },
-				    legend: {
-				        data: ['上月', '本月'],
-				        textStyle: {
-                            color: '#fff'
-                        },
-				    },
-				    grid: {
-				        left: '3%',
-				        right: '4%',
-				        bottom: '20%',
-				        containLabel: true
-				    },
-				    xAxis: {
-				        type: 'value',
-				        min: 0,
-                        max: 100,
-                        interval: 25,
-				        axisLabel: {
-	                        formatter: '{value}%',
-	                        textStyle: {
-	                            color: '#2394f2'
-	                        }
-	                    },
-	                    axisLine:{
-	                        lineStyle:{
-	                            color:'#2394f2'
-	                        }
-	        			},
-	                    splitLine:{show: false},//去除网格线
-				    },
-				    yAxis: {
-				        type: 'category',
-				        data: name,
-				        axisLine:{
-	                        lineStyle:{
-	                            color:'#2394f2'
-	                        }
-	        			},
-				    },
-				    series: [
-				        {
-				            name: '上月',
-				            type: 'bar',
-				            data: shangyue,
-				            barWidth : 10
-				        },
-				        {
-				            name: '本月',
-				            type: 'bar',
-				            data: benyue,
-				            barWidth : 10
-				        }
-				    ]
-				};
-				myChart.setOption(option);
 
-            },
             //案件类型占比数据
             GetCaseTypePie(){
-            	let t = this;
-            	this.TypeLengedData = [];
+            	const _this = this;
             	let type = $('#TypeSelect option:selected').val()?$('#TypeSelect option:selected').val():'3';
-            	api.GetCaseTypePie(type).then(res=>{
-            		console.log(res);
-            		this.allData = res.data.data;
-            		this.allData.forEach(item=>{
-            			item.value = item.num;
-            			t.TypeLengedData.push(item.name)
-            		})
-            		t.DataConsumptionType();
-            	})
+            	//分类待定
+                api.GetIGyGridinfo().then(result=>{
+                    console.log(result.data.data);
+                    let resultData = result.data.data.map(v=>{return{value:v.id, name:v.name}})
+                    let resultLend = result.data.data.map(v=>{return{name:v.name}})
+                    //图表
+                    _this.DataConsumptionType(resultData,resultLend);
+                });
             },
             // 案件类型占比
-            DataConsumptionType() {
-            	let t = this;
+            DataConsumptionType(data1,data2) {
+        	    let value1 = data1;
+                let value2 = data2;
                 // 基于准备好的dom，初始化echarts实例
                 let myChart = echarts.init(document.getElementById('CaseType'));
                 // 指定图表的配置项和数据
                 let option = {
 					title : {
-				        text: '案件类型占比',
+				        //text: '案件类型占比',
 				        x:'left',
 				        textStyle: {
                             color: '#fff'
@@ -1310,7 +840,7 @@
                         top:10,
         				right:0,
         				bottom:60,
-						data:t.TypeLengedData,
+						data:value2,
                         textStyle: {
                             color: '#fff'
                         },
@@ -1339,7 +869,7 @@
                                     }
                                 }
                             },
-                            data:t.allData,
+                            data:value1,
                         },
 
                     ]
@@ -1394,7 +924,7 @@
                     return value2 - value1
                 }
             },
-            //
+            //切换指标筛选
             intekqzlChange(val){
                 let datakey = val;
                 this.kongqiData = [];
@@ -1441,25 +971,17 @@
                 //    this.qualitys = codedata;
                 // })
                 //模块四空气排名
-                api.GetLfAirWinterPre().then(res => {
-                    let data = res.data.Data;
-                    this.LfAirWinterPre = data;
-                })
-                //模块五未来三天天气  2018.12.29
+                // api.GetLfAirWinterPre().then(res => {
+                //     let data = res.data.Data;
+                //     this.LfAirWinterPre = data;
+                // })
+                //模块五未来三天天气
                 api.GetWeatherWinterPre().then(res => {
-
+                    //
                     let data = res.data.Data;
-                    if (data[0].minQuality == data[0].maxQuality) {
-                        this.onelan = false;
-                    }
-                    if (data[1].minQuality == data[1].maxQuality) {
-                        this.twolan = false;
-                    }
-                    if(data[2]){
-                        if (data[2].minQuality == data[2].maxQuality) {
-                            this.treelan = false;
-                        }
-                    }
+                    if (data[0].minQuality == data[0].maxQuality) {this.onelan = false;}
+                    if (data[1].minQuality == data[1].maxQuality) {this.twolan = false;}
+                    if(data[2]){if (data[2].minQuality == data[2].maxQuality) {this.treelan = false;}}
                     this.WeatherWinterPre = data;
                 });
                 //企业列表数据
@@ -1476,43 +998,65 @@
                         this.EnterpriseData.push(tableData3);
                     })
                 })
-                //工地列表数据
-//              api.GetgdWinterPreDustControl().then(res => {
-//
-//                  let pm10data = res.data.Data.Pm10;
-//                  let pm25data = res.data.Data.Pm25;
-//                  let i = 1;
-//                  pm10data.forEach(item => {
-//                      const tableData1 = {};
-//                      tableData1.ranking = i++;//排名
-//                      tableData1.gridName = item.gridName;//城市id
-//                      tableData1.stationname = item.stationname;//纬度
-//                      tableData1.pm10 = item.pm10;//经度
-//                      this.PM10Data.push(tableData1);
-//                  })
-
-//                  pm25data.forEach(item => {
-//                      const tableData2 = {};
-//                      tableData2.ranking = (i++) - 10;//排名
-//                      tableData2.gridName = item.gridName;//城市id
-//                      tableData2.stationname = item.stationname;//纬度
-//                      tableData2.pm25 = item.pm25;//经度
-//                      this.PM25Data.push(tableData2);
-//                  })
-//              })
+               // 工地列表数据
+             api.GetgdWinterPreDustControl().then(res => {
+                 //console.log('工地数据')
+                 //console.log(res)
+                 let pm2510data = res.data.Data;
+                 let pm25data = pm2510data.sort(this.compare('pm25'));
+                 let pm10data = pm2510data.sort(this.compare('pm10'));
+                 let i = 1;
+                 pm25data.forEach(item => {
+                     const tableData1 = {};
+                     tableData1.ranking = i++;//排名
+                     tableData1.gridName = item.firstgridname;//城市id
+                     tableData1.stationname = item.name;//纬度
+                     tableData1.pm10 = item.pm10;//经度
+                     this.PM10Data.push(tableData1);
+                 })
+                //pm10
+                 pm10data.forEach(item => {
+                     const tableData2 = {};
+                     tableData2.ranking = (i++) -pm2510data.length;
+                     tableData2.gridName = item.firstgridname;//城市id
+                     tableData2.stationname = item.name;//纬度
+                     tableData2.pm25 = item.pm25;//经度
+                     this.PM25Data.push(tableData2);
+                 })
+             })
                 //Tvoc列表数据
-//              api.GetWinterPreTVocControl().then(res => {
-//                  let data4 = res.data.Data;
-//                  let i = 1;
-//                  data4.forEach(item => {
-//                      const tableData4 = {};
-//                      tableData4.SerialNumber = i++;//排名
-//                      tableData4.gridName = item.gridName;//城市id
-//                      tableData4.stationname = item.pointName;//纬度
-//                      tableData4.overItem = item.tvoc;//经度
-//                      this.TvocData.push(tableData4);
-//                  })
-//              })
+             // api.GetWinterPreTVocControl().then(res => {
+             //     let data4 = res.data.Data;
+             //     let i = 1;
+             //     data4.forEach(item => {
+             //         const tableData4 = {};
+             //         tableData4.SerialNumber = i++;//排名
+             //         tableData4.gridName = item.gridName;//城市id
+             //         tableData4.stationname = item.pointName;//纬度
+             //         tableData4.overItem = item.tvoc;//经度
+             //         this.TvocData.push(tableData4);
+             //     })
+             // })
+                //餐饮油烟数据
+                api.GetSootStatisticdata().then(res => {
+                    let data4 = res.data.Data;
+                    console.log('数据测试演员');
+                    console.log(data4);
+                    let i = 1;
+                    data4.forEach((item,index) => {
+                        const tableData4 = {};
+                        if(index <= 9){
+                            tableData4.SerialNumber = i++;//排名
+                            tableData4.gridName = item.thirdGridName || '---';//城市id
+                            tableData4.stationname = item.name || '---';//纬度
+                            tableData4.overItem = item.concentrationOut|| '---';//经度
+                        }else {
+                            return false;
+                        }
+
+                        this.TvocData.push(tableData4);
+                    })
+                })
             },
             //获取月考核数据
            	GetMonthCheck(){
@@ -1542,25 +1086,18 @@
             //图片背景跟换
             getImagesTarget(type) {
                 let rtValue;
-                switch (type) {
-                    case '严重':
-                        rtValue = 'du-yz';
-                        break;
-                    case '中度':
-                        rtValue = 'du-zz';
-                        break;
-                    case '优':
-                        rtValue = 'du-y';
-                        break;
-                    case '良':
-                        rtValue = 'du-l';
-                        break;
-                    case '轻度':
-                        rtValue = 'du-qd';
-                        break;
-                    case '重度':
-                        rtValue = 'du-zd';
-                        break;
+                if(type.indexOf('严重')!=-1){
+                    rtValue = 'du-yz';
+                }else if(type.indexOf('中度')!=-1){
+                    rtValue = 'du-zz';
+                }else if(type.indexOf('优')!=-1){
+                    rtValue = 'du-y';
+                }else if(type.indexOf('良')!=-1){
+                    rtValue = 'du-l';
+                }else if(type.indexOf('轻度')!=-1){
+                    rtValue = 'du-qd';
+                }else if(type.indexOf('重度')!=-1){
+                    rtValue = 'du-zd';
                 }
                 return rtValue;
             },
@@ -1734,6 +1271,327 @@
                         //console.log(Vcolor);
                 return Vcolor;
             },
+          /*gy*/
+          renderSixPie() {
+            let myChart = echarts.init(document.getElementById('sixPollution'));
+            let option = {
+              tooltip : {
+                trigger: 'axis',
+              },
+              grid: {
+                top:20,
+                left: '7%',
+                right: '4%',
+                containLabel: false
+              },
+              xAxis : [
+                {
+                  type : 'category',
+                  // data : ['固安县','安次区','开发区','广阳区','永清县','香河县','大城县','文安县','大厂县','霸州市','三河市'],
+                  data : this.xAxis,
+                  splitLine:{show: false},//去除网格线
+                  axisPointer: {
+                    type: ''
+                  },
+                  axisLine:{
+                    lineStyle:{
+                      color:'#cccdd3'
+                    }
+                  },
+                  axisTick:{
+                    show:false
+                  },
+                  axisLabel: {
+                    rotate:45,
+                    interval: 0,
+                    textStyle: {
+                      color: '#eee',//坐标值得具体的颜色
+                    }
+                  },
+                }
+              ],
+              yAxis : [
+                {
+                  type : 'value',
+                  splitLine:{
+                    show: true,
+                    lineStyle:{
+                      color:'#3e4260'
+                    }
+                  },
+                  axisLine:{
+                    lineStyle:{
+                      color:'#cccdd3'
+                    }
+                  },
+                  axisTick:{
+                    show:false
+                  },
+                  axisLabel: {
+                    textStyle: {
+                      color: '#eee',//坐标值得具体的颜色
+
+                    }
+                  },
+                }
+              ],
+              series : [
+                {
+                  name:'',
+                  type:'bar',
+                  data:this.sixPollutionData,
+                  itemStyle:{
+                    normal:{
+                      color: {
+                        type: 'linear',
+                        x: 0,
+                        y: 1,
+                        x2: 0,
+                        y2: 0,
+                        colorStops: [{
+                          offset: 0,
+                          color: '#ff7f12' // 0% 处的颜色
+                        }, {
+                          offset: 1,
+                          color: '#fec47f' // 100% 处的颜色
+                        }],
+                        globalCoord: false // 缺省为 false
+                      },
+                      barBorderRadius: [5, 5, 0, 0],
+                    },
+                  },
+                  barWidth:10,
+                },
+              ]
+            };
+            myChart.setOption(option);
+
+          },
+            //颜色列表
+          tableRowClassName({row, rowIndex}) {
+            if (rowIndex%2 === 0) {
+              return 'warning-row';
+            } else {
+              return 'success-row';
+            }
+            return '';
+          },
+          getSixPollution(){
+            /*获取六项污染物贡献率*/
+            this.sixPollutionData = [];
+            this.xAxis = [];
+            let mmTime = this.MonthVal;
+            api.getElectricForDay(mmTime).then(result=>{
+              if(result.data.status===1){
+                let res = result.data.data;
+                console.log(res)
+                for ( let key in res){
+                  if(key!='id'&&key!='time'){
+                    this.xAxis.push(this.keyChange(key));
+                    this.sixPollutionData.push(res[key]);
+                  }
+                }
+                this.renderSixPie();
+              }
+            })
+          },
+          keyChange(key){
+            switch (key) {
+              case 'ga':
+                return '固安县';
+                break;
+              case 'ac':
+                return '安次区';
+                break;
+              case 'kf':
+                return '开发区';
+                break;
+              case 'gy':
+                return '广阳区';
+                break;
+              case 'yq':
+                return '永清县';
+                break;
+              case 'xh':
+                return '香河县';
+                break;
+              case 'dcheng':
+                return '大城县';
+                break;
+              case 'wa':
+                return '文安县';
+                break;
+              case 'dchang':
+                return '大厂县';
+                break;
+              case 'bz':
+                return '霸州市';
+                break;
+              case 'sh':
+                return '三河市';
+                break;
+            }
+          },
+            //切换
+            timeClick(v, i) {
+                this.isChoose = i;
+            },
+          getAirQualityData(){
+            /*获取优良天数据*/
+            api.GetWinterPrePollutionDaysMonthPc().then(result=>{
+              console.log(result);
+              if(result.data.Status===1){
+                let res = result.data.Data;
+                  console.log(res);
+                  if(this.isSelect){
+                    this.fineData = res.filter(item=>item.name==='重污染');
+                    this.getAirQuality();
+                  }else{
+                    this.fineData = res.filter(item=>item.name==='优良天');
+                    this.getAirQuality();
+                  }
+
+              }
+            })
+          },
+          getAirQuality(){
+            let myChart = echarts.init(document.getElementById('airQuality'));
+            let option = {
+              tooltip : {
+                trigger: 'axis',
+              },
+              legend: {
+                data:[this.fineData[0].legend+'年',this.fineData[1].legend+'年'],
+                textStyle: {
+                  color: '#eee'          // 图例文字颜色
+                },
+                itemHeight: 4,
+                borderRadius: 2,
+                left: 30,
+                top: 0
+              },
+              grid: {
+                top:40,
+                left: '7%',
+                right: '4%',
+                containLabel: false
+              },
+              xAxis : [
+                {
+                  type : 'category',
+                  data : ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],
+                  splitLine:{show: false},//去除网格线
+                  axisPointer: {
+                    type: ''
+                  },
+                  axisLine:{
+                    lineStyle:{
+                      color:'#cccdd3'
+                    }
+                  },
+                  axisTick:{
+                    show:false
+                  },
+                  axisLabel: {
+                    interval: 0,
+                    textStyle: {
+                      color: '#eee',//坐标值得具体的颜色
+
+                    }
+                  },
+                }
+              ],
+              yAxis : [
+                {
+                  type : 'value',
+                  splitLine:{
+                    show: true,
+                    lineStyle:{
+                      color:'#3e4260'
+                    }
+                  },//去除网格线
+                  // min: 0,
+                  // max: 50,
+                  // interval: 5,
+                  axisLine:{
+                    lineStyle:{
+                      color:'#cccdd3'
+                    }
+                  },
+                  axisTick:{
+                    show:false
+                  },
+                  axisLabel: {
+                    textStyle: {
+                      color: '#eee',//坐标值得具体的颜色
+
+                    }
+                  },
+                }
+              ],
+              series : [
+                {
+                  name:this.fineData[0].legend+'年',
+                  type:'bar',
+                  data:this.fineData[0].series.map(item=>{return item.value}),
+                  itemStyle:{
+                    normal:{
+                      color: {
+                        type: 'linear',
+                        x: 0,
+                        y: 1,
+                        x2: 0,
+                        y2: 0,
+                        colorStops: [{
+                          offset: 0,
+                          color: '#ff7f12' // 0% 处的颜色
+                        }, {
+                          offset: 1,
+                          color: '#fec47f' // 100% 处的颜色
+                        }],
+                        globalCoord: false // 缺省为 false
+                      },
+                      barBorderRadius: [5, 5, 0, 0],
+                    },
+                  },
+                  barWidth:10,
+                },
+                {
+                  name:this.fineData[1].legend+'年',
+                  type:'bar',
+                  data:this.fineData[1].series.map(item=>{return item.value}),
+                  itemStyle:{
+                    normal:{
+                      color: {
+                        type: 'linear',
+                        x: 0,
+                        y: 1,
+                        x2: 0,
+                        y2: 0,
+                        colorStops: [{
+                          offset: 0,
+                          color: '#4eadfd' // 0% 处的颜色
+                        }, {
+                          offset: 1,
+                          color: '#05f2fe' // 100% 处的颜色
+                        }],
+                        globalCoord: false // 缺省为 false
+                      },
+                      barBorderRadius: [5, 5, 0, 0],
+                    },
+                  },
+                  barWidth:10,
+                },
+
+              ]
+            };
+            myChart.setOption(option);
+          },
+          Select(item,i){
+            console.log(i);
+            this.isSelect = i;
+            this.getAirQualityData();
+          }
         },
         components: {BattleMap, WinterProgress ,Weather},
     };
@@ -1742,830 +1600,371 @@
 </script>
 <style lang="scss" scoped>
 
-    .control {
-        width: 100%;
-        height: 100%;
-        color: white;
-        padding: 5px 10px;
-    }
+   .Like-winter{
+       width: 100%;
+       height: 100%;
+       color: #fff;
+       background-color: #151A37;
+       .warp-gtzz{
+           width: 100%;
+           height: calc(100% - 86px);
+           .title {
+               text-align: left;
+               padding: 10px;
+               color: rgba(18, 218, 136, 1);
+               font-size: 16px;
+               .line {
+                   display: inline-block;
+                   font-style: normal;
+                   margin: -2px 8px;
+                   width: 4px;
+                   height: 15px;
+                   background: rgba(18, 218, 136, 1);
+               }
+           }
+           .comclass{
+               background:rgba(27,33,67,1);
+               box-shadow:0px 6px 13px 0px rgba(27,33,67,0.44);
+               border-radius:10px;
+               margin-top: 20px;
+           }
+           .warp-left{
+               width: 30%;
+               height: 100%;
+               margin-left: 1%;
+               float: left;
 
-    .pm h2 {
-        font-size: 21px;
-        font-family: 'Arial-BoldMT';
-        margin: 0;
-        float: left
-    }
-
-    .pm .yujing {
-        font-size: 12px;
-        font-family: "Microsoft YaHei";
-        color: #BECBEC;
-        float: right
-    }
-
-    .top div, .under div {
-        font-size: 14px;
-        font-family: 'Microsoft YaHei';
-        position: relative;
-        /* left:-50%*/
-    }
-
-    .top, .under {
-        display: inline-block;
-        text-align: left;
-        position: relative;
-        left: 0;
-        width: 330px;
-    }
-
-    .top {
-        bottom: -16px;
-    }
-
-    .under {
-        top: -16px;
-    }
-
-    .real {
-        transform: rotate(180deg)
-    }
-
-    //今日控制目标
-    .htt-one-up .item {
-        display: inline-block;
-        margin-bottom: 5px;
-        width: 160px;
-    }
-
-    .htt-one-up .item div:nth-child(1) {
-        font-size: 16px;
-        font-weight: bolder;
-    }
-
-    .htt-one-up .item div:nth-child(2) {
-        font-size: 12px;
-        color: #BECBEC;
-    }
-
-    .htt-one-up .colLine {
-        height: 35px;
-        width: 1px;
-        margin-bottom: -5px;
-        background: #17558F;
-        border-top: 1px solid white;
-        border-bottom: 1px solid white;
-    }
-    .item-kz-class{
-        width: 94%;
-        margin: 0 auto;
-        .kz-class{
-            margin-top: 10px;
-        }
-        .rb-class{
-            margin-top: 10px;
-        }
-    }
-
-    //媒体查询
-    @media only screen and (min-width: 1600px) {
-
-        .Window_one {
-            height: 365px !important;
-        }
-        .Window_Two {
-            height: 365px !important;
-        }
-        .Window_Three {
-            height: 438px !important;
-        }
-        .Window_Four {
-            height: 336px !important;
-        }
-        .Window_Five {
-            height: 336px !important;
-        }
-        .Window_six {
-            height: 262px !important;
-        }
-        /*---大屏预警管控---*/
-        .pp_tab{
-            li{
-                width: 72px!important;
-            }
-        }
-        .bao_left{
-            margin-right: 15px!important;
-        }
-        .bao_right{
-            dl{
-                margin-right: 12px!important;
-            }
-        }
-        .item_text4{
-            height: 330px!important;
-        }
-        /*---大屏幕大气污染图例--*/
-        #pmcodepc{
-            width: 96%!important;
-            height: 250px!important;
-            margin-left: 10px!important;
-        }
-        #CaseDeal{
-        	margin-top: 15px!important;
-            width: 400px!important;
-        	height: 600px!important;
-        }
-    }
-	.Window_Four .el-tabs{
-		width: 100%;
-		height: 100%;
-		#pane-first_t{
-			width: 100%!important;
-			height: 100%!important;
-		}
-	}
-    //
-    .Like-winter {
-        width: 100%;
-        height: auto;
-        color: #fff;
-        background: #242953;
-        .right{
-        	float: right;
-        }
-        .title {
-            width: 1324px;
-            height: auto;
-            margin: 0 auto;
-            position: relative;
-            h1 {
-                margin: 0;
-                font-size: 44px;
-                line-height: 80px;
-                color: #b0d6fa;
-                letter-spacing: 64px;
-            }
-            .text_left {
-                top: 25px;
-                left: 2px;
-                text-align: left;
-                font-size: 16px;
-                position: absolute;
-                width: 370px;
-                height: 60px;
-                color: #fff;
-                border: none;
-                .oline1 {
-                    span {
-                        padding-left: 4px;
-                        font-size: 18px;
-                        font-weight: bold;
-                        color: #c7254e;
-                    }
-                }
-            }
-            .txtshow {
-                top: 25px;
-                right: 10px;
-                font-size: 19px;
-                position: absolute;
-                width: 478px;
-                height: 60px;
-                color: #fff;
-                border: none;
-                .juli_one {
-                    float: left;
-                }
-                .juli_two {
-                    float: right;
-                }
-                span {
-                    font-size: 22px;
-                    padding: 0 4px;
-                    font-weight: bold;
-                    color: #ce453d;
-                }
-            }
-        }
-        .qxtable {
-            width: 100%;
-            height: 15px;
-            text-align: left;
-            margin-top: 22px;
-            margin-bottom: 2px;
-            color: #BECBEC;
-            i {
-                display: inline-block;
-                width: 3px;
-                height: 12px;
-                margin-right: 5px;
-                margin-top: 4px;
-                margin-left: 10px;
-                float: left;
-                background: #005BEA;
-                background: -webkit-linear-gradient(top, #00C6FB, #005BEA);
-            }
-            a {
-                padding: 0 4px;
-                color: #ccc;
-            }
-        }
-        .warp_box {
-            width: 1324px;
-            overflow-y: auto;
-            overflow-x: hidden;
-            padding-bottom: 20px;
-            margin: 0 auto;
-        }
-        .Window_one {
-            width: 370px;
-            height: 305px;
-            border: solid 1px #428bca;
-            background: #1d2339;
-            float: left;
-            overflow: hidden;
-            position: relative;
-
-            .item_text4{
-                overflow-x: hidden;
-                overflow-y: auto;
-                height: 268px;
-            }
-            .winter_one_top01,.winter_one_top02{
-                position: absolute;
-                top: 6px;
-                right: 10px;
-            }
-            .tt-text{
-                width: 100%;
-                height: 40px;
-                border-bottom: solid 1px #428bca;
-                line-height: 40px;
-                p{
-                    text-align: left;
-                    padding-left: 10px;
-                }
-            }
-            .tt-tab{
-                width: 100%;
-                height: 40px;
-                line-height: 40px;
-                .tt-tab-l{
-                    float: left;
-                    font-size: 12px;
-                    width: 94px;
-                    height: 40px;
-                    padding-left: 0px;
-                    border-bottom: 1px solid #ccc;
-                }
-                .tt-tab-r{
-                    float: left;
-                    width:  calc(100% - 94px);
-                }
-            }
-            .qxtable_bottom{
-                width: 100%;
-                height: 22px;
-                text-align: left;
-                margin-bottom: 4px;
-                color: #BECBEC;
-                .tb_ul{
-                    float: right;
-                    margin-right:0px;
-                    overflow: hidden;
-                    li{
-                        list-style: none;
-                        text-align: center;
-                        float: left;
-                        font-size: 12px;
-                        cursor: pointer;
-                        width:53px;
-                        border-bottom: solid 1px #fff;
-                    }
-                    .bottomColor{
-                        border-bottom: solid 2px #1e68d1;
-                        //background: #666;
-                    }
-                }
-                i {
-                    display: inline-block;
-                    width: 3px;
-                    height: 12px;
-                    margin-right: 5px;
-                    margin-top: 4px;
-                    margin-left: 10px;
-                    float: left;
-                    background: #005BEA;
-                    background: -webkit-linear-gradient(top, #00C6FB, #005BEA);
-                }
-                a {
-                    padding: 0 4px;
-                    color: #ccc;
-                }
-            }
-            .winter_bao_top{
-                width: 100%;
-                height: 90px;
-                overflow: hidden;
-                .bao_left{
-                    margin-top: 3px;
-                    float: left;
-                    width: 80px;
-                    margin-right: 0px;
-                    dl{
-                        width: 80px;
-                    }
-                }
-                .bao_right{
-                    float: left;
-                    height: 60px;
-                    dl{
-                        width: 38px;
-                        float: left;
-                        margin-left: 3px;
-                        .w_title{
-                            font-size: 13px;
-                        }
-                        .w_value{
-                            display: inline-block;
-                            width: 100%;
-                            height: 18px;
-                            color: #494949;
-                            line-height: 18px;
-                            border-radius: 3px;
-                        }
-                        dd{
-                            margin-top: 2px;
-                            position: relative;
-                            .jb_dian{
-                                border: solid 1px #fff;
-                                position: absolute;
-                                top:calc(50% - 3px);
-                                right: -1px;
-                                display: inline-block;
-                                width: 6px;
-                                height: 6px;
-                                border-radius: 50%;
-                                background: red;
-                            }
-
-                        }
-
-                    }
-                }
-            }
-            .conten_detail {
-                text-align: left;
-                padding-left: 10px;
-            }
-            .detail {
-                width: 100%;
-                height: auto;
-                div:nth-child(1) {
-                    line-height: 13px;
-                    width: 10%;
-                    text-align: left;
-                }
-            }
-            .item_text1 {
-                width: 100%;
-                height: 24px;
-                font {
-                    float: right;
-                    padding-right: 10px;
-                    padding-top: 4px;
-                }
-            }
-            .item_text3 {
-                width: 100%;
-                height: 24px;
-                line-height: 34px;
-                text-align: left;
-                padding-left: 20px;
-                border-bottom: solid 1px #ccc;
-
-                a {
-                    padding: 0 4px;
-                    color: #ccc;
-                }
-            }
-        }
-        .Window_Two {
-            width: 428px;
-            height: 305px;
-            border: solid 1px #428bca;
-            background: #1d2339;
-            float: left;
-            overflow: hidden;
-    .class-fx{
-      width: 130px;
-      height: 38px;
-      position: absolute;
-      top: 10px;
-        overflow: hidden;
-      z-index: 9999;
-      left: 10px;
-        .weather_panel{
-            margin-top: -4px;
-        }
-    }
-        }
-        .Window_Three {
-            width: 480px;
-            height: 378px;
-            border: solid 1px #428bca;
-            background: #1d2339;
-            float: left;
-            overflow-x: hidden;
-            overflow-y: auto;
-            .CountyCheck{
-            	float: right;
-            	margin-right: 10px;
-            	margin-top: 10px;
-            }
-            .qxtable{
-                .left{
-                    float: left;
-                }
-                .right{
-                    float: right;
-                    margin-right: 30px;
-                    li{
-                    	cursor: pointer;
-                        list-style: none;
-                        float: left;
-                        padding: 0 5px;
-                        color: #fff;
-                        font-size: 12px;
-                    }
-                    .selec{
-                        background: #2394f2;
-                    }
-                }
-            }
-			.endTime{
-				font-size: 8px;
-				color: #5d77a9;
-				margin-right: 20px;
-				span{
-					color: #adbadb;
-				}
-			}
-            //采暖考核模块
-            .item_banyuan {
-                width: 460px;
-                height: 88px;
-                margin-top: 9px;
-                margin-left: 9px;
-                .obay_1 {
-                    float: left;
-                    width: 186px;
-                    height: 88px;
-                    border-left: solid 1px #7c7056;
-                    overflow: hidden;
-                    background: url("../../../static/imgs/mues/cainuan/l-bg2.png") right no-repeat;
-                    position: relative;
-                    .title_baay {
-                        height: 32px;
-                        font-size: 24px;
-                        font-weight: bold;
-                    }
-                    p {
-                        padding-right: 37px;
-                    }
-                    .pro_l {
-                        height: 88px;
-                        width: 70px;
-                        position: absolute;
-                        bottom: -5px;
-                        right: -8px;
-                    }
-                }
-                .obay_2 {
-                    float: left;
-                    width: 88px;
-                    height: 88px;
-                    overflow: hidden;
-                    border-top: solid 1px #7c7056;
-                    p {
-                        font-size: 12px;
-                        padding-top: 3px;
-                    }
-                    .title_baay {
-                        height: 32px;
-                        font-size: 26px;
-                        font-weight: bold;
-                    }
-                    img {
-                        margin-top: 20px;
-                    }
-                }
-                .obay_3 {
-                    float: left;
-                    width: 184px;
-                    height: 88px;
-                    border-right: solid 1px #7c7056;
-                    overflow: hidden;
-                    background: url("../../../static/imgs/mues/cainuan/r-bg2.png") no-repeat;
-                    position: relative;
-                    .title_baay {
-                        padding-top: 15px;
-                        height: 32px;
-                        font-size: 24px;
-                        font-weight: bold;
-                    }
-                    p {
-                        padding-left: 35px;
-                        padding-top: 15px;
-                    }
-                    .pro_r {
-                        height: 88px;
-                        width: 70px;
-                        position: absolute;
-                        bottom: -5px;
-                        left: 0;
-                    }
-                }
-            }
-            .addData {
-                height: 120px;
-                .line_top {
-                    p {
-                        font-size: 12px;
-                        line-height: 26px;
-                    }
-                }
-            }
-            .table_kaohe_sanqu {
-                width: 450px;
-                height: 110px;
-                margin: 0 auto;
-                .lable_title {
-                    text-align: left;
-                    height: 28px;
+               .kq-num{
+                   width: 100%;
+                   height: calc(50% - 20px);
+                 position: relative;
+                 overflow: hidden;
+                 .selecFine{
+                   position: absolute;
+                   right: 30px;
+                   z-index: 99999;
+                   span{
+                     padding: 10px;
+                     &:hover{
+                       cursor: pointer;
+                     }
+                   }
+                 }
+                  #airQuality{
                     width: 100%;
-                    color: #fff;
+                    height: calc(100% - 10px);
+                    /*height: 100%;*/
+                  }
+               }
+               .kq-yb{
+                   width: 100%;
+                   height: calc(48% - 20px);
+                   overflow-y: hidden;
+                   .yichu{
+                       width: 570px;
+                       overflow-y: hidden;
+                       overflow-x: auto;
+                   }
+                   .data_water1,.data_water2,.data_water3 {
+                       margin-top: 2%;
+                       width: 33.3%;
+                       height: auto;
+                       padding:0 4%;
+                       border-right: solid 1px #1080cc;
+                       float: left;
+                       p {
+                           color: #fff;
+                           font-size: 14px;
+                           padding-bottom: 4px;
+                       }
+                       a {
+                           display: inline-block;
+                           width: 100%;
+                           margin-top: 4px;
+                           padding-left: 14px;
+                           color: #9ea9c7;
+                           font-size: 12px;
+                           line-height: 16px;
+                           text-align: left;
+                           overflow:hidden; //超出的文本隐藏
+                           text-overflow:ellipsis; //溢出用省略号显示
+                           white-space:nowrap; //溢出不换行
+                       }
+                       span {
+                           color: #fff;
+                       }
+                   }
+                   .data_water3{
+                       border-right: none;
+                   }
 
-                    a {
-                        color: #fff;
-                        display: inline-block;
-                    }
-                }
-                .tubiao_warp {
-                    .warp_left {
-                        float: left;
-                        height: 80px;
-                        width: 209px;
+               }
+           }
+           .warp-conter{
+               width: 36%;
+               height: 100%;
+               margin: 0 1%;
+               float: left;
 
-                    }
-                    .warp_chenter {
-                        float: left;
-                        height: 80px;
-                        width: 59px;
+               .map-was{
+                   width: 100%;
+                   height: calc(50% - 20px);
+                   overflow: hidden;
+                   position: relative;
+                   .class-fx{
+                       width: 130px;
+                       height: 38px;
+                       position: absolute;
+                       top: 10px;
+                       overflow: hidden;
+                       z-index: 9999;
+                       left: 10px;
+                       .weather_panel{
+                           margin-top: -4px;
+                       }
+                   }
+               }
+               .table-was{
+                   width: 100%;
+                   height: calc(48% - 20px);
+                   overflow: hidden;
+                   .choose{
+                       width: 100%;
+                       height: 80px;
+                       .table-sleect{
+                           width: 100%;
+                           padding-top: 7px;
+                           text-align: right;
+                       }
+                       ul {
+                           width: 100%;
+                           text-align: left;
+                           display: inline-block;
+                           border-bottom: 1px solid rgba(10, 15, 42, 1);
+                           padding-left: 20px;
+                           li {
+                               width: 85px;
+                               display: inline-block;
+                               font-size: 14px;
+                               font-family: MicrosoftYaHei;
+                               font-weight: 400;
+                               text-align: center;
+                               line-height: 36px;
+                               margin-right: 15px;
+                           }
+                           li:last-child{
+                               margin-right: 0;
+                           }
 
-                        ul {
-                            li {
-                                list-style: none;
-                            }
-                        }
-                    }
-                    .warp_right {
-                        float: right;
-                        height: 80px;
-                        width: 182px;
+                           :hover {
+                               cursor: pointer;
+                           }
+                       }
+                       .checked {
+                           border-bottom: 2px solid rgba(18, 218, 136, 1);
+                       }
 
-                    }
-                }
-            }
-            .table_kaohe_baxian {
-                width: 100%;
-                height: 190px;
-                margin: 0 auto;
-                .lable_title {
-                    text-align: left;
-                    height: 28px;
-                    width: 100%;
-                    color: #fff;
-                    padding-left: 16px;
-                    //background: #777;
-                    a {
-                        color: #fff;
-                        display: inline-block;
-                    }
-                }
-                .tubiao_warp {
-                    .warp_left {
-                        float: left;
-                        height: 165px;
-                        width: 219px;
+                   }
+                   .tab_container{
+                       width: 100%;
+                       height: calc(100% - 80px);
+                       overflow-y: auto;
+                       overflow-x: hidden;
+                   }
+               }
+           }
+           .warp-right{
+               width: 30%;
+               height: 100%;
+               margin-right: 1%;
+               float: left;
 
-                    }
-                    .warp_chenter {
-                        float: left;
-                        height: 165px;
-                        width: 59px;
+               .yj-was{
+                   width: 100%;
+                   height: calc(55% - 20px);
+                   .yj-title{
+                       font-size:18px;
+                       font-family:MicrosoftYaHei;
+                       font-weight:400;
+                       color:rgba(18,218,136,1);
+                       line-height:46px;
+                       width: 100%;
+                       height: 46px;
+                       text-align: center;
+                       background:rgba(21,26,55,0.5);
+                       box-shadow:0px 4px 6px 0px rgba(27,33,67,0.59);
+                   }
+                   .tt-tab{
+                       width: 100%;
+                       height: 40px;
+                       line-height: 40px;
+                       .tt-tab-l{
+                           float: left;
+                           font-size: 12px;
+                           width: 94px;
+                           height: 40px;
+                           padding-left: 0px;
+                           border-bottom: 1px solid #ccc;
+                       }
+                       .tt-tab-r{
+                           float: left;
+                           width:  calc(100% - 94px);
+                       }
+                   }
+                   .item_text4{
+                       overflow-x: hidden;
+                       overflow-y: auto;
+                       height: calc(100% - 50px);
+                       .winter_bao_top{
+                           width: 100%;
+                           height: 90px;
+                           overflow: hidden;
+                           .bao_left{
+                               margin-top: 3px;
+                               float: left;
+                               width: 80px;
+                               margin-right: 0px;
+                               dl{
+                                   width: 80px;
+                               }
+                           }
+                           .bao_right{
+                               float: left;
+                               width: calc(100% - 80px);
+                               height: 60px;
+                               dl{
+                                   width: 15%;
+                                   float: left;
+                                   margin-left: 3px;
+                                   .w_title{
+                                       font-size: 13px;
+                                   }
+                                   .w_value{
+                                       display: inline-block;
+                                       width: 100%;
+                                       height: 18px;
+                                       color: #494949;
+                                       line-height: 18px;
+                                       border-radius: 3px;
+                                   }
+                                   dd{
+                                       margin-top: 2px;
+                                       position: relative;
+                                       .jb_dian{
+                                           border: solid 1px #fff;
+                                           position: absolute;
+                                           top:calc(50% - 3px);
+                                           right: -1px;
+                                           display: inline-block;
+                                           width: 6px;
+                                           height: 6px;
+                                           border-radius: 50%;
+                                           background: red;
+                                       }
 
-                        ul {
-                            li {
-                                list-style: none;
-                            }
-                        }
-                    }
-                    .warp_right {
-                        float: right;
-                        height: 165px;
-                        width: 200px;
+                                   }
 
-                    }
-                }
-            }
-        }
-        .Window_Four {
-            width: 370px;
-            height: 276px;
-            border: solid 1px #428bca;
-            background: #1d2339;
-            float: left;
-            overflow-x: hidden;
-            overflow-y: auto;
-            .daqititle {
-                margin-top: 30px;
-            }
-            .nytable {
-                width: 100%;
-                tr, td {
-                    border: none;
-                    height: 38px;
-                }
-                .lightColor {
-                    background: #22293c !important;
-                }
-                .darkColor {
-                    background: #051427 !important;
-                }
-                .goLeft {
-                    text-align: left;
-                    padding-left: 20px;
-                }
-            }
-            .prog_box {
-                .item_progrs_left {
-                    width: 20%;
-                    float: left;
-                    padding-left: 4%;
-                    margin-right: 5%;
-                    li {
-                        list-style: none;
-                    }
-                }
-                .item_progrs {
-                    margin-top: 2.5px;
-                    width: 70%;
-                    float: left;
-                }
-            }
-            .renwu-box {
-                width: 300px;
-                height: auto;
-                margin: 0 auto;
-                .e_users {
-                    width: 150px;
-                    height: 60px;
-                    margin-top: 35px;
-                    float: left;
-                    p {
-                        margin: 0;
-                        color: #8079eb;
-                        font-size: 22px;
-                        font-weight: bold;
-                        padding: 3px;
-                        span {
-                            font-size: 14px;
-                        }
-                    }
-                    h5 {
-                        margin: 6px;
-                        color: #45edf8;
-                        font-size: 22px;
-                    }
-                }
-            }
+                               }
+                           }
+                       }
+                       .qxtable_bottom{
+                           width: 100%;
+                           height: 22px;
+                           text-align: left;
+                           margin-bottom: 4px;
+                           color: #BECBEC;
+                           .pp_tab{
+                               width: 100%;
+                               float: left;
+                               margin:5px 0 8px 6px ;
+                               line-height: 20px
+                           }
+                           .tb_ul{
+                               float: right;
+                               width: 100%;
+                               height: 30px;
+                               margin-right:0px;
+                               overflow: hidden;
+                               li{
+                                   list-style: none;
+                                   text-align: center;
+                                   float: left;
+                                   font-size: 12px;
+                                   cursor: pointer;
+                                   width:16.3%;
+                                   border-bottom: solid 1px #000;
+                               }
+                               .bottomColor{
+                                   border-bottom: solid 2px rgba(18,218,136,1);
+                                   color: rgba(18,218,136,1);
+                               }
+                           }
+                           i {
+                               display: inline-block;
+                               width: 3px;
+                               height: 12px;
+                               margin-right: 5px;
+                               margin-top: 4px;
+                               margin-left: 10px;
+                               float: left;
+                               background: #005BEA;
+                               background: -webkit-linear-gradient(top, #00C6FB, #005BEA);
+                           }
+                           a {
+                               padding: 0 4px;
+                               color: #ccc;
+                           }
+                       }
+                       .winter_top_table{
+                           table{
+                               td{
+                                   height: 28px;
+                               }
+                               tr:nth-child(2n) {
+                                   background-color: #1E254F;
+                               }
+                               tr:nth-child(2n+1) {
+                                   background-color: #161C3A;
+                               }
+                           }
+                       }
+                       .item-kz-class{
+                           width: 94%;
+                           margin: 0 auto;
+                           .kz-class{
+                               margin-top: 10px;
+                           }
+                           .rb-class{
+                               margin-top: 10px;
+                           }
+                       }
+                   }
+               }
+               .gxl-was{
+                 width: 100%;
+                 height: calc(43% - 20px);
+                 overflow: hidden;
+                 .titleText{
+                   float: left;
+                 }
+                 .monthSelect{
+                   float: right;
+                 }
+                 #sixPollution{
+                   width: 100%;
+                   float: left;
+                   height: calc(100% - 30px);
+                 }
+               }
+           }
+       }
+   }
 
-        }
-        .Window_Five {
-            width: 428px;
-            height: 276px;
-            border: solid 1px #428bca;
-            background: #1d2339;
-            float: left;
-            overflow-x: hidden;
-            overflow-y: auto;
-        }
-        .Window_six {
-            width: 480px;
-            height: 202px;
-            border: solid 1px #428bca;
-            background: #1d2339;
-            overflow: hidden;
-            float: left;
-            .tt-text{
-                width: 100%;
-                height: 36px;
-                border-bottom: solid 1px #428bca;
-                line-height: 36px;
-                p{
-                    text-align: left;
-                    padding-left: 10px;
-                }
-            }
-            .tian {
-                display: inline-block;
-                width: 20px;
-            }
-            .data_water1 {
-                margin-top: 8px;
-                width: 158px;
-                height: auto;
-                border-right: solid 1px #1080cc;
-                float: left;
-                p {
-                    color: #fff;
-                    font-size: 14px;
-                    padding-bottom: 4px;
-                }
-                a {
-                    display: inline-block;
-                    width: 100%;
-                    margin-top: 4px;
-                    padding-left: 14px;
-                    color: #9ea9c7;
-                    font-size: 12px;
-                    line-height: 16px;
-                    text-align: left;
-                    overflow:hidden; //超出的文本隐藏
-                    text-overflow:ellipsis; //溢出用省略号显示
-                    white-space:nowrap; //溢出不换行
-                }
-                span {
-                    color: #fff;
-                }
-            }
-            .data_water2 {
-                margin-top: 8px;
-                width: 158px;
-                height: auto;
-                border-right: solid 1px #1080cc;
-                float: left;
-                p {
-                    color: #fff;
-                    font-size: 14px;
-                    padding-bottom: 4px;
-                }
-                a {
-                    display: inline-block;
-                    width: 100%;
-                    margin-top: 4px;
-                    padding-left: 14px;
-                    color: #9ea9c7;
-                    font-size: 12px;
-                    line-height: 16px;
-                    text-align: left;
-                    overflow:hidden; //超出的文本隐藏
-                    text-overflow:ellipsis; //溢出用省略号显示
-                    white-space:nowrap; //溢出不换行
-                }
-                span {
-                    color: #fff;
-                }
-            }
-            .data_water3 {
-                margin-top: 8px;
-                float: left;
-                width: 158px;
-                height: auto;
-                p {
-                    color: #fff;
-                    font-size: 14px;
-                    padding-bottom: 4px;
-                }
-                a {
-                    display: inline-block;
-                    width: 100%;
-                    margin-top: 4px;
-                    padding-left: 14px;
-                    color: #9ea9c7;
-                    font-size: 12px;
-                    line-height: 16px;
-                    text-align: left;
-                    overflow:hidden; //超出的文本隐藏
-                    text-overflow:ellipsis; //溢出用省略号显示
-                    white-space:nowrap; //溢出不换行
-                }
-                span {
-                    color: #fff;
-                    display: inline-block;
-                }
-            }
-        }
-    }
+
+   //媒体查询
+   @media only screen and (min-width: 1500px) {
+       .data_water1,.data_water2,.data_water3{
+           margin-top: 16%!important;
+       }
+   }
 </style>

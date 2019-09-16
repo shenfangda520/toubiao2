@@ -2,16 +2,17 @@
   <div class="ly-tree">
     <div class="t-handle" @click="handleClick">筛选</div>
     <ul>
-      <li v-for="(v,i) in treeOption" v-show="v.visible" :id="('LI_'+ v.code)" :style="'background:'+(v.checked ? '#2494F2' : 'rgba(0, 0, 0, 0.6)')" :data-index="i" :data-type="v.code" @click="liClick">
+      <li v-for="(v,i) in treeOption" v-show="v.visible" :id="('LI_'+ v.code)" :style="'color:'+(v.checked ? '#10B977' : 'rgba(255, 255, 255, 1)')" :data-index="i" :data-type="v.code" @click="liClick">
         <div class="t-item">
           <img :title="v.name" class="t-icon" :src="v.checked ? v.checkedSrc : v.src"/>
-          <span class="t-text">{{v.name}}</span>
-          <select v-show="v.checked" :id="'SELECT_'+v.code" title="" @change="targetChanged" :data-index="i" :style="'display:'+ (v.childs.length ? 'line-block' : 'none')">
+          <span class="t-text" :style="'border-right:'+(v.checked ? 'solid 4px #12DA88' : 'none')">{{v.name}}</span>
+          <select v-show="v.childs.length && v.checked" :id="'SELECT_'+v.code" title="" @change="targetChanged" :data-index="i" :style="'display:'+ (v.childs.length ? 'line-block' : 'none')">
             <option v-for="(c,j) in v.childs">{{c.text}}</option>
           </select>
         </div>
       </li>
     </ul>
+    
     <main-handle></main-handle>
   </div>
 </template>
@@ -28,8 +29,8 @@
             name: '国省控监测',
             code: 'layer_gs',
             layerIndex: 0,
-            checked: true,
-            visible: true,
+            checked: false,
+            visible: false,
             src: 'static/imgs/main/gs.png',
             checkedSrc: 'static/imgs/main/gs_c.png',
             displayName: 'pointname',
@@ -76,7 +77,7 @@
             code: 'layer_cgq_lcs',
             layerIndex: 1,
             checked: false,
-            visible: true,
+            visible: false,
             src: 'static/imgs/main/cg.png',
             checkedSrc: 'static/imgs/main/cg_c.png',
             displayName: 'stationname',
@@ -109,8 +110,8 @@
             layerIndex: 3,
             displayName: 'name',
             checked: false,
-            visible: true,
-            src: 'static/imgs/main/m_cx.png',
+            visible: false,
+            src: 'static/imgs/main/cx.png',
             checkedSrc: 'static/imgs/main/cx_c.png',
             primaryKey: '',
             childs: [{
@@ -129,7 +130,7 @@
             code: 'layer_gd',
             layerIndex: 4,
             checked: false,
-            visible: true,
+            visible: false,
             src: 'static/imgs/main/gd.png',
             checkedSrc: 'static/imgs/main/gd_c.png',
             displayName: 'name',
@@ -160,7 +161,7 @@
             code: 'layer_qy',
             layerIndex: 5,
             checked: false,
-            visible: true,
+            visible: false,
             src: 'static/imgs/main/qy.png',
             checkedSrc: 'static/imgs/main/qy_c.png',
             primaryKey: '',
@@ -175,79 +176,123 @@
               fieldName: 'so2Status'
             }]
           }, {
+            name: '餐饮油烟监测',
+            code: 'layer_cy',
+            layerIndex: 2,
+            checked: false,
+            visible: false,
+            src: 'static/imgs/main/cy.png',
+            checkedSrc: 'static/imgs/main/cy_c.png',
+            primaryKey: '',
+            childs: []
+          },{
+            name: '尾气遥感监测',
+            code: 'layer_wq',
+            layerIndex: 2,
+            checked: false,
+            visible: false,
+            src: 'static/imgs/main/wq.png',
+            checkedSrc: 'static/imgs/main/wq_c.png',
+            primaryKey: '',
+            childs: []
+          },{
+            name: '油气回收在线监测',
+            code: 'layer_yq',
+            layerIndex: 2,
+            checked: false,
+            visible: false,
+            src: 'static/imgs/main/yy.png',
+            checkedSrc: 'static/imgs/main/yy_c.png',
+            primaryKey: '',
+            childs: []
+          },{
+            name: '工地扬尘监控',
+            code: 'layer_sp_gd',
+            layerIndex: 2,
+            checked: false,
+            visible: false,
+            src: 'static/imgs/main/gd_sp.png',
+            checkedSrc: 'static/imgs/main/gd_sp_c.png',
+            primaryKey: '',
+            childs: []
+          }, {
             name: 'TVOC监测',
             code: 'layer_cgq_voc',
             layerIndex: 2,
-            checked: false,
+            checked: true,
             visible: true,
             src: 'static/imgs/mues/sixzb/vocw.png',
             checkedSrc: 'static/imgs/mues/sixzb/vocw_c.png',
             primaryKey: '',
             childs: []
-          }, {
-            name: '散乱污企业',
-            code: 'layer_sp_slw',
-            layerIndex: 9,
+          },{
+            name: '餐饮油烟监控',
+            code: 'layer_sp_cy',
+            layerIndex: 2,
             checked: false,
-            visible: true,
-            hasCamera: true,
-            cameraType: 4,
-            displayName: 'CamName',
+            visible: false,
+            src: 'static/imgs/main/cy_sp.png',
+            checkedSrc: 'static/imgs/main/cy_sp_c.png',
             primaryKey: '',
-            src: 'static/imgs/mues/video/slw.png',
-            checkedSrc: 'static/imgs/mues/video/slw_c.png',
             childs: []
-          }, {
-            name: 'VOCs企业',
+          },{
+            name: 'VOC监控',
             code: 'layer_sp_voc',
-            layerIndex: 10,
+            layerIndex: 2,
             checked: false,
-            visible: true,
-            hasCamera: true,
-            cameraType: 3,
-            displayName: 'CamName',
+            visible: false,
+            src: 'static/imgs/main/voc_sp.png',
+            checkedSrc: 'static/imgs/main/voc_sp_c.png',
             primaryKey: '',
-            src: 'static/imgs/mues/video/voc.png',
-            checkedSrc: 'static/imgs/mues/video/voc_c.png',
             childs: []
-          }, {
+          },{
+            name: '散乱污监控',
+            code: 'layer_sp_slw',
+            layerIndex: 2,
+            checked: false,
+            visible: false,
+            src: 'static/imgs/main/slw_sp.png',
+            checkedSrc: 'static/imgs/main/slw_sp_c.png',
+            primaryKey: '',
+            childs: []
+          },{
+            name: '秸秆焚烧',
+            code: 'layer_sp_fs',
+            layerIndex: 2,
+            checked: false,
+            visible: false,
+            src: 'static/imgs/main/jg_sp.png',
+            checkedSrc: 'static/imgs/main/jg_sp_c.png',
+            primaryKey: '',
+            childs: []
+          },{
             name: '高空五公里',
             code: 'layer_sp_gkw',
             layerIndex: 11,
             checked: false,
-            visible: true,
+            visible: false,
             hasCamera: true,
             cameraType: 5,
             displayName: 'CamName',
             primaryKey: '',
-            src: 'static/imgs/mues/video/gkw.png',
-            checkedSrc: 'static/imgs/mues/video/gkw_c.png',
-            childs: []
-          }, {
-            name: '道路路况',
-            code: 'layer_lk',
-            layerIndex: 8,
-            visible: true,
-            checked: false,
-            src: 'static/imgs/main/lk.png',
-            checkedSrc: 'static/imgs/main/lk_c.png',
-            primaryKey: '',
+            src: 'static/imgs/main/gkw.png',
+            checkedSrc: 'static/imgs/main/gkw_c.png',
             childs: []
           }, {
             name: '大气排放源清单',
             code: 'layer_yqd',
             layerIndex: 6,
             checked: false,
-            visible: true,
+            visible: false,
             src: 'static/imgs/main/yqd.png',
             checkedSrc: 'static/imgs/main/yqd_c.png',
             displayName: 'e',
             primaryKey: '',
             childs: [
-                {
-                    text: 'SO2',
-                    fieldName: 'so2'
-                }, {
+              {
+                text: 'SO2',
+                fieldName: 'so2'
+              }, {
                 text: 'NOX',
                 fieldName: 'nox'
               }, {
@@ -278,51 +323,22 @@
             code: 'layer_yj',
             layerIndex: 7,
             checked: false,
-            visible: true,
+            visible: false,
             src: 'static/imgs/main/yj.png',
             checkedSrc: 'static/imgs/main/yj_c.png',
             primaryKey: '',
             displayField: 'companyname',
             childs: []
           }, {
-            name: '渣土车GPS',
-            code: 'layer_zt',
-            layerIndex: 12,
+            name: '河道监控',
+            code: 'layer_sp_hd',
+            layerIndex: 7,
             checked: false,
             visible: false,
-            src: 'static/imgs/main/zt.png',
-            checkedSrc: 'static/imgs/main/zt_c.png',
+            src: 'static/imgs/main/sp_hd.png',
+            checkedSrc: 'static/imgs/main/sp_hd_c.png',
             primaryKey: '',
-            childs: []
-          }, {
-            name: '环卫车GPS',
-            code: 'layer_hw',
-            layerIndex: 13,
-            checked: false,
-            visible: false,
-            src: 'static/imgs/main/hw.png',
-            checkedSrc: 'static/imgs/main/hw_c.png',
-            primaryKey: '',
-            childs: []
-          }, {
-            name: '加油站在线监测',
-            code: 'layer_jy',
-            layerIndex: 14,
-            checked: false,
-            visible: false,
-            src: 'static/imgs/main/jy.png',
-            checkedSrc: 'static/imgs/main/jy_c.png',
-            primaryKey: '',
-            childs: []
-          }, {
-            name: '全民举报',
-            code: 'layer_qm',
-            layerIndex: 15,
-            checked: false,
-            visible: true,
-            src: 'static/imgs/main/qm.png',
-            checkedSrc: 'static/imgs/main/qm_c.png',
-            primaryKey: '',
+            displayField: 'companyname',
             childs: []
           }],
         hasClose: false,
@@ -332,7 +348,7 @@
       }
     },
     created() {
-
+      this.$store.state.menuData = [];
     },
     mounted() {
 
@@ -341,13 +357,14 @@
 
       //指标切换点击事件
       liClick(e) {
-        let a = 1;
         const _this = this;
         if (e.target.nodeName === 'SELECT' || _this.hasSelect) {
           _this.hasSelect = false;
           return;
         }
+
         let childElement = e.currentTarget;
+        childElement.querySelector('select').selectedIndex = 0;
         let imgElement = childElement.querySelector('img');
         let index = childElement.getAttribute('data-index');
         let type = childElement.getAttribute('data-type');
@@ -356,20 +373,31 @@
         let hasChecked = false;
         let cameraType = item.hasCamera ? item.cameraType : undefined;
         let slePollution = document.getElementById('SELECT_' + item.code);
-        imgElement.getAttribute('src') !== item.src ? (imgElement.src = item.src, childElement.style.backgroundColor = 'rgba(0, 0, 0, 0.6)') : (imgElement.src = item.checkedSrc, childElement.style.backgroundColor = '#2494F2', hasChecked = true);
+        imgElement.getAttribute('src') !== item.src ? (imgElement.src = item.src, childElement.style.color = '#10B977') : (imgElement.src = item.checkedSrc, hasChecked = true);
         !hasChecked && (slePollution && (slePollution.value = (item.childs.length && item.childs[0].text)));
         //hasChecked ? (slePollution.removeAttribute('disabled'), this.checkCount++) : (slePollution.setAttribute('disabled', hasChecked), this.checkCount--);
-        item.childs.length && (item.checked = hasChecked);
+        // item.childs.length && (item.checked = hasChecked);
+        item.checked = hasChecked;
         bus.$emit('targetMainLayer', type, hasChecked, cameraType);
+          //已有对象不添加
+          if(this.$store.state.menuData){
+              //console.log(Array.isArray(this.$store.state.menuData));
+              for(let i=0;i<this.$store.state.menuData.length;i++){
+                  let item = this.$store.state.menuData[i];
+                  if(item.show_xs === type){
+                      //删除选项
+                      let keyarr = this.$store.state.menuData;
+                      for (let k = 0; k < keyarr.length; k++) {
+                          if (keyarr[k].show_xs == type) {
+                              // 删除指定对象
+                              this.removeObjWithArr(keyarr, keyarr[k])
+                          }
+                      }
+                  }
+              }
+          };
         ///动态添加右侧菜单
         if (hasChecked == true && type != 'layer_lk' && type != 'layer_zt' && type != 'layer_hw' && type != 'layer_jy') {
-            //已有对象不添加
-            debugger
-            this.$store.state.menuData.forEach(item=>{
-                if(item.show_xs === type){
-                    return false
-                }
-            })
           //添加对应右侧菜单
           switch (type) {
             case 'layer_gs':
@@ -432,25 +460,47 @@
               });
                 bus.$emit('menuative', '企业');
               break;
-            case 'layer_yqd':
+            case 'layer_cy':
               this.$store.state.menuData.unshift({
-                title: '静态',
-                title_tx: '大气排放源清单',
-                show_xs: 'layer_yqd',
+                title: '餐饮',
+                title_tx: '餐饮油烟监控',
+                show_xs: 'layer_cy',
                 url: 'static/imgs/indeximgs/morenimg/icon_jiayou.png',
                 url_one: 'static/imgs/indeximgs/morenimg/icon_jiayou.png'
               });
-                bus.$emit('menuative', '静态');
+                bus.$emit('menuative', '餐饮');
               break;
-            case 'layer_yj':
+              // add by zhengjingmin
+              case 'layer_wq':
+                  this.$store.state.menuData.unshift({
+                    title: '尾气遥感',
+                    title_tx: '尾气遥感监测',
+                    show_xs: 'layer_wq',
+                    url: 'static/imgs/indeximgs/morenimg/icon_jiayou.png',
+                    url_one: 'static/imgs/indeximgs/morenimg/icon_jiayou.png'
+                  });
+                  bus.$emit('menuative', '尾气遥感');
+                  break;
+              case 'layer_yy':
+                  this.$store.state.menuData.unshift({
+                    title: '油烟回收',
+                    title_tx: '油烟回收在线监测',
+                    show_xs: 'layer_yy',
+                    url: 'static/imgs/indeximgs/morenimg/icon_jiayou.png',
+                    url_one: 'static/imgs/indeximgs/morenimg/icon_jiayou.png'
+                  });
+                  bus.$emit('menuative', '油烟回收');
+                  break;
+            // end by zhengjingmin
+            case 'layer_sp_gd':
               this.$store.state.menuData.unshift({
-                title: '应急',
-                title_tx: '应急清单',
-                show_xs: 'layer_yj',
+                title: '工地扬尘监控',
+                title_tx: '工地扬尘监控',
+                show_xs: 'layer_sp_gd',
                 url: 'static/imgs/indeximgs/morenimg/icon_huanwei.png',
                 url_one: 'static/imgs/indeximgs/morenimg/icon_huanwei.png'
               });
-                bus.$emit('menuative', '应急');
+                bus.$emit('menuative', '工地扬尘监控');
               break;
             case 'layer_sp_slw':
               this.$store.state.menuData.unshift({
@@ -464,34 +514,74 @@
               break;
             case 'layer_sp_voc':
               this.$store.state.menuData.unshift({
-                title: 'VOC视频',
+                title: 'VOC监控',
                 title_tx: 'VOC视频监控',
                 show_xs: 'layer_sp_voc',
                 url: 'static/imgs/indeximgs/morenimg/voc.png',
                 url_one: 'static/imgs/indeximgs/morenimg/voc.png'
               });
-                bus.$emit('menuative', 'VOC视频');
+                bus.$emit('menuative', 'VOC监控');
               break;
-            case 'layer_sp_gkw':
+            case 'layer_sp_cy':
               this.$store.state.menuData.unshift({
-                title: '高空视频',
-                title_tx: '高空五公里视频监控',
-                show_xs: 'layer_sp_gkw',
+                title: '餐饮油烟监控',
+                title_tx: '餐饮油烟监控',
+                show_xs: 'layer_sp_cy',
                 url: 'static/imgs/indeximgs/morenimg/gkw.png',
                 url_one: 'static/imgs/indeximgs/morenimg/gkw.png'
               });
-                bus.$emit('menuative', '高空视频');
+                bus.$emit('menuative', '餐饮油烟监控');
               break;
-            case 'layer_qm':
-              this.$store.state.menuData.unshift({
-                title: '全民举报',
-                title_tx: '全民举报',
-                show_xs: 'layer_qm',
-                url: 'static/imgs/indeximgs/morenimg/quanmin.png',
-                url_one: 'static/imgs/indeximgs/morenimg/quanmin.png'
-              });
-                bus.$emit('menuative', '全民举报');
-              break;
+              case 'layer_sp_fs':
+                  this.$store.state.menuData.unshift({
+                      title: '秸秆焚烧',
+                      title_tx: '秸秆焚烧',
+                      show_xs: 'layer_sp_fs',
+                      url: 'static/imgs/indeximgs/morenimg/gkw.png',
+                      url_one: 'static/imgs/indeximgs/morenimg/gkw.png'
+                  });
+                  bus.$emit('menuative', '秸秆焚烧');
+                  break;
+              case 'layer_sp_hd':
+                  this.$store.state.menuData.unshift({
+                      title: '河道监控',
+                      title_tx: '河道监控',
+                      show_xs: 'layer_sp_hd',
+                      url: 'static/imgs/indeximgs/morenimg/gkw.png',
+                      url_one: 'static/imgs/indeximgs/morenimg/gkw.png'
+                  });
+                  bus.$emit('menuative', '河道监控');
+                  break;
+              case 'layer_qm':
+                  this.$store.state.menuData.unshift({
+                      title: '案件',
+                      title_tx: '案件',
+                      show_xs: 'layer_qm',
+                      url: 'static/imgs/indeximgs/morenimg/anjian.png',
+                      url_one: 'static/imgs/indeximgs/morenimg/anjian.png'
+                  });
+                  bus.$emit('menuative', '案件');
+                  break;
+              case 'layer_yj':
+                  this.$store.state.menuData.unshift({
+                      title: '应急清单',
+                      title_tx: '应急清单',
+                      show_xs: 'layer_yj',
+                      url: 'static/imgs/indeximgs/morenimg/anjian.png',
+                      url_one: 'static/imgs/indeximgs/morenimg/anjian.png'
+                  });
+                  bus.$emit('menuative', '应急清单');
+                  break;
+              case 'layer_yqd':
+                  this.$store.state.menuData.unshift({
+                      title: '大气原清单',
+                      title_tx: '大气原清单',
+                      show_xs: 'layer_yqd',
+                      url: 'static/imgs/indeximgs/morenimg/anjian.png',
+                      url_one: 'static/imgs/indeximgs/morenimg/anjian.png'
+                  });
+                  bus.$emit('menuative', '大气原清单');
+                  break;
               default:
                   bus.$emit('menuative', '统计');
                   break;
@@ -565,7 +655,7 @@
   .ly-tree {
     height: 90%;
     position: absolute;
-    margin: 2.5% 0;
+    margin: 1.5% 0;
   }
 
   ul {
@@ -576,34 +666,40 @@
   }
 
   li {
-    background-color: #fff;
+    background-color: rgba(27,33,67,0.8);
     margin: 0;
     cursor: pointer;
   }
 
   .t-handle {
-    background: #fff;
-    color: #2494F2;
+    /*background: #fff;*/
+    /*color: #2494F2;*/
+    background:#161C3A;
+    /*opacity: .8;*/
+    color:#12DA88;
+    font-size:16px;
     line-height: 38px;
-    opacity: 0.8;
+    /*opacity: 0.8;*/
     cursor: pointer;
   }
 
   .t-item {
     position: relative;
-    height: 32px;
+    height: 30px;
   }
 
   .t-item .t-icon {
     float: left;
     display: inline-block;
     margin: 6px 12px;
+    height:16px;
+    width:16px;
   }
 
   .t-item .t-text {
     float: left;
     width: 120px;
-    line-height: 32px;
+    line-height: 30px;
     text-align: left;
     vertical-align: baseline;
     white-space: nowrap;
@@ -617,5 +713,7 @@
     float: right;
     border: none;
     position: absolute;
+    background:#1B2143;
+    color:#fff;
   }
 </style>

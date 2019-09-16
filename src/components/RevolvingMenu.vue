@@ -9,7 +9,7 @@
                     <li style="z-index: 996"><a @click="chuandiclick('SKJZB')" title="省控点均值比"><span class="icon-sjzb"></span></a></li>
                     <li style="z-index: 994"><a @click="chuandiclick('GDYTJ')" title="固定源统计"><span class="icon-gdytj"></span></a></li>
                     <li style="z-index: 992"><a @click="chuandiclick('XZKQZ')" title="乡镇空气站"><span class="icon-xzkqz"></span></a></li>
-                    <li style="z-index: 990"><a href="#/pollution" title="污染日历"><span class="icon-wrrl"></span></a></li>
+                    <!--<li style="z-index: 990"><a href="#/pollution" title="污染日历"><span class="icon-wrrl"></span></a></li>-->
                 </ul>
             </div>
         </div>

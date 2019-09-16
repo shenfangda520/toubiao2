@@ -2,15 +2,15 @@
 <!--后台管理-渣土车-->
 <template>
     <div class="businessOperation">
-		<!--------------右侧数据展示------>
+		<!--右侧数据展示-->
 		<div id="right">
-			<!----------渣土车-->
+			<!--渣土车-->
 			<div class="box">
                 <div class="warning">
                     <a>渣土车</a>
                 </div>
             </div>
-            <!-----------查询部分------->
+            <!--查询部分-->
 			<div class="search">
 				<span>车牌号码</span><el-input v-model="carNumber" placeholder="请输入内容"></el-input>
 				<span>所属单位</span><el-input v-model="unitName" placeholder="请输入内容"></el-input>
@@ -19,7 +19,7 @@
 				<el-button type="primary" class='btns' @click="">导出</el-button>
 			</div>
 			
-			<!--------------列表部分---------->
+			<!--列表部分-->
 			<div class="box">
                 <div class="warning">
                     <a>列表</a>
@@ -76,7 +76,7 @@
 			      :total="totalCount">
 			    </el-pagination>
 			</div>
-			<!--------------添加弹框部分--------------->
+			<!--添加弹框部分-->
 			<div class="popUp" v-if="isNew">
 	            <div class="mask"></div>
 	            <div class="succ-pop">
@@ -141,7 +141,7 @@
 	               </div>
 	            </div>
 	        </div>
-	        <!--------------编辑弹框部分--------------->
+	        <!--编辑弹框部分-->
 			<div class="popUp" v-if="isEdit">
 	            <div class="mask"></div>
 	            <div class="succ-pop">

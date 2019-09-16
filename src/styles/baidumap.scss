@@ -55,6 +55,12 @@
   display: none;
 }
 
+.BMapLib_bubble_content{
+  .highcharts-button-symbol,.highcharts-button-box{
+    display: none!important;
+  }
+}
+
 /*应急清单下弹出框样式*/
 .Emergencylist {
   .BMapLib_bubble_top {

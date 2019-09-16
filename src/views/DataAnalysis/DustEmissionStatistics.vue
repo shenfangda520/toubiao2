@@ -244,7 +244,7 @@
                 let ndt7 = new Date(ndt);
                 ndt7.setDate(ndt.getDate() - 7);
                 this.$axios({
-                    url: 'http://117.119.97.150:8063/api/Dust/GetWindDirectionPie',
+                    url: 'http://58.132.207.211:8063/api/Dust/GetWindDirectionPie',
                     //url: 'http://117.119.97.150:8063/api/Dust/GetWindDirectionPie',
                     method: 'GET',
                     headers: {
@@ -374,7 +374,7 @@
             },
             initlistData(params) {
                 this.$axios({
-                    url: 'http://117.119.97.150:8063/api/Dust/GetDustStatistics',
+                    url: 'http://58.132.207.211:8063/api/Dust/GetDustStatistics',
                     //url: 'http://117.119.97.150:8063/api/Dust/GetDustStatistics',
                     method: 'GET',
                     headers: {

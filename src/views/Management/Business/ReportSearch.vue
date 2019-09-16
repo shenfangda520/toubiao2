@@ -46,33 +46,33 @@
 			    :data="tableData"
 				border
 			    style="width: 100%">
-			    <!--<el-table-column-->
-			      <!--prop="xzname"-->
-			      <!--label="所属乡镇"-->
-			      <!--&gt;-->
-			    <!--</el-table-column>-->
-			    <!--<el-table-column-->
-			      <!--prop="czname"-->
-			      <!--label="所属村庄"-->
-			      <!--&gt;-->
-			    <!--</el-table-column>-->
 			    <el-table-column
-			      prop="name"
+			      prop="Town"
+			      label="所属乡镇"
+			      >
+			    </el-table-column>
+			    <el-table-column
+			      prop="Country"
+			      label="所属村庄"
+			      >
+			    </el-table-column>
+			    <el-table-column
+			      prop="GridMember"
 			      label="巡查员姓名"
 			      >
 			    </el-table-column>
 			    <el-table-column
-			      prop="sum"
+			      prop="SubmitCount"
 			      label="上报案件数量">
 			    </el-table-column>
-				<el-table-column
-						prop="distortNum"
-						label="误报案件数量">
-				</el-table-column>
-			    <el-table-column
-			      prop="per"
-			      label="误报率">
-			    </el-table-column>
+				<!--<el-table-column-->
+						<!--prop="distortNum"-->
+						<!--label="误报案件数量">-->
+				<!--</el-table-column>-->
+			    <!--<el-table-column-->
+			      <!--prop="per"-->
+			      <!--label="误报率">-->
+			    <!--</el-table-column>-->
 			</el-table>
 		   	<div class="page">
 			    <span class="demonstration">共找到{{totalCount}}条记录</span>
@@ -99,6 +99,7 @@
         data() {
             return {
                 //
+                patrollerName:'',
                 CaseStartTime:'',
                 CaseEndTime:'',
 		        tableData:[],
@@ -107,10 +108,8 @@
 				startTime:'',
 				endTime:'',
 				totalCount:1,
-				InfoData:[],
-              patrollerName:'',
-              CityData:[],
-
+                allData:[],
+				InfoData:[]
             }
         },
         mounted() {
@@ -132,8 +131,8 @@
       		},
 			//
             handleCurrentChange(val){
-              this.setPageTable(10, val);
         	    console.log(`这是 ${val} 页码`);
+                this.setPageTable(10, val);
 			},
       		//获取列表
       		GetMonitoringDay(){
@@ -141,41 +140,40 @@
                 let startTime = this.startTime;
                 let endTime = this.endTime;
                 let name = this.patrollerName;
-      			this.CityData = [];
+      			this.allData = [];
                 //巡查员案件上报统计
                 api.PostCaseInfoGroupByUser(startTime,endTime,name).then(result=>{
       				console.log(result)
       				if(result){
-      					let InfoData = result.data.data;
-      					_this.totalCount = result.data.data.length;
+      					let InfoData = result.data.Data;
+      					_this.totalCount = result.data.Data.length;
       					console.log(InfoData)
       					if(InfoData){
       						InfoData.forEach(item=>{
 								let tableData = {};
-                                 tableData.distortNum = item.distortNum;//
-                                 tableData.sum = item.sum;//
-                                 tableData.name = item.name;//
-								 tableData.per = item.per;//
-		                        _this.CityData.push(tableData);
+                                 tableData.Country = item.Country || '--';//
+                                 tableData.GridMember = item.GridMember || '--';//
+                                 tableData.SubmitCount = item.SubmitCount || '--';//
+								 tableData.Town = item.Town || '--';//
+		                        _this.allData.push(tableData);
 							})
-                  this.setPageTable(10, 1);
       					}
 
       				}
+                    this.setPageTable(10, 1);
 				});
       		},
-          //分页数据
-          setPageTable(pageSize, pageNum) {
-            let i = 1;
-            let rtValue = [];
-            let startNum = pageSize * (pageNum - 1);
-            for (let i = 0; i < pageSize; i++) {
-              if ((startNum + i + 1) > this.CityData.length)
-                break;
-              rtValue.push(this.CityData[startNum + i]);
-            }
-            this.tableData = rtValue;
-          },
+            //分页效果
+            setPageTable(pageSize, pageNum) {
+                let rtValue = [];
+                let startNum = pageSize * (pageNum - 1);
+                for (let i = 0; i < pageSize; i++) {
+                    if ((startNum + i + 1) > this.allData.length)
+                        break;
+                    rtValue.push(this.allData[startNum + i]);
+                }
+                this.tableData = rtValue;
+            },
       		//导出
       		GetExportCase(){
 				let startTime = this.startTime;
