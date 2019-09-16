@@ -179,11 +179,11 @@ export default {
         break;
       case 'LAYER_CGQ_VOC':
         cf = apiConfig[0];
-        url = cf.site + cf.port + cf.path + '/XhHb/GetXhHbPointsVoc';
+        url = 'http://gkpt.zq12369.com:8016/api/XhHb/GetXhHbPointsVoc';//cf.site + cf.port + cf.path + '/XhHb/GetXhHbPointsVoc';
         break;
         case 'LAYER_CGQ_VOC_INFO':
         cf = apiConfig[0];
-        url = cf.site + cf.port + cf.path + '/XhHb/GetXhHbPointsVoc';
+        url = 'http://gkpt.zq12369.com:8016/api/XhHb/GetXhHistoriesVoc';//cf.site + cf.port + cf.path + '/XhHb/GetXhHbPointsVoc';
         break;
     }
     return url;
