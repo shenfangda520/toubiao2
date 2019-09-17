@@ -1837,7 +1837,7 @@
           '        <div class="key" style=\'color:' + (data.tVOC_V > 300 ? '#fff' : '#000') + ';background-color:' + getVOCLeveColor(data.tVOC_V) + '\'>TVOC</div>\n' +
           '        <div class="value">' + (this.hasNullOrUndefined(data.tVOC_V) ? data.tVOC_V : '--') + '</div>\n' +
           '    </div>\n' +
-          '</div><div class="chart"><div id=\'citychart_' + data.stationId + '\' style=\'width:100%;height:110px;\'></div></div>' +
+          '</div><div class="chart"><div id=\'citychart_' + data.stationId + '\' style=\'width:100%;height:110px;display:none;\'></div></div>' +
           '<div class="Introduce"><div class="Net">所属网格：' + gridName + '</div><div class="Person">网格员代表：' + memberName + '</div><div>联系方式：' + tel + '</div></div>'
       },
 
