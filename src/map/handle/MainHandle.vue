@@ -796,25 +796,26 @@
           let pt = new BMap.Point(value.lo || value.lng || value.Longitude || value.longitude, value.la || value.lat || value.Latitude || value.latitude);
           let marker = type.toUpperCase() === 'LAYER_GS' ? t.getGSValueLabel(pt, value, fieldName) : t.getMarker(pt, t.getMarkerState(value, type, fieldName), type, value[displayName] || undefined);
 
-          let label = t.getDisplayFieldLabel(pt, value, displayName);
-          (label && type.toUpperCase() === 'LAYER_GS') && (t.map.addOverlay(label), this.hasMarkerVisible(value) ? label.show() : label.hide(), label.attributes = value, label.valueField = fieldName, label.layerType = type, label.displayField = displayName, t.lsMarkers.push({
-            marker: label,
-            type: type
-          }));
-          //获取警报Label
-          let labelRed = t.getLabelRed(value, type, fieldName, pt, this.browser);
-          (labelRed && (value.isLf || true) && ((parseInt(value.dataLevel) === 1) || true)) && (t.lsRedLabels.push({
-            label: labelRed,
-            type: type,
-            attributes: value
-          }), t.map.addOverlay(labelRed), t.map.getZoom() > 9 ? labelRed.show() : labelRed.hide());
-
-          //加载数值Label
-          let labelValue = t.setValueLabel(value, fieldName, type, pt);
-          (labelValue && (type.toUpperCase() !== 'LAYER_GS' && type.toUpperCase() !== 'LAYER_QY')) && (t.lsValueLabels.push({
-            label: labelValue,
-            type: type
-          }), marker.setLabel(labelValue));//t.map.addOverlay(labelValue));
+          // //0917
+          // let label = t.getDisplayFieldLabel(pt, value, displayName);
+          // (label && type.toUpperCase() === 'LAYER_GS') && (t.map.addOverlay(label), this.hasMarkerVisible(value) ? label.show() : label.hide(), label.attributes = value, label.valueField = fieldName, label.layerType = type, label.displayField = displayName, t.lsMarkers.push({
+          //   marker: label,
+          //   type: type
+          // }));
+          // //获取警报Label
+          // let labelRed = t.getLabelRed(value, type, fieldName, pt, this.browser);
+          // (labelRed && (value.isLf || true) && ((parseInt(value.dataLevel) === 1) || true)) && (t.lsRedLabels.push({
+          //   label: labelRed,
+          //   type: type,
+          //   attributes: value
+          // }), t.map.addOverlay(labelRed), t.map.getZoom() > 9 ? labelRed.show() : labelRed.hide());
+          //
+          // //加载数值Label
+          // let labelValue = t.setValueLabel(value, fieldName, type, pt);
+          // (labelValue && (type.toUpperCase() !== 'LAYER_GS' && type.toUpperCase() !== 'LAYER_QY')) && (t.lsValueLabels.push({
+          //   label: labelValue,
+          //   type: type
+          // }), marker.setLabel(labelValue));//t.map.addOverlay(labelValue));
 
           marker && ((type.toUpperCase() !== 'LAYER_YQD' && t.map.addOverlay(marker)), marker.attributes = value, marker.valueField = fieldName, marker.layerType = type, marker.displayField = displayName, t.lsMarkers.push({
             marker: marker,
@@ -1462,7 +1463,7 @@
           }
 
             (this.searchInfoWindow = new BMapLib.SearchInfoWindow(t.map, res || '无数据', {
-              title: '<sapn style="font-size:16px" ><b title="' + (attributes[displayName] || '') + '">' + (attributes[displayName] || '') + '</b>' + '</span><span id="vocvideo" class="class-vidoes"  style="display:' + (['LAYER_CGQ_VOC', 'LAYER_SP_GD', 'LAYER_SP_CY', 'LAYER_SP_VOC', 'LAYER_SP_SLW', 'LAYER_SP_FS', 'LAYER_SP_HD'].indexOf(ptType.toUpperCase()) > -1 ? 'block' : 'none') + '">视频点击播放</span>',             //标题
+              title: '<sapn style="font-size:16px" ><b title="' + (attributes[displayName] || '') + '">' + (attributes[displayName] || '') + '</b>' + '</span><span id="vocvideo" class="class-vidoes"  style="display:' + (['LAYER_CGQ_VOC', 'LAYER_SP_GD', 'LAYER_SP_CY', 'LAYER_SP_VOC', 'LAYER_SP_SLW', 'LAYER_SP_FS', 'LAYER_SP_HD'].indexOf(ptType.toUpperCase()) > -1 ? 'none' : 'none') + '">视频点击播放</span>',             //标题0917
               width: infoWidth,
               height: "auto",
               enableAutoPan: true,
