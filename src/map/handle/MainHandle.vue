@@ -1303,26 +1303,26 @@
         let m = new BMap.Marker(point, {
           offset: (attributes.hasOwnProperty('ptType')) && (attributes.ptType.toUpperCase() === 'LAYER_GS' ? (new BMap.Size(-39, 18)) : (new BMap.Size(-39, 38))) || (new BMap.Size(0, 0))
         });
-        if (attributes.hasOwnProperty('ptType') && (attributes.ptType.toUpperCase() === 'LAYER_SP' || attributes.ptType.toUpperCase() === 'LAYER_SP_GKW')) {
+        if (attributes.hasOwnProperty('ptType') && (attributes.ptType.toUpperCase() === 'LAYER_SP_SLW' || attributes.ptType.toUpperCase() === 'LAYER_SP_GKW')) {
 
           // t.VideoPlayback(attributes.CamIndexCode);//attributes.DevIndexCode
-          t.VideoPlayback('0', attributes.name, attributes.cameraCode);
+          // t.VideoPlayback('0', attributes.name, attributes.cameraCode);
 
-          // let res = t.setCameraWindow(attributes);
-          // (this.searchInfoWindow = new BMapLib.SearchInfoWindow(t.map, res, {
-          //   title: '<sapn style="font-size:16px"><b>' + (attributes['CamName'] || '') + ' - ' + (attributes['TypeName'] || '') + '</b>' + '</span>',             //标题
-          //   width: 520,
-          //   height: 424,
-          //   enableAutoPan: true,
-          //   enableSendToPhone: false,
-          //   searchTypes: []
-          // }));
+          let res = t.setCameraWindow(attributes);
+          (this.searchInfoWindow = new BMapLib.SearchInfoWindow(t.map, res, {
+            title: '<sapn style="font-size:16px"><b>' + (attributes['CamName'] || '') + ' - ' + (attributes['TypeName'] || '') + '</b>' + '</span>',             //标题
+            width: 520,
+            height: 424,
+            enableAutoPan: true,
+            enableSendToPhone: false,
+            searchTypes: []
+          }));
           //视频关闭窗口
           //this.searchInfoWindow.addEventListener('close',function(){
           // console.log('关闭开关打开')
           // document.getElementById('v-frame').contentWindow.OnStopPreview();
           //});
-          // this.searchInfoWindow.open(m);
+          this.searchInfoWindow.open(m);
         } else if (attributes.hasOwnProperty('ptType') && (attributes.ptType.toUpperCase() === 'LAYER_YJ')) {
           let res = t.setEmergencyWindow(attributes);
           let imgUrl = '/static/imgs/main/yj-' + attributes.whetherpeak + '-' + attributes.buttonstate + '.png';
@@ -2378,7 +2378,8 @@
 
       //设置摄像头IFrame
       setCameraWindow(data) {
-        return '<iframe id="v-frame" style="height:100%;width:100%;border:none;" src="/static/video/video.html?camIndexCode=' + data['CamIndexCode'] + '&devIndexCode=' + data['DevIndexCode'] + '&area=' + data['Area'] + '&type=' + data['Type'] + '&name=' + data['CamName'] + '&panyname=' + data['CompanyName'] + '"></iframe>';
+        // return '<iframe id="v-frame" style="height:100%;width:100%;border:none;" src="/static/video/video.html?camIndexCode=' + data['CamIndexCode'] + '&devIndexCode=' + data['DevIndexCode'] + '&area=' + data['Area'] + '&type=' + data['Type'] + '&name=' + data['CamName'] + '&panyname=' + data['CompanyName'] + '"></iframe>';
+        return `<div style="height:100%;width:100%;">123</div>`
       },
 
       //设置应急清单Iframe
