@@ -433,7 +433,7 @@
             displayName = 'name';
             let urlFS = RequestHandle.getRequestUrl(uppercaseType);
             lsUrl.push(urlFS);
-            requestType = 'POST';
+            requestType = 'get';
             break;
           case 'LAYER_CGQ_LCS'://六参数
             //pmsKey = uppercaseType === 'LAYER_CG' ? undefined : (uppercaseType === 'LAYER_CGQ_LCS' ? '' : (uppercaseType === 'LAYER_CGQ_GSX' ? '' : (uppercaseType === 'LAYER_CGQ_VOC' ? '' : undefined)));
@@ -1083,17 +1083,17 @@
             }
             break;
           case 'LAYER_SP_SLW':
-            level = -1;
-            const casenum = parseInt(data['sunnum']);
-            if (casenum < 1) {
-              level = 2;
-            }
-            else if (casenum >= 1 && casenum < 3) {
-              level = 3;
-            }
-            else if (casenum >= 3) {
-              level = 4;
-            }
+            level = 1;
+            // const casenum = parseInt(data['sunnum']);
+            // if (casenum < 1) {
+            //   level = 2;
+            // }
+            // else if (casenum >= 1 && casenum < 3) {
+            //   level = 3;
+            // }
+            // else if (casenum >= 3) {
+            //   level = 4;
+            // }
             break;
           case 'LAYER_SP_VOC':
           case 'LAYER_SP_CY':

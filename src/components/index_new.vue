@@ -2,10 +2,10 @@
     <div class="Paneldataindex">
         <!--首页面板-->
         <div class="radiolist">
-            <el-radio-group v-model="radio1">
-              <el-radio-button label="TVOC在线监测"></el-radio-button>
-              <el-radio-button label="VOC视频监控"></el-radio-button>
-              <el-radio-button label="分配记电系统"></el-radio-button>
+            <el-radio-group v-model="radioValue" @change="changeEvent">
+              <el-radio-button label="1">TVOC在线监测</el-radio-button>
+              <el-radio-button label="2">VOC视频监控</el-radio-button>
+              <el-radio-button label="3">分配记电系统</el-radio-button>
             </el-radio-group>
         </div>
     </div>
@@ -20,7 +20,7 @@
         name: 'paneldata',
         data() {
             return {
-               radio1:'TVOC在线监测'
+              radioValue:'1'
             }
         },
         activated() {},
@@ -36,8 +36,20 @@
             
         },
         methods: {
-
-          
+          changeEvent(l){
+            switch(parseInt(l)){
+              case 1:
+                bus.$emit('targetMainLayer', 'layer_cgq_voc', true);
+                bus.$emit('targetMainLayer', 'LAYER_SP_SLW', false);
+                break;
+              case 2:
+                bus.$emit('targetMainLayer', 'layer_cgq_voc', false);
+                bus.$emit('targetMainLayer', 'LAYER_SP_SLW', true);
+                break;
+              case 3:
+                break;
+            }
+          }
         },
         components: {}
     }

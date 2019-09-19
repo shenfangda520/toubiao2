@@ -116,10 +116,10 @@ export default {
         cf = apiConfig[3];
         url = cf.site + cf.port + cf.path + 'guangyang/vocs/info';
         break;
-      case 'LAYER_SP_SLW'://散乱污视频
-        cf = apiConfig[3];
-        url = cf.site + cf.port + cf.path + 'guangyang/company/getCompanyCasenum?type=2';
-        break;
+      // case 'LAYER_SP_SLW'://散乱污视频
+      //   cf = apiConfig[3];
+      //   url = cf.site + cf.port + cf.path + 'guangyang/company/getCompanyCasenum?type=2';
+      //   break;
       case 'LAYER_SP_SLW_INFO'://散乱污视频信息
         cf = apiConfig[3];
         url = cf.site + cf.port + cf.path + 'guangyang/company/getCompanyCameras';
@@ -184,6 +184,9 @@ export default {
         case 'LAYER_CGQ_VOC_INFO':
         cf = apiConfig[0];
         url = 'http://gkpt.zq12369.com:8016/api/XhHb/GetXhHistoriesVoc';//cf.site + cf.port + cf.path + '/XhHb/GetXhHbPointsVoc';
+        break;
+      case 'LAYER_SP_SLW':
+        url = '../../static/data/videos.json';
         break;
     }
     return url;
