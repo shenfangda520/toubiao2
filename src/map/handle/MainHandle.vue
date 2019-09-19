@@ -2379,7 +2379,20 @@
       //设置摄像头IFrame
       setCameraWindow(data) {
         // return '<iframe id="v-frame" style="height:100%;width:100%;border:none;" src="/static/video/video.html?camIndexCode=' + data['CamIndexCode'] + '&devIndexCode=' + data['DevIndexCode'] + '&area=' + data['Area'] + '&type=' + data['Type'] + '&name=' + data['CamName'] + '&panyname=' + data['CompanyName'] + '"></iframe>';
-        return `<div style="height:100%;width:100%;">123</div>`
+        return `<div style="height:100%;width:100%;">
+<video style="width: 100%;height: calc(100% - 100px)" src="../../static/videos/${data.id}.mp4" muted autoplay loop controls>
+                        您的浏览器不支持视频播放；请升级浏览器
+                    </video>
+             <div class="vdimages">
+                <div class="rowclass"><span>名称：</span>${data.name}</div>
+                <div class="rowclass"><span>地址：</span>${data.add}</div>
+                <div class="rowclass">
+                    <span>联系人：</span>${data.Contact}
+                    <span class="lxfs">联系方式：</span>${data.Phone}
+                </div>
+                <div class="rowclass"><span>治理设备运行状态：</span>${data.openstatus}</div>
+            </div>
+        </div>`
       },
 
       //设置应急清单Iframe
@@ -3272,7 +3285,21 @@
   * {
     font-family: 'Microsoft YaHei'
   }
-
+  .vdimages{
+      width: 90%;
+      height: auto;
+      margin: 10px auto;
+      border: solid 1px #c8c9cc;
+      border-bottom:none;
+  }
+  .vdimages .rowclass{
+      line-height: 20px;
+      padding-left: 20px;
+      border-bottom: solid 1px #c8c9cc;
+  }
+  .rowclass .lxfs{
+      padding-left: 40px;
+  }
   .class-vidoes {
     display: inline-block;
     float: right;
